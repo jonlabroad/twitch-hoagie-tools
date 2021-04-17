@@ -3,8 +3,6 @@ import ChatParser from "./ChatParser";
 
 const twitchChatUrl = "wss://irc-ws.chat.twitch.tv:443";
 
-//const Websockets = require('ws');
-
 interface ChatEvent {
     data: string
 }
@@ -27,23 +25,21 @@ export default class TwitchChatClient {
 
     connect() {
         console.log(`Connecting to ${twitchChatUrl}`);
-        this.ws = new WebSocket(twitchChatUrl);
-        this.ws.onopen = this.onConnect.bind(this);
-        this.ws.onclose = this.onDisconnect.bind(this);
-        this.ws.onmessage = (event: ChatEvent) => {
-            this.pong(event.data);
-            const msg = event.data;
-            console.log(msg);
+        if (!this.connected) {
+            this.ws = new WebSocket(twitchChatUrl);
+            this.ws.onopen = this.onConnect.bind(this);
+            this.ws.onclose = this.onDisconnect.bind(this);
+            this.ws.onmessage = (event: ChatEvent) => {
+                this.pong(event.data);
+                const msg = event.data;
+                console.log(msg);
 
-            const parsedMessage = ChatParser.parse(msg);
-            if (parsedMessage) {
-                this.onMessage({
-                    username: msg.slice(1, msg.indexOf('!')),
-                    message: msg.slice(msg.lastIndexOf(':') + 1),
-                    timestamp: new Date(),
-                });
-            }
-        }
+                const parsedMessage = ChatParser.parse(msg);
+                if (parsedMessage) {
+                    this.onMessage(parsedMessage);
+                }
+            } 
+        } 
     }
 
     disconnect() {

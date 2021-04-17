@@ -1,5 +1,6 @@
 import AlertType from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
+import StreamEvent from "../events/StreamEvent";
 
 export interface StateContextType {
     dispatch: any,
@@ -16,6 +17,9 @@ export const defaultAppState: AppState = {
     },
     alert: {
         alerts: []
+    },
+    event: {
+        events: []
     }
 };
 
@@ -26,6 +30,7 @@ export interface AppState {
     isLoggedIn: boolean;
     chat: ChatState;
     alert: AlertState;
+    event: EventState;
 }
 
 export interface ChatState {
@@ -35,6 +40,10 @@ export interface ChatState {
 
 export interface AlertState {
     alerts: AlertType[];
+}
+
+export interface EventState {
+    events: StreamEvent[];
 }
 
 export interface ModAlert {

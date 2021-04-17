@@ -12,7 +12,7 @@ export const AlertCard = (props: AlertCardProps) => {
     const shoutoutAlert = props.alert as ShoutoutAlertType;
     return <FlexRow className="alert-card">
         <div className="alert-avatar">
-            <img src={shoutoutAlert.userData[0].profile_image_url} />
+            <img src={shoutoutAlert.userData.profile_image_url} />
         </div>
         <div className="alert-username">
             {shoutoutAlert.message?.username}

@@ -11,6 +11,7 @@ import { appStateReducer, LoginAction } from "../state/AppStateReducer";
 import CacheManager from "../util/CacheManager";
 import { AlertContainer } from "./alerts/AlertContainer";
 import { ChatMessage, SimpleChatDisplay } from "./chat/SimpleChatDisplay";
+import { EventsContainer } from "./events/EventsContainer";
 
 export const clientId = "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
 const scopes = "chat:read chat:edit"
@@ -91,6 +92,7 @@ export const MainPage = (props: MainPageProps) => {
                 />
 */}
                 <AlertContainer />
+                <EventsContainer />
             </StateContext.Provider>
         </AlertContext.Provider>
     </React.Fragment>

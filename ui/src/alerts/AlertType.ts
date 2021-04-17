@@ -1,4 +1,5 @@
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
+import { UserData } from "../service/TwitchClientTypes";
 
 export default abstract class AlertType {
     type: "shoutout" | "generic" = "generic";
@@ -14,13 +15,15 @@ export default abstract class AlertType {
 }
 
 export class ShoutoutAlertType extends AlertType {
-    userData: any;
+    userData: UserData;
     channelData: any;
 
-    constructor(message: ChatMessage, userData: any, channelData: any) {
+    constructor(message: ChatMessage, userData: UserData, channelData: any) {
         super(message);
         this.type = "shoutout";
         this.userData = userData;
         this.channelData = channelData;
+
+        this.key = () => `${this.type}_${this?.userData.login ?? ""}`;
     }
 }

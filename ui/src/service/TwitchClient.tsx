@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import NodeCache from "node-cache";
 import { clientId } from "../components/MainPage";
 import CacheManager from "../util/CacheManager";
+import { UserData } from "./TwitchClientTypes";
 
 export interface ValidatedSession {
     expires_in: number
@@ -33,7 +34,7 @@ export default class TwitchClient {
         };
     }
 
-    async getUsers(usernames: string[]): Promise<any[]> {
+    async getUsers(usernames: string[]): Promise<UserData[]> {
         const data = await this.getRequest(`https://api.twitch.tv/helix/users?${usernames.map(username => `login=${username}&`)}`);
         return data.data;
     }

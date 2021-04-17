@@ -1,13 +1,22 @@
 import AlertType from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
+import StreamEvent from "../events/StreamEvent";
 import { AppState } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alert" | "add_chat_message" | "login";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "login";
 }
 
 export interface AddAlertAction extends AppStateAction {
-    alert: AlertType;
+    alerts: AlertType[];
+}
+
+export interface RemoveAlertAction extends AppStateAction {
+    alerts: AlertType[];
+}
+
+export interface AddEventAction extends AppStateAction {
+    event: StreamEvent;
 }
 
 export interface AddChatMessageAction extends AppStateAction {
@@ -22,19 +31,34 @@ export interface LoginAction extends AppStateAction {
 
 export const appStateReducer = (state: AppState, action: AppStateAction): AppState => {
     switch (action.type) {
-        case "add_alert": {
+        case "add_alerts": {
             const addAlertAction = action as AddAlertAction;
-            // Do not add if it already exists
-            const existing = state.alert.alerts.find(alert => alert.key() === addAlertAction.alert.key());
-            if (!existing) {
-                return {
-                    ...state,
-                    alert: {
-                        alerts: [...state.alert.alerts, addAlertAction.alert],
-                    }
+            const newAlerts = addAlertAction.alerts.filter(a => !state.alert.alerts.find(o => a.key() === o.key()));
+            return {
+                ...state,
+                alert: {
+                    alerts: [...state.alert.alerts, ...newAlerts],
                 }
             }
-            break;
+        }
+        case "remove_alerts": {
+            const removeAlertAction = action as RemoveAlertAction;
+            const newAlerts = state.alert.alerts.filter(a => !removeAlertAction.alerts.find(o => a.key() === o.key()));
+            return {
+                ...state,
+                alert: {
+                    alerts: newAlerts,
+                }
+            }
+        }
+        case "add_event": {
+            const addEventAction = action as AddEventAction;
+            return {
+                ...state,
+                event: {
+                    events: [...state.event.events, addEventAction.event],
+                }
+            }
         }
         case "add_chat_message": {
             const addChatMsgAction = action as AddChatMessageAction;
