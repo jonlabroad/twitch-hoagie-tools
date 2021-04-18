@@ -27,8 +27,12 @@ export default class AlertGenerator {
     async checkForShoutOut(msg: ChatMessage): Promise<ShoutoutAlertType[]> {
         const userData = await this.twitchClient.getUsers([msg.username]);
         const channelData = await this.twitchClient.getChannel(userData[0].id);
+        const follows = await this.twitchClient.getFollows({
+            toId: userData[0].id,
+        });
+        console.log({follows});
         if (userData[0].broadcaster_type === "affiliate" || userData[0].broadcaster_type === "partner" || msg.username === "hoagiebot5000") {
-            return [new ShoutoutAlertType(msg, userData[0], channelData)];
+            return [new ShoutoutAlertType(msg, userData[0], channelData[0], follows)];
         }
         return [];
     }

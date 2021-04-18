@@ -1,6 +1,6 @@
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 
-export type StreamEventType = "shoutout" | "generic"
+export type StreamEventType = "shoutout" | "ignore" | "generic"
 
 export default abstract class StreamEvent {
     type: StreamEventType = "generic";
@@ -17,4 +17,16 @@ export class ShoutoutStreamEvent extends StreamEvent {
         this.chatMsg = chat;
         this.username = username;
     } 
+}
+
+export class IgnoreStreamEvent extends StreamEvent {
+    ignoreType: string;
+    username: string;
+
+    constructor(ignoreType: StreamEventType, username: string) {
+        super();
+        this.type = "ignore"
+        this.ignoreType = ignoreType;
+        this.username = username;
+    }
 }

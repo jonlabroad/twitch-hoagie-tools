@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import NodeCache from "node-cache";
 import { clientId } from "../components/MainPage";
 import CacheManager from "../util/CacheManager";
-import { UserData } from "./TwitchClientTypes";
+import { ChannelData, UserData, UsersFollows } from "./TwitchClientTypes";
 
 export interface ValidatedSession {
     expires_in: number
@@ -43,8 +43,21 @@ export default class TwitchClient {
         return await this.getRequest(`https://api.twitch.tv/helix/streams?user_login=${username}`);
     }
 
-    async getChannel(broadcasterId: string): Promise<any> {
-        return await this.getRequest(`https://api.twitch.tv/helix/channels?broadcaster_id=${broadcasterId}`);
+    async getChannel(broadcasterId: string): Promise<ChannelData[]> {
+        const data = await this.getRequest(`https://api.twitch.tv/helix/channels?broadcaster_id=${broadcasterId}`);
+        return data.data;
+    }
+
+    async getFollows(props: { toId?: string, fromId?: string, max?: number, cursor?: string }): Promise<UsersFollows> {
+        const { toId, fromId, max, cursor } = props;
+        let query = [];
+        query.push(toId ? `to_id=${toId}` : '');
+        query.push(fromId ? `from_id=${fromId}` : '');
+        query.push(max ? `first=${max}` : '');
+        query.push(cursor ? `after=${cursor}` : '');
+        const request = `https://api.twitch.tv/helix/users/follows?${query.join("&")}`;
+        const data = await this.getRequest(request);
+        return data;
     }
 
     async getRequest(request: string) {

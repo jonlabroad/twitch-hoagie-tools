@@ -86,11 +86,6 @@ export const MainPage = (props: MainPageProps) => {
                     </Button>}
                     </Toolbar>
                 </AppBar>
-{/*
-                <SimpleChatDisplay
-                    messages={appState.chat.messages}
-                />
-*/}
                 <AlertContainer />
                 <EventsContainer />
             </StateContext.Provider>

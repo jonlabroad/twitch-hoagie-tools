@@ -26,7 +26,6 @@ export const EventsContainer = (props: EventsContainerProps) => {
         async function processMsg() {
             if (lastMessage) {
                 const events = await eventGenerator.current.fromChatMessage(lastMessage);
-                console.log({events})
                 events.forEach(ev => {
                     stateContext.dispatch({
                         type: "add_event",
@@ -39,13 +38,13 @@ export const EventsContainer = (props: EventsContainerProps) => {
     }, [lastMessage])
 
     return (<React.Fragment>
-        {event.events.map((event, i) => (
+        {/* event.events.map((event, i) => (
             <React.Fragment key={i}>
                 <EventCard key={i}
                     event={event}
                 />
             </React.Fragment>
-        ))}
+        ))*/}
     </React.Fragment>
     );
 }

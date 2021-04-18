@@ -1,3 +1,4 @@
+import { Grid } from "@material-ui/core";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AlertGenerator from "../../alerts/AlertGenerator";
 import AlertTrimmer from "../../alerts/AlertTrimmer";
@@ -52,13 +53,17 @@ export const AlertContainer = (props: AlertContainerProps) => {
     }, [stateContext.state.event.events]);
 
     return (<React.Fragment>
-        {alert.alerts.map((alert, i) => (
-            <React.Fragment key={i}>
-                <AlertCard key={i}
-                    alert={alert}
-                />
-            </React.Fragment>
-        ))}
+        <Grid container spacing={3}>
+            <Grid item xs={4}>
+                {alert.alerts.map((alert, i) => (
+                    <React.Fragment key={i}>
+                        <AlertCard key={i}
+                            alert={alert}
+                        />
+                    </React.Fragment>
+                ))}
+            </Grid>
+        </Grid>
     </React.Fragment>
     );
 }
