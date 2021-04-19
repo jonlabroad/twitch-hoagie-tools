@@ -1,6 +1,9 @@
 import React from "react";
 import { ShoutoutAlertType } from "../../alerts/AlertType"
 import { CopyButton } from "../../alerts/CopyButton";
+import { IgnoreButton } from "../../alerts/IgnoreButton";
+import Config from "../../Config";
+import { CountdownTimer } from "../CountdownTimer";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 export interface ShoutoutAlertCardProps {
@@ -9,6 +12,10 @@ export interface ShoutoutAlertCardProps {
 
 export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
     const { alert } = props;
+
+    const timestamp = new Date(alert.timestamp ?? "");
+    const expiry = Config.alertExpirySec["shoutout"];
+    console.log({[alert.userData.display_name]: timestamp});
 
     return <React.Fragment>
         <FlexRow className={`shoutout-card`}>
@@ -33,10 +40,18 @@ export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
                     </div>
                 </FlexCol>
             </FlexRow>
-            <CopyButton
-                text="Copy Cmd"
-                command={`!so ${alert.userData.login}`}
-            />
+            <FlexCol>
+                <CountdownTimer
+                    expiryDate={new Date(timestamp.getTime() + expiry*1e3)}
+                />
+                <IgnoreButton 
+                    alert={alert}
+                />
+                <CopyButton
+                    text="Copy Cmd"
+                    command={`!so ${alert.userData.login}`}
+                />
+            </FlexCol>
         </FlexRow>
     </React.Fragment>
 

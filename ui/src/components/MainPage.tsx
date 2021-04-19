@@ -4,17 +4,17 @@ import { useParams } from "react-router";
 import AlertGenerator, { AlertContextType } from "../alerts/AlertGenerator";
 import { useTwitchChatClient } from "../hooks/chatClientHooks";
 import { useLogin } from "../hooks/loginHooks";
-import TwitchChatClient from "../service/TwitchChatClient";
 import TwitchClient from "../service/TwitchClient";
 import { AppState, defaultAppState, StateContextType } from "../state/AppState";
 import { appStateReducer, LoginAction } from "../state/AppStateReducer";
 import CacheManager from "../util/CacheManager";
+import LocalStorage from "../util/LocalStorage";
 import { AlertContainer } from "./alerts/AlertContainer";
-import { ChatMessage, SimpleChatDisplay } from "./chat/SimpleChatDisplay";
 import { EventsContainer } from "./events/EventsContainer";
 
 export const clientId = "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
-const scopes = "chat:read chat:edit"
+//const scopes = "chat:read chat:edit"
+const scopes = "chat:read"
 
 export interface MainPageProps {
 
@@ -31,12 +31,14 @@ export const AlertContext = createContext<AlertContextType>({
 
 export const MainPage = (props: MainPageProps) => {
     const { streamer } = useParams() as { streamer: string };
+
+    const rawPersistedState = LocalStorage.get(`appState_${streamer}`);
     const [appState, appStateDispatch] = useReducer(appStateReducer, {
-        ...defaultAppState,
+        ...(rawPersistedState ? JSON.parse(rawPersistedState) : defaultAppState),
         streamer,
     } as AppState);
     
-    const chatClient = useTwitchChatClient(appState, appStateDispatch);
+    const chatClient = useTwitchChatClient(appState, appStateDispatch);    
     const twitchClient = useRef<TwitchClient | undefined>(undefined);
     const alertGenerator = useRef<AlertGenerator | undefined>(undefined);
     const caches = useRef(new CacheManager());

@@ -1,8 +1,9 @@
 import { Grid } from "@material-ui/core";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import AlertGenerator from "../../alerts/AlertGenerator";
-import AlertTrimmer from "../../alerts/AlertTrimmer";
-import { StateContextType } from "../../state/AppState";
+import { useAlertTrimming } from "../../hooks/alertTrimHooks";
+import { useModActionTrimming } from "../../hooks/modActionTrimHooks";
+import { useStatePersistance } from "../../hooks/persistanceHooks";
+import { IgnoreShoutoutModAction } from "../../state/AppState";
 import { AddAlertAction } from "../../state/AppStateReducer";
 import { ChatMessage } from "../chat/SimpleChatDisplay";
 import { AlertContext, StateContext } from "../MainPage";
@@ -12,22 +13,19 @@ export interface AlertContainerProps {
 
 }
 
-const trimAlerts = (stateContext: StateContextType) => {
-    const trimmedAlerts = AlertTrimmer.getAlertsToTrim(stateContext.state.alert.alerts, stateContext.state.event.events);
-    if (trimmedAlerts.length > 0) {
-        stateContext.dispatch({
-            type: "remove_alerts",
-            alerts: trimmedAlerts,
-        } as AddAlertAction);
-    }
-}
-
 export const AlertContainer = (props: AlertContainerProps) => {
     const stateContext = useContext(StateContext);
     const alertContext = useContext(AlertContext);
+
+    // This should probably go on a higher level component, but MainPage doesn't use the state context...
+    useStatePersistance(stateContext.state.streamer ?? "", stateContext);
+
     const { chat, alert } = stateContext.state;
 
     const [lastMessage, setLastMessage] = useState<ChatMessage | undefined>(undefined);
+
+    useAlertTrimming(stateContext);
+    useModActionTrimming(stateContext);
 
     useEffect(() => {
         if (chat.messages.length > 0) {
@@ -48,20 +46,18 @@ export const AlertContainer = (props: AlertContainerProps) => {
         processMsg();
     }, [lastMessage])
 
-    useEffect(() => {
-        trimAlerts(stateContext);
-    }, [stateContext.state.event.events]);
-
     return (<React.Fragment>
         <Grid container spacing={3}>
             <Grid item xs={4}>
-                {alert.alerts.map((alert, i) => (
-                    <React.Fragment key={i}>
-                        <AlertCard key={i}
-                            alert={alert}
-                        />
-                    </React.Fragment>
-                ))}
+                {alert.alerts.filter(alert => !stateContext.state.modActions.actions.find(action => 
+                    action.type === "ignore_shoutout" && ((action as IgnoreShoutoutModAction).alertKey === alert.key)))
+                    .map((alert, i) => (
+                        <React.Fragment key={i}>
+                            <AlertCard key={i}
+                                alert={alert}
+                            />
+                        </React.Fragment>
+                    ))}
             </Grid>
         </Grid>
     </React.Fragment>

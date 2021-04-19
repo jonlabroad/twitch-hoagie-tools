@@ -16,6 +16,10 @@ export const useTwitchChatClient = (state: AppState, dispatch: any) => {
             });
             chatClient.current.connect();
         }
+
+        return function cleanup() {
+            chatClient.current?.disconnect();
+        }
     }, [state.username, state.accessToken, state.streamer]);
 
     return chatClient;

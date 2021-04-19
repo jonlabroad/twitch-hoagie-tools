@@ -1,31 +1,36 @@
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import { ChannelData, UserData, UsersFollows } from "../service/TwitchClientTypes";
 
-export default abstract class AlertType {
-    type: "shoutout" | "generic" = "generic";
-    message?: ChatMessage;
-    timestamp?: Date;
+export type AlertTypeType = "shoutout" | "generic";
 
-    key: () => string = () => `${this.type}_${this?.message?.username ?? ""}`;
-
-    constructor(message: ChatMessage) {
-        this.timestamp = new Date();
-        this.message = message;
-    }
+export const createBaseAlert = (type: AlertTypeType, message: ChatMessage): AlertType => {
+    return {
+        type,
+        timestamp: new Date().toISOString(),
+        message,
+        key: `${type}_${message?.username ?? ""}`
+    };
 }
 
-export class ShoutoutAlertType extends AlertType {
+export default interface AlertType {
+    type: AlertTypeType;
+    message?: ChatMessage;
+    timestamp?: string;
+
+    key: string
+}
+
+export const createShoutoutAlert = (message: ChatMessage, userData: UserData, channelData: ChannelData, followers: UsersFollows) => {
+    let alert = createBaseAlert("shoutout", message) as ShoutoutAlertType;
+    alert.userData = userData;
+    alert.channelData = channelData;
+    alert.followers = followers;
+    alert.key = `${alert.type}_${alert?.userData.login ?? ""}`;
+    return alert;
+}
+
+export interface ShoutoutAlertType extends AlertType {
     userData: UserData;
     channelData: ChannelData;
     followers: UsersFollows;
-
-    constructor(message: ChatMessage, userData: UserData, channelData: ChannelData, followers: UsersFollows) {
-        super(message);
-        this.type = "shoutout";
-        this.userData = userData;
-        this.channelData = channelData;
-        this.followers = followers;
-
-        this.key = () => `${this.type}_${this?.userData.login ?? ""}`;
-    }
 }

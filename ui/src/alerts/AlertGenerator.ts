@@ -2,7 +2,7 @@ import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import TwitchClient from "../service/TwitchClient";
 import { AppState } from "../state/AppState";
 import AlertTrimmer from "./AlertTrimmer";
-import AlertType, { ShoutoutAlertType } from "./AlertType";
+import AlertType, { createShoutoutAlert, ShoutoutAlertType } from "./AlertType";
 
 export interface AlertContextType {
     alertGenerator?: AlertGenerator;
@@ -21,7 +21,7 @@ export default class AlertGenerator {
         alerts.push(...(await this.checkForShoutOut(msg)));
 
         const alertsToTrim = AlertTrimmer.getAlertsToTrim(alerts, state.event.events);
-        return alerts.filter(newAlert => !alertsToTrim.find(a => a.key() === newAlert.key()));
+        return alerts.filter(newAlert => !alertsToTrim.find(a => a.key === newAlert.key));
     }
 
     async checkForShoutOut(msg: ChatMessage): Promise<ShoutoutAlertType[]> {
@@ -30,9 +30,9 @@ export default class AlertGenerator {
         const follows = await this.twitchClient.getFollows({
             toId: userData[0].id,
         });
-        console.log({follows});
-        if (userData[0].broadcaster_type === "affiliate" || userData[0].broadcaster_type === "partner" || msg.username === "hoagiebot5000") {
-            return [new ShoutoutAlertType(msg, userData[0], channelData[0], follows)];
+
+        if (true /*userData[0].broadcaster_type === "affiliate" || userData[0].broadcaster_type === "partner" || msg.username === "hoagiebot5000"*/) {
+            return [createShoutoutAlert(msg, userData[0], channelData[0], follows)];
         }
         return [];
     }

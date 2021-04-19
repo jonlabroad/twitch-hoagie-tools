@@ -1,4 +1,4 @@
-import AlertType from "../alerts/AlertType";
+import AlertType, { AlertTypeType } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 
@@ -20,6 +20,9 @@ export const defaultAppState: AppState = {
     },
     event: {
         events: []
+    },
+    modActions: {
+        actions: []
     }
 };
 
@@ -31,6 +34,7 @@ export interface AppState {
     chat: ChatState;
     alert: AlertState;
     event: EventState;
+    modActions: ModActionState;
 }
 
 export interface ChatState {
@@ -49,4 +53,30 @@ export interface EventState {
 export interface ModAlert {
     priority: number;
     message: string;
+}
+
+export type ModActionType = "ignore_shoutout";
+
+export interface ModAction {
+    key: string
+    type: ModActionType
+    timestamp: Date
+}
+
+export const createIgnoreShoutoutModAction = (alertKey: string): IgnoreShoutoutModAction  => {
+    return {
+        key: `ignore_shoutout_${alertKey}`,
+        type: "ignore_shoutout",
+        alertKey,
+        timestamp: new Date(),
+    } as IgnoreShoutoutModAction;
+}
+
+export interface IgnoreShoutoutModAction extends ModAction {
+    alertType: AlertTypeType
+    alertKey: string
+}
+
+export interface ModActionState {
+    actions: ModAction[]
 }
