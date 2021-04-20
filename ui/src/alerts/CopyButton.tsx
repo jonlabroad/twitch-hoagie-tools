@@ -9,7 +9,7 @@ export interface CopyButtonProps {
 export const CopyButton = (props: CopyButtonProps) => {
     return <React.Fragment>
         <Button
-            style={{height: 40}}
+            style={{fontSize: 12, width: 90, height: 30}}
             variant="contained"
             color="primary"
             onClick={() => navigator.clipboard.writeText(props.command)}>

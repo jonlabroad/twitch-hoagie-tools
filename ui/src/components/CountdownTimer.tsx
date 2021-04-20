@@ -31,7 +31,7 @@ export const CountdownTimer = (props: CountdownTimerProps) => {
     const sec = Math.round(durationSec - min * 60);
     const secString = sec < 10 ? `0${sec}` : sec.toString();
 
-    return <div>
+    return <div className="countdown-timer">
         {min}:{secString}
     </div>
 }

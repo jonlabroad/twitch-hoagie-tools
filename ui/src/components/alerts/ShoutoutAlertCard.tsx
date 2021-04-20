@@ -13,10 +13,6 @@ export interface ShoutoutAlertCardProps {
 export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
     const { alert } = props;
 
-    const timestamp = new Date(alert.timestamp ?? "");
-    const expiry = Config.alertExpirySec["shoutout"];
-    console.log({[alert.userData.display_name]: timestamp});
-
     return <React.Fragment>
         <FlexRow className={`shoutout-card`}>
             <FlexRow alignItems="center">
@@ -25,33 +21,32 @@ export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
                         <img src={alert.userData.profile_image_url} />
                     </div>
                 </a>
-                <FlexCol>
+                <FlexCol className="user-card-user-info">
                     <div className="user-card-username">
                         {alert.userData.display_name}
                     </div>
+                    <div className="user-card-followers">
+                        {alert.followers.total} followers
+                    </div>
+                </FlexCol>
+                <FlexCol className="user-card-channel-info">
                     <div className="user-card-broadcaster-type">
                         {alert.userData.broadcaster_type}
                     </div>
-                    <div className="user-card-followers">
-                        {alert.followers.total} followers
-                </div>
                     <div className="shoutout-card-game-name">
                         {alert.channelData.game_name}
                     </div>
                 </FlexCol>
             </FlexRow>
-            <FlexCol>
-                <CountdownTimer
-                    expiryDate={new Date(timestamp.getTime() + expiry*1e3)}
-                />
-                <IgnoreButton 
+            <FlexRow alignItems="center">
+                <IgnoreButton
                     alert={alert}
                 />
                 <CopyButton
-                    text="Copy Cmd"
+                    text="Copy !so"
                     command={`!so ${alert.userData.login}`}
                 />
-            </FlexCol>
+            </FlexRow>
         </FlexRow>
     </React.Fragment>
 

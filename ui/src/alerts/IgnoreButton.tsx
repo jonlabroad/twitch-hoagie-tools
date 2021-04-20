@@ -13,7 +13,7 @@ export const IgnoreButton = (props: IgnoreButtonProps) => {
 
     return <React.Fragment>
         <Button
-            style={{ height: 40 }}
+            style={{ marginRight: 5, fontSize: 12, width: 90, height: 30 }}
             variant="contained"
             color="secondary"
             onClick={() => {
