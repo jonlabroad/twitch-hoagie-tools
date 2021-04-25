@@ -1,0 +1,94 @@
+service: hoagietools-service
+
+plugins:
+  - serverless-api-cloudfront
+  #- serverless-domain-manager
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline
+frameworkVersion: '2'
+
+custom:
+  myStage: ${opt:stage, self:provider.stage}
+  myTableName: HoagieTools-${opt:stage, self:provider.stage}
+  dynamodb:
+    start:
+      migrate: true
+    stages:
+      - local
+#  customDomain:
+#    domainName: hoagietools.thejonlab.net
+#    basePath: ''
+#    stage: ${self:custom.myStage}
+#    createRoute53Record: true
+#    certificateName: '*.thejonlab.net'
+  apiCloudFront:
+    domain: hoagietools.thejonlab.net
+    certificate: arn:aws:acm:us-east-1:796987500533:certificate/5e0d7068-5db2-47d6-a7a2-adedd79b2c9a
+    compress: true
+    # Unfortunately, the DefaultTTL must be set manually
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  httpApi:
+    cors: true
+#  iamRoleStatements:
+#    - Effect: 'Allow'
+#      Action:
+#        - 'dynamodb:Query'
+#        - 'dynamodb:Scan'
+#        - 'dynamodb:GetItem'
+#        - 'dynamodb:PutItem'
+#        - 'dynamodb:UpdateItem'
+#        - 'dynamodb:DeleteItem'
+#      Resource:
+#        Fn::GetAtt:
+#          - StreamerMusicQueueTable
+#          - Arn
+  environment:
+    PERSPECTIVE_API_KEY: ${file(secrets.yml):perspectiveApiKey}
+
+functions:
+  chatevalget:
+    handler: chatevalHandler.eval
+    events:
+      - http:
+          method: GET
+          path: /api/chateval
+          cors: true
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  chatevalpost:
+    handler: chatevalHandler.eval
+    events:
+      - http:
+          method: POST
+          path: /api/chateval
+          cors: true
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+#resources:
+#  Resources:
+#    StreamerMusicQueueTable:
+#      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+#      Properties:
+#        AttributeDefinitions:
+#          - AttributeName: CategoryKey
+#            AttributeType: S
+#          - AttributeName: SubKey
+#            AttributeType: S
+#        KeySchema:
+#          - AttributeName: CategoryKey
+#            KeyType: HASH
+#          - AttributeName: SubKey
+#            KeyType: RANGE
+#        ProvisionedThroughput:
+#          ReadCapacityUnits: 1
+#          WriteCapacityUnits: 1
+#        TableName: ${self:custom.myTableName}
