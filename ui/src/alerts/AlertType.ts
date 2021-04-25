@@ -1,7 +1,7 @@
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import { ChannelData, UserData, UsersFollows } from "../service/TwitchClientTypes";
 
-export type AlertTypeType = "shoutout" | "generic";
+export type AlertTypeType = "shoutout" | "chat_eval" | "generic";
 
 export const createBaseAlert = (type: AlertTypeType, message: ChatMessage): AlertType => {
     return {
@@ -33,4 +33,17 @@ export interface ShoutoutAlertType extends AlertType {
     userData: UserData;
     channelData: ChannelData;
     followers: UsersFollows;
+}
+
+export const createEvaluatedMessageAlert = (message: ChatMessage, evaluation: Record<string, number>,  userData: UserData) => {
+    let alert = createBaseAlert("chat_eval", message) as EvaluatedMessageAlert;
+    alert.userData = userData;
+    alert.key = `${alert.type}_${alert?.userData.login ?? ""}_${message.message}`;
+    alert.evaluation = evaluation;
+    return alert;
+}
+
+export interface EvaluatedMessageAlert extends AlertType {
+    userData: UserData;
+    evaluation: Record<string, number>
 }

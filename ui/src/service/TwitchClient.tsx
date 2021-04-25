@@ -48,6 +48,18 @@ export default class TwitchClient {
         return data.data;
     }
 
+    async getChannelByUser(username: string): Promise<ChannelData | undefined> {
+        const userData = await this.getUsers([username]);
+        if (userData && userData.length > 0) {
+            const broadcasterId = userData[0].id;
+            const channelData = await this.getChannel(broadcasterId);
+            if (channelData && channelData.length > 0) {
+                return channelData[0];
+            }
+        }
+        return undefined;
+    }
+
     async getFollows(props: { toId?: string, fromId?: string, max?: number, cursor?: string }): Promise<UsersFollows> {
         const { toId, fromId, max, cursor } = props;
         let query = [];

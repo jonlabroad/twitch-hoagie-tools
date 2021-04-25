@@ -1,6 +1,7 @@
 import AlertType, { AlertTypeType } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
+import { UserData } from "../service/TwitchClientTypes";
 
 export interface StateContextType {
     dispatch: any,
@@ -29,6 +30,7 @@ export const defaultAppState: AppState = {
 export interface AppState {
     username?: string;
     streamer?: string;
+    streamerData?: UserData;
     accessToken?: string;
     isLoggedIn: boolean;
     chat: ChatState;
@@ -55,7 +57,7 @@ export interface ModAlert {
     message: string;
 }
 
-export type ModActionType = "ignore_shoutout";
+export type ModActionType = "ignore_shoutout" | "ignore_chat_eval";
 
 export interface ModAction {
     key: string

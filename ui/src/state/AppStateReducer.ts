@@ -3,10 +3,11 @@ import { stringify } from "qs";
 import AlertType, { AlertTypeType } from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
+import { ChannelData, UserData } from "../service/TwitchClientTypes";
 import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "ignore_shoutout" | "remove_mod_actions" | "login";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection";
 }
 
 export interface AddAlertAction extends AppStateAction {
@@ -37,6 +38,14 @@ export interface LoginAction extends AppStateAction {
     username: string;
     accessToken: string;
     isLoggedIn: boolean;
+}
+
+export interface SetChannelInfoAction extends AppStateAction {
+    userData: UserData;
+}
+
+export interface SetChatConnectionAction extends AppStateAction {
+    connected: boolean;
 }
 
 export const appStateReducer = (state: AppState, action: AppStateAction): AppState => {
@@ -118,6 +127,23 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
                 accessToken: loginAction.accessToken,
                 isLoggedIn: loginAction.isLoggedIn,
             };
+        }
+        case "set_channel_info": {
+            const setChannelInfoAction = action as SetChannelInfoAction;
+            return {
+                ...state,
+                streamerData: setChannelInfoAction.userData,
+            }
+        }
+        case "set_chat_connection": {
+            const setChatConnection = action as SetChatConnectionAction;
+            return {
+                ...state,
+                chat: {
+                    ...state.chat,
+                    connected: setChatConnection.connected,
+                }
+            }
         }
         default:
             console.error(`Do not know how to process ${action.type}`);

@@ -15,12 +15,14 @@ export default class TwitchChatClient {
     ws: any = undefined;
     connected: boolean = false;
     onMessage: (msg: ChatMessage) => void
+    onConnectionChange: (connected: boolean) => void
 
-    constructor(username: string, channel: string, oauthToken: string, onMessage: (msg: ChatMessage) => void) {
+    constructor(username: string, channel: string, oauthToken: string, onMessage: (msg: ChatMessage) => void, onConnectionChange: (connected: boolean) => void) {
         this.username = username;
         this.channel = channel;
         this.oauthToken = oauthToken;
         this.onMessage = onMessage;
+        this.onConnectionChange = onConnectionChange;
     }
 
     connect() {
@@ -57,11 +59,13 @@ export default class TwitchChatClient {
 
         console.log(`CONNECTED to ${this.channel}`);
         this.connected = true;
+        this.onConnectionChange(this.connected);
     }
 
     onDisconnect() {
         console.log(`DISCONNECTED from ${this.channel}`);
         this.connected = false;
+        this.onConnectionChange(this.connected);
     }
 
     pong(message: string) {

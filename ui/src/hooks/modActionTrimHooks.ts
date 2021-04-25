@@ -7,7 +7,6 @@ import { RemoveModActionsAction } from "../state/AppStateReducer";
 const trimAlerts = (state: AppState, dispatch: any) => {
     const trimmedActions = ModActionTrimmer.getActionsToTrim(state);
     if (trimmedActions.length > 0) {
-        console.log({trimmedActions});
         dispatch({
             type: "remove_mod_actions",
             modActions: trimmedActions,

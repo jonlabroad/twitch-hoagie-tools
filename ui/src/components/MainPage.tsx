@@ -1,8 +1,9 @@
-import { AppBar, Button, Link, Tab, Tabs, Toolbar, Typography } from "@material-ui/core"
+import { AppBar, Button, Grid, Link, Tab, Tabs, Toolbar, Typography } from "@material-ui/core"
 import React, { createContext, useEffect, useReducer, useRef, useState } from "react"
 import { useParams } from "react-router";
 import AlertGenerator, { AlertContextType } from "../alerts/AlertGenerator";
 import { useTwitchChatClient } from "../hooks/chatClientHooks";
+import { useChatEvaluator } from "../hooks/chatModHooks";
 import { useLogin } from "../hooks/loginHooks";
 import TwitchClient from "../service/TwitchClient";
 import { AppState, defaultAppState, StateContextType } from "../state/AppState";
@@ -10,6 +11,9 @@ import { appStateReducer, LoginAction } from "../state/AppStateReducer";
 import CacheManager from "../util/CacheManager";
 import LocalStorage from "../util/LocalStorage";
 import { AlertContainer } from "./alerts/AlertContainer";
+import { ChannelHeader } from "./ChannelHeader";
+import { ChatMessage } from "./chat/SimpleChatDisplay";
+import { ChatEvaluatorContainer } from "./chatEval/ChatEvaluatorContainer";
 import { EventsContainer } from "./events/EventsContainer";
 
 export const clientId = "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
@@ -37,8 +41,17 @@ export const MainPage = (props: MainPageProps) => {
         ...(rawPersistedState ? JSON.parse(rawPersistedState) : defaultAppState),
         streamer,
     } as AppState);
-    
-    const chatClient = useTwitchChatClient(appState, appStateDispatch);    
+
+    const chatClient = useTwitchChatClient(appState, appStateDispatch);
+
+    // TODO move this to a shared hook!@!!!!!!
+    const [lastMessage, setLastMessage] = useState<ChatMessage | undefined>(undefined);
+    useEffect(() => {
+        if (appState.chat.messages.length > 0) {
+            setLastMessage(appState.chat.messages[appState.chat.messages.length - 1]);
+        }
+    }, [appState.chat.messages]);
+
     const twitchClient = useRef<TwitchClient | undefined>(undefined);
     const alertGenerator = useRef<AlertGenerator | undefined>(undefined);
     const caches = useRef(new CacheManager());
@@ -77,7 +90,7 @@ export const MainPage = (props: MainPageProps) => {
                     <Toolbar variant="dense">
                         <Typography variant="h6" style={{ marginRight: "20px" }}>
                             Hoagie Tools
-                </Typography>
+                    </Typography>
                         {appState.isLoggedIn ? <div>{appState.username}</div> :
                             <Button
                                 variant="contained"
@@ -88,7 +101,15 @@ export const MainPage = (props: MainPageProps) => {
                     </Button>}
                     </Toolbar>
                 </AppBar>
-                <AlertContainer />
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
+                        <ChannelHeader />
+                    </Grid>
+                </Grid>
+                <Grid container spacing={3}>
+                    <AlertContainer />
+                    <ChatEvaluatorContainer lastMessage={lastMessage} twitchClient={twitchClient.current}/>
+                </Grid>
                 <EventsContainer />
             </StateContext.Provider>
         </AlertContext.Provider>

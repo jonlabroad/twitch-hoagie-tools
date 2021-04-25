@@ -31,7 +31,7 @@ export default class AlertGenerator {
             toId: userData[0].id,
         });
 
-        if (true /*userData[0].broadcaster_type === "affiliate" || userData[0].broadcaster_type === "partner" || msg.username === "hoagiebot5000"*/) {
+        if (userData[0].broadcaster_type === "affiliate" || userData[0].broadcaster_type === "partner" || msg.username === "hoagiebot5000") {
             return [createShoutoutAlert(msg, userData[0], channelData[0], follows)];
         }
         return [];

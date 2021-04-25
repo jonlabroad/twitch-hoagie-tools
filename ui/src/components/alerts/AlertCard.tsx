@@ -10,6 +10,7 @@ import Config from "../../Config"
 
 export interface AlertCardProps {
     alert: AlertType;
+    children: JSX.Element[] | JSX.Element
 }
 
 export const AlertCard = (props: AlertCardProps) => {
@@ -27,7 +28,7 @@ export const AlertCard = (props: AlertCardProps) => {
                             expiryDate={new Date(dateStamp.getTime() + expiry * 1e3)}
                         />
                     </FlexRow>
-                    <ShoutoutAlertCard alert={shoutoutAlert} />
+                    {props.children}
                 </FlexCol>
             </div>
         </Card>

@@ -8,12 +8,20 @@ export const useTwitchChatClient = (state: AppState, dispatch: any) => {
 
     useEffect(() => {
         if (state.username && state.accessToken && state.streamer) {
-            chatClient.current = new TwitchChatClient(state.username, state.streamer, state.accessToken as string, (msg) => {
-                dispatch({
-                    type: "add_chat_message",
-                    message: msg,
-                });
-            });
+            chatClient.current = new TwitchChatClient(state.username, state.streamer, state.accessToken as string,
+                (msg) => {
+                    dispatch({
+                        type: "add_chat_message",
+                        message: msg,
+                    });
+                },
+                (connected) => {
+                    dispatch({
+                        type: "set_chat_connection",
+                        connected
+                    });
+                }
+            );
             chatClient.current.connect();
         }
 

@@ -1,0 +1,26 @@
+.channel-avatar {
+    margin-left: 10px;
+    margin-top: 10px;
+    img {
+        height: 100px;
+        border-radius: 50px;
+    }
+}
+
+.channel-name {
+    margin-left: 20px;
+
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.channel-chat-connection {
+    margin-left: 20px;
+    margin-top: 5px;
+
+    font-size: 14px;
+
+    div {
+        margin-left: 5px;
+    }
+}
