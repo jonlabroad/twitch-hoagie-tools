@@ -3,11 +3,12 @@ import { stringify } from "qs";
 import AlertType, { AlertTypeType } from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
-import { ChannelData, UserData } from "../service/TwitchClientTypes";
+import { GetQueueResponse } from "../service/StreamerSongListClient";
+import { ChannelData, StreamData, UserData } from "../service/TwitchClientTypes";
 import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection" | "update_songqueue";
 }
 
 export interface AddAlertAction extends AppStateAction {
@@ -42,10 +43,15 @@ export interface LoginAction extends AppStateAction {
 
 export interface SetChannelInfoAction extends AppStateAction {
     userData: UserData;
+    streamData: StreamData;
 }
 
 export interface SetChatConnectionAction extends AppStateAction {
     connected: boolean;
+}
+
+export interface UpdateSongQueueAction extends AppStateAction {
+    queue: GetQueueResponse;
 }
 
 export const appStateReducer = (state: AppState, action: AppStateAction): AppState => {
@@ -56,10 +62,10 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
             addAlertAction.alerts.forEach(newAlert => {
                 const existingAlertIndex = newAlerts.findIndex(a => a.key === newAlert.key);
                 if (existingAlertIndex >= 0) {
-                    console.log({existingAlertIndex});
+                    console.log({ existingAlertIndex });
                     newAlerts = [...newAlerts.slice(0, existingAlertIndex), newAlert, ...newAlerts.slice(existingAlertIndex + 1)];
                 } else {
-                    console.log({newAlert});
+                    console.log({ newAlert });
                     newAlerts.push(newAlert);
                 }
             })
@@ -102,7 +108,7 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
         case "ignore_shoutout": {
             const ignoreAlertAction = action as IgnoreShoutoutAction;
             const newAction = createIgnoreShoutoutModAction(ignoreAlertAction.alertKey);
-            console.log({newAction});
+            console.log({ newAction });
             return {
                 ...state,
                 modActions: {
@@ -132,7 +138,11 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
             const setChannelInfoAction = action as SetChannelInfoAction;
             return {
                 ...state,
-                streamerData: setChannelInfoAction.userData,
+                streamerData: {
+                    userData: setChannelInfoAction.userData,
+                    streamData: setChannelInfoAction.streamData,
+                }
+
             }
         }
         case "set_chat_connection": {
@@ -144,6 +154,13 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
                     connected: setChatConnection.connected,
                 }
             }
+        }
+        case "update_songqueue": {
+            const updateQueue = action as UpdateSongQueueAction;
+            return {
+                ...state,
+                songQueue: updateQueue.queue,
+            };
         }
         default:
             console.error(`Do not know how to process ${action.type}`);

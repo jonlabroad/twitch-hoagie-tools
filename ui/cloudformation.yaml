@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Create S3 static website bucket, fronted by CloudFront CDN and Route53 CNAME'
+Parameters:
+  DomainName:
+    Type: String
+    Description: Name to use for the Domain and S3 bucket
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+    ConstraintDescription: must be a valid Domain/S3 bucket name.
+Resources:
+  WebsiteS3:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref 'DomainName'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Service
+          Value: StaticSitePublishing
+  WebsiteCloudfront:
+    Type: 'AWS::CloudFront::Distribution'
+    DependsOn:
+      - WebsiteS3
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Join ['', [!Ref 'DomainName', '.hoagieman.net']]
+        Enabled: true
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        DefaultCacheBehavior:
+          TargetOriginId: !Join ['', ['S3-', !Ref 'DomainName']]
+          ViewerProtocolPolicy: redirect-to-https
+          MinTTL: 0
+          DefaultTTL: 60
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+        Origins:
+          - DomainName: !Join ['', [!Ref 'DomainName', '.s3-website-us-east-1.amazonaws.com']]
+            Id: !Join ['', ['S3-', !Ref 'DomainName']]
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+            Locations: []
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2018
+  WebsiteRoute53:
+    Type: 'AWS::Route53::RecordSetGroup'
+    DependsOn:
+      - WebsiteCloudfront
+    Properties:
+      HostedZoneName: hoagieman.net.
+      RecordSets:
+        - Name: !Join ['', [!Ref 'DomainName', '.hoagieman.net.']]
+          Type: CNAME
+          TTL: '300'
+          ResourceRecords:
+            - !GetAtt 
+              - WebsiteCloudfront
+              - DomainName
+  WebsiteS3Policy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref WebsiteS3
+      PolicyDocument:
+        Version: 2012-10-17
+        Id: Policy1557855097592
+        Statement:
+          - Sid: Stmt1557855096235
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref WebsiteS3
+                - /*

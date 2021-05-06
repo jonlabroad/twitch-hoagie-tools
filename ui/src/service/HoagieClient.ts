@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default class HoagieClient {
-    readonly BASE_URL = 'https://hoagietools.thejonlab.net/api/';
+    readonly BASE_URL = 'https://hoagietools-svc.hoagieman.net/api/';
 
     async analyze(text: string): Promise<Record<string, number> | undefined> {
         let result = undefined;

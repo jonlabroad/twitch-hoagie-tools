@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 import NodeCache from "node-cache";
-import { clientId } from "../components/MainPage";
+import Config from "../Config";
 import CacheManager from "../util/CacheManager";
-import { ChannelData, UserData, UsersFollows } from "./TwitchClientTypes";
+import { ChannelData, StreamData, UserData, UsersFollows } from "./TwitchClientTypes";
 
 export interface ValidatedSession {
     expires_in: number
@@ -48,6 +48,11 @@ export default class TwitchClient {
         return data.data;
     }
 
+    async getStreams(username: string): Promise<StreamData | undefined> {
+        const data = await this.getRequest(`https://api.twitch.tv/helix/streams?user_login=${username}`);
+        return data.data[0];
+    }
+
     async getChannelByUser(username: string): Promise<ChannelData | undefined> {
         const userData = await this.getUsers([username]);
         if (userData && userData.length > 0) {
@@ -80,7 +85,7 @@ export default class TwitchClient {
 
         const response = await axios.get(request, {
             headers: {
-                "client-id": clientId,
+                "client-id": Config.clientId,
                 Authorization: `Bearer ${this.accessToken}`
             }
         });

@@ -2,6 +2,7 @@ import { AppBar, Button, Grid, Link, Tab, Tabs, Toolbar, Typography } from "@mat
 import React, { createContext, useEffect, useReducer, useRef, useState } from "react"
 import { useParams } from "react-router";
 import AlertGenerator, { AlertContextType } from "../alerts/AlertGenerator";
+import Config from "../Config";
 import { useTwitchChatClient } from "../hooks/chatClientHooks";
 import { useChatEvaluator } from "../hooks/chatModHooks";
 import { useLogin } from "../hooks/loginHooks";
@@ -15,10 +16,7 @@ import { ChannelHeader } from "./ChannelHeader";
 import { ChatMessage } from "./chat/SimpleChatDisplay";
 import { ChatEvaluatorContainer } from "./chatEval/ChatEvaluatorContainer";
 import { EventsContainer } from "./events/EventsContainer";
-
-export const clientId = "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
-//const scopes = "chat:read chat:edit"
-const scopes = "chat:read"
+import { SongQueue } from "./ssl/SongQueue";
 
 export interface MainPageProps {
 
@@ -73,7 +71,12 @@ export const MainPage = (props: MainPageProps) => {
             twitchClient.current = client;
             alertGenerator.current = new AlertGenerator(client);
         }
-    }, [appState.accessToken])
+    }, [appState.accessToken]);
+
+    useEffect(() => {
+        const path = window.location.pathname;
+        LocalStorage.set("lastPath", { path });
+    }, []);
 
     return <React.Fragment>
         <AlertContext.Provider value={{
@@ -95,7 +98,7 @@ export const MainPage = (props: MainPageProps) => {
                             <Button
                                 variant="contained"
                                 color="secondary"
-                                href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}&client_id=${clientId}&redirect_uri=http://localhost:3000&response_type=token`}
+                                href={`https://id.twitch.tv/oauth2/authorize?scope=${Config.scopes}&client_id=${Config.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
                             >
                                 Login
                     </Button>}
@@ -104,6 +107,9 @@ export const MainPage = (props: MainPageProps) => {
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
                         <ChannelHeader />
+                    </Grid>
+                    <Grid item xs={3} >
+                        <SongQueue />
                     </Grid>
                 </Grid>
                 <Grid container spacing={3}>

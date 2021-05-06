@@ -1,3 +1,5 @@
+@import "Theme";
+
 .chat-eval-card {
     justify-content: space-between;
 }
@@ -9,8 +11,24 @@
 
 .chat-eval-message {
     font-size: 13px;
+
+    padding: 2px;
 }
 
 .chat-eval-message-container {
     font-size: 12px; 
+}
+
+.chat-eval-evaluations {
+    font-size: 11px;
+    justify-content: space-between;
+}
+
+.chat-eval-high-alert-card {
+    background-color: $high-alert-highlight;
+}
+
+.chat-eval-high-alert-eval {
+    color: $high-alert-red;
+    font-weight: bold;
 }

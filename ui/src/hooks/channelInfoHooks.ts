@@ -9,9 +9,11 @@ export const useChannelInfo = (streamer: string | undefined, stateContext: State
             if (streamer && stateContext.state.accessToken) {
                 const twitchClient = new TwitchClient(stateContext.state.accessToken)
                 const userData = await twitchClient.getUsers([streamer]);
+                const streamData = await twitchClient.getStreams(streamer);
                 stateContext.dispatch({
                     type: "set_channel_info",
                     userData: userData[0],
+                    streamData: streamData,
                 } as SetChannelInfoAction);
             }
         }

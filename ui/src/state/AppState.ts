@@ -1,7 +1,8 @@
 import AlertType, { AlertTypeType } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
-import { UserData } from "../service/TwitchClientTypes";
+import { GetQueueResponse } from "../service/StreamerSongListClient";
+import { StreamData, UserData } from "../service/TwitchClientTypes";
 
 export interface StateContextType {
     dispatch: any,
@@ -30,13 +31,17 @@ export const defaultAppState: AppState = {
 export interface AppState {
     username?: string;
     streamer?: string;
-    streamerData?: UserData;
+    streamerData?: {
+        userData: UserData;
+        streamData: StreamData;
+    },
     accessToken?: string;
     isLoggedIn: boolean;
     chat: ChatState;
     alert: AlertState;
     event: EventState;
     modActions: ModActionState;
+    songQueue?: GetQueueResponse;
 }
 
 export interface ChatState {

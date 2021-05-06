@@ -5,6 +5,7 @@ import { useAlertTrimming } from "../../hooks/alertTrimHooks";
 import { useChannelInfo } from "../../hooks/channelInfoHooks";
 import { useModActionTrimming } from "../../hooks/modActionTrimHooks";
 import { useStatePersistance } from "../../hooks/persistanceHooks";
+import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import { IgnoreShoutoutModAction } from "../../state/AppState";
 import { AddAlertAction } from "../../state/AppStateReducer";
 import { ChatMessage } from "../chat/SimpleChatDisplay";
@@ -28,6 +29,7 @@ export const AlertContainer = (props: AlertContainerProps) => {
     useAlertTrimming(stateContext);
     useModActionTrimming(stateContext);
     useChannelInfo(stateContext.state.streamer, stateContext);
+    useStreamerSongListEvents(stateContext);
 
     const [lastMessage, setLastMessage] = useState<ChatMessage | undefined>(undefined);
     useEffect(() => {

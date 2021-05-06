@@ -1,7 +1,9 @@
 import { MainPage } from './components/MainPage';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { LoginRedirect } from './components/LoginRedirect';
 
 import 'fontsource-roboto';
+
 
 function App() {
   return (
@@ -10,6 +12,9 @@ function App() {
         <Switch>
           <Route path="/s/:streamer">
             <MainPage />
+          </Route>
+          <Route path="/loginRedirect">
+            <LoginRedirect />
           </Route>
         </Switch>
       </Router>

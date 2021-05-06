@@ -1,12 +1,15 @@
 import React from "react"
-import AlertType, { ShoutoutAlertType } from "../../alerts/AlertType"
+import AlertType from "../../alerts/AlertType"
 import { FlexCol, FlexRow } from "../util/FlexBox"
 
 import "../../styles/AlertCard.scss"
-import { ShoutoutAlertCard } from "./ShoutoutAlertCard"
 import { Card } from "@material-ui/core"
 import { CountdownTimer } from "../CountdownTimer"
 import Config from "../../Config"
+
+const alertTypeMappings: Record<string, string> = {
+    "chat_eval": "Message Review"
+}
 
 export interface AlertCardProps {
     alert: AlertType;
@@ -15,7 +18,6 @@ export interface AlertCardProps {
 
 export const AlertCard = (props: AlertCardProps) => {
     const { alert } = props;
-    const shoutoutAlert = props.alert as ShoutoutAlertType;
     const dateStamp = new Date(alert.timestamp ?? "");
     const expiry = Config.alertExpirySec[alert.type];
     return <React.Fragment>
@@ -23,7 +25,7 @@ export const AlertCard = (props: AlertCardProps) => {
             <div className="alert-card-content">
                 <FlexCol>
                     <FlexRow justifyContent="space-between">
-                        <div className={`alert-card-type ${alert.type}-type`}>{alert.type}</div>
+                        <div className={`alert-card-type ${alert.type}-type`}>{alertTypeMappings[alert.type] ?? alert.type}</div>
                         <CountdownTimer
                             expiryDate={new Date(dateStamp.getTime() + expiry * 1e3)}
                         />
