@@ -62,10 +62,8 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
             addAlertAction.alerts.forEach(newAlert => {
                 const existingAlertIndex = newAlerts.findIndex(a => a.key === newAlert.key);
                 if (existingAlertIndex >= 0) {
-                    console.log({ existingAlertIndex });
                     newAlerts = [...newAlerts.slice(0, existingAlertIndex), newAlert, ...newAlerts.slice(existingAlertIndex + 1)];
                 } else {
-                    console.log({ newAlert });
                     newAlerts.push(newAlert);
                 }
             })
@@ -108,7 +106,6 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
         case "ignore_shoutout": {
             const ignoreAlertAction = action as IgnoreShoutoutAction;
             const newAction = createIgnoreShoutoutModAction(ignoreAlertAction.alertKey);
-            console.log({ newAction });
             return {
                 ...state,
                 modActions: {

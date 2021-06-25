@@ -1,0 +1,24 @@
+.chatusers-row {
+    margin-top: 2px;
+    margin-left: 5px;
+
+    align-items: center;
+}
+
+.chatusers-avatar {
+    margin-right: 10px;
+    img {
+        height: 25px;
+        border-radius: 5px;
+        width: auto;
+    }
+}
+
+.chatusers-user {
+    font-size: 12px;
+}
+
+.chatusers-follow {
+    font-size: 12px;
+    margin-right: 25px;
+}

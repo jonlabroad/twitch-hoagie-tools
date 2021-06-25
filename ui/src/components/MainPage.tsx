@@ -1,4 +1,4 @@
-import { AppBar, Button, Grid, Link, Tab, Tabs, Toolbar, Typography } from "@material-ui/core"
+import { AppBar, Button, Grid, Hidden, Link, Tab, Tabs, Toolbar, Typography } from "@material-ui/core"
 import React, { createContext, useEffect, useReducer, useRef, useState } from "react"
 import { useParams } from "react-router";
 import AlertGenerator, { AlertContextType } from "../alerts/AlertGenerator";
@@ -11,12 +11,18 @@ import { AppState, defaultAppState, StateContextType } from "../state/AppState";
 import { appStateReducer, LoginAction } from "../state/AppStateReducer";
 import CacheManager from "../util/CacheManager";
 import LocalStorage from "../util/LocalStorage";
+import LoginUtil from "../util/LoginUtil";
+import { EmbeddedVideo } from "../video/EmbeddedVideo";
 import { AlertContainer } from "./alerts/AlertContainer";
 import { ChannelHeader } from "./ChannelHeader";
+import { ChatParticipants } from "./chat/ChatParticipants";
+import { EmbeddedChat } from "./chat/EmbeddedChat";
 import { ChatMessage } from "./chat/SimpleChatDisplay";
 import { ChatEvaluatorContainer } from "./chatEval/ChatEvaluatorContainer";
 import { EventsContainer } from "./events/EventsContainer";
 import { SongQueue } from "./ssl/SongQueue";
+import { StreamerLinks } from "./StreamerLinks";
+import { FlexRow } from "./util/FlexBox";
 
 export interface MainPageProps {
 
@@ -91,30 +97,62 @@ export const MainPage = (props: MainPageProps) => {
                     color: "#dbdbf8"
                 }} position="static">
                     <Toolbar variant="dense">
-                        <Typography variant="h6" style={{ marginRight: "20px" }}>
-                            Hoagie Tools
-                    </Typography>
-                        {appState.isLoggedIn ? <div>{appState.username}</div> :
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                href={`https://id.twitch.tv/oauth2/authorize?scope=${Config.scopes}&client_id=${Config.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
-                            >
-                                Login
+                        <FlexRow style={{ width: "100%" }} justifyContent="space-between" alignItems="center">
+                            <Typography variant="h6" style={{ marginRight: "20px" }}>
+                                Hoagie Tools
+                            </Typography>
+                            {appState.isLoggedIn ?
+                                <FlexRow alignItems="center">
+                                    <div>{appState.username}</div>
+                                    <Button
+                                        style={{
+                                            marginLeft: 10
+                                        }}
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => LoginUtil.logout()}
+                                    >
+                                        Log Out
+                                </Button>
+                                </FlexRow>
+                                :
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    href={`https://id.twitch.tv/oauth2/authorize?scope=${Config.scopes}&client_id=${Config.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
+                                >
+                                    Login
                     </Button>}
+                        </FlexRow>
                     </Toolbar>
                 </AppBar>
                 <Grid container spacing={3}>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                         <ChannelHeader />
                     </Grid>
                     <Grid item xs={3} >
-                        <SongQueue />
+                    </Grid>
+                    <Grid item xs={3} >
+                    </Grid>
+                    <Grid item xs={1} >
+                        <StreamerLinks />
                     </Grid>
                 </Grid>
                 <Grid container spacing={3}>
                     <AlertContainer />
-                    <ChatEvaluatorContainer lastMessage={lastMessage} twitchClient={twitchClient.current}/>
+                    <Hidden mdDown>
+                        <Grid item md={3}>
+                            <EmbeddedChat />
+                        </Grid>
+                    </Hidden>
+                    <Grid item xs={3}>
+                        <SongQueue />
+                        <EmbeddedVideo />
+                        <ChatParticipants
+                            twitchClient={twitchClient.current}
+                        />
+                    </Grid>
+                    <ChatEvaluatorContainer lastMessage={lastMessage} twitchClient={twitchClient.current} />
                 </Grid>
                 <EventsContainer />
             </StateContext.Provider>

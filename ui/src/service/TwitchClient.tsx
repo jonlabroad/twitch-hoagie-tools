@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import NodeCache from "node-cache";
 import Config from "../Config";
 import CacheManager from "../util/CacheManager";
-import { ChannelData, StreamData, UserData, UsersFollows } from "./TwitchClientTypes";
+import { ChannelData, StreamData, UserData, UserFollows, UsersFollows, UserSubscriptions } from "./TwitchClientTypes";
 
 export interface ValidatedSession {
     expires_in: number
@@ -40,7 +40,18 @@ export default class TwitchClient {
     }
 
     async getUserStream(username: string): Promise<any[]> {
-        return await this.getRequest(`https://api.twitch.tv/helix/streams?user_login=${username}`);
+        const data = await this.getRequest(`https://api.twitch.tv/helix/streams?user_login=${username}`);
+        return data.data;
+    }
+
+    async getUserSubscriptions(broadcasterId: string, userId: string): Promise<UserSubscriptions[]> {
+        const data = await this.getRequest(`https://api.twitch.tv/helix/subscriptions/user?broadcaster_id=${broadcasterId}&user_id=${userId}`);
+        return data.data;
+    }
+
+    async getUserFollows(broadcasterId: string, userId: string): Promise<UserFollows[]> {
+        const data = await this.getRequest(`https://api.twitch.tv/helix/users/follows?to_id=${broadcasterId}&from_id=${userId}`);
+        return data.data;
     }
 
     async getChannel(broadcasterId: string): Promise<ChannelData[]> {

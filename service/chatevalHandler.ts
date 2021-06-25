@@ -3,8 +3,6 @@
 import PerspectiveClient from "./src/PerspectiveClient";
 
 module.exports.eval = async (event: any) => {
-    console.log(event);
-
     const apiKey = process.env.PERSPECTIVE_API_KEY;
     if (!apiKey) {
         return {
@@ -14,7 +12,6 @@ module.exports.eval = async (event: any) => {
     }
 
     const message = decodeURIComponent(event.queryStringParameters.msg);
-    console.log({message});
     const client = new PerspectiveClient(apiKey);
     const response = await client.analyze(message);
 

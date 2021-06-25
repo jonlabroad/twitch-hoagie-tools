@@ -9,21 +9,16 @@ export interface LoginRedirectProps {
 }
 
 export const LoginRedirect = (props: LoginRedirectProps) => {
-    const stateContext = useContext(StateContext);
+    const [loggedIn, setLoggedIn] = useState(false);
 
     const [] = useLogin((username: string | undefined, accessToken: string, isLoggedIn: boolean) => {
         if (username) {
-            stateContext.dispatch({
-                type: "login",
-                username,
-                accessToken,
-                isLoggedIn,
-            } as LoginAction);
+            setLoggedIn(isLoggedIn);
         }
     });
 
     useEffect(() => {
-        if (stateContext.state.isLoggedIn) {
+        if (loggedIn) {
             const pathString = LocalStorage.get("lastPath");
             if (pathString) {
                 const path = JSON.parse(pathString);
@@ -39,7 +34,7 @@ export const LoginRedirect = (props: LoginRedirectProps) => {
                 window.location.replace(url);
             }
         }
-    }, [stateContext.state.isLoggedIn]);
+    }, [loggedIn]);
 
     return <React.Fragment>
         <div></div>

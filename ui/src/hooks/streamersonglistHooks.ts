@@ -23,7 +23,6 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
             queue
         } as UpdateSongQueueAction);
 
-        console.log({queue});
         return queue;
     }
 
@@ -60,9 +59,10 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
                 // but needs to be cast as a string for the socket event
                 console.log("SSL connected");
                 console.log(`Joining SSL room ${streamerId}`);
-                client.current.emit('join-room', `8764`);
+                client.current.emit('join-room', `${streamerId}`);
                 client.current.on('queue-update', () => {
                     console.log("queue-update");
+                    getQueue(streamerId);
                 });
                 client.current.on('update-playhistory', () => {
                     // the history has been updated, should refetch

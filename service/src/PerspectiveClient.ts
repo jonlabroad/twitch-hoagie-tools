@@ -6,7 +6,6 @@ export default class PerspectiveClient {
     readonly DISCOVERY_URL = 'https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1';
 
     constructor(apiKey: string) {
-        console.log({Perspective});
         this.client = new Perspective(
             {
                 apiKey

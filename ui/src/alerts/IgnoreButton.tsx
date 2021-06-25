@@ -1,7 +1,6 @@
 import { Button } from "@material-ui/core"
 import React, { useContext } from "react"
 import { StateContext } from "../components/MainPage";
-import { createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModActionType } from "../state/AppState";
 import AlertType from "./AlertType";
 
 export interface IgnoreButtonProps {
@@ -13,7 +12,7 @@ export const IgnoreButton = (props: IgnoreButtonProps) => {
 
     return <React.Fragment>
         <Button
-            style={{ marginRight: 5, fontSize: 12, width: 90, height: 30 }}
+            style={{ marginRight: 0, marginBottom: 5, fontSize: 12, width: 90, height: 30 }}
             variant="contained"
             color="secondary"
             onClick={() => {

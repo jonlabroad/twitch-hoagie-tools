@@ -22,8 +22,8 @@ export const SongQueue = (props: SongQueueProps) => {
             <FlexCol className="songqueue-container">
                 {state.songQueue?.list?.slice(0, 5).map((song, i) => <React.Fragment>
                     <FlexRow className={`${i === 0 ? "songqueue-currentsong" : ""} songqueue-song`}>
-                        <div className="songqueue-artist">{song.song.artist}</div>
-                        <div className="songqueue-title">{song.song.title}</div>
+                        <div className="songqueue-artist">{song.song?.artist}</div>
+                        <div className="songqueue-title">{song.song?.title}</div>
                     </FlexRow>
                 </React.Fragment>
                 )}

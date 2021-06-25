@@ -10,7 +10,8 @@ export function useStatePersistance(streamer: string, stateContext: StateContext
         intervalHandle.current = setInterval(() => {
             const stateToSave = JSON.parse(JSON.stringify(latestState.current));
             stateToSave.accessToken = undefined;
-            stateToSave.chat.connected = false;    
+            stateToSave.chat.connected = false;
+            stateToSave.isLoggedIn = false;
             LocalStorage.set(`appState_${streamer}`, stateToSave)
         }, 10000);
         return function cleanup() {

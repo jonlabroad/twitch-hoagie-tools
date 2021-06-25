@@ -5,10 +5,10 @@ export default class ChatParser {
 
     public static parse(rawMessage: string): ChatMessage | undefined {
         const matches = rawMessage.match(ChatParser.regex);
-        if (matches?.groups?.messageType === "PRIVMSG") {
+        if (matches?.[3] === "PRIVMSG") {
             return {
-                username: matches.groups?.username,
-                message: matches.groups?.message,
+                username: matches?.[1],
+                message: matches?.[5],
                 timestamp: new Date(),
             } as ChatMessage;
         }

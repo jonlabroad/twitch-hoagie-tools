@@ -21,6 +21,23 @@ export interface ChannelData {
     title: string
 }
 
+export interface UserSubscriptions {
+    broadcaster_id: string
+    broadcaster_name: string
+    broadcaster_login: string
+    is_gift: boolean
+    tier: string
+}
+
+export interface UserFollows {
+    from_id: string
+    from_login: string
+    from_name: string
+    to_id: string
+    to_name: string
+    followed_at: string
+}
+
 export interface StreamData {
     id: string
     user_id: string
@@ -40,15 +57,15 @@ export interface StreamData {
 
 export interface UsersFollows {
     total: number,
-    data:        {
+    data: {
         from_id: string
         from_login: string
         from_name: string
         to_id: string
         to_name: string
         followed_at: string
-     }[]
-    pagination:{
-      cursor: string
+    }[]
+    pagination: {
+        cursor: string
     }
 }

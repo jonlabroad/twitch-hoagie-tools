@@ -1,3 +1,4 @@
+import { Hidden } from "@material-ui/core";
 import React from "react";
 import { ShoutoutAlertType } from "../../alerts/AlertType"
 import { CopyButton } from "../../alerts/CopyButton";
@@ -29,16 +30,18 @@ export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
                         {alert.followers.total} followers
                     </div>
                 </FlexCol>
-                <FlexCol className="user-card-channel-info">
-                    <div className="user-card-broadcaster-type">
-                        {alert.userData.broadcaster_type}
-                    </div>
-                    <div className="shoutout-card-game-name">
-                        {alert.channelData.game_name}
-                    </div>
-                </FlexCol>
+                <Hidden mdDown>
+                    <FlexCol className="user-card-channel-info">
+                        <div className="user-card-broadcaster-type">
+                            {alert.userData.broadcaster_type}
+                        </div>
+                        <div className="shoutout-card-game-name">
+                            {alert.channelData.game_name}
+                        </div>
+                    </FlexCol>
+                </Hidden>
             </FlexRow>
-            <FlexRow alignItems="center">
+            <FlexCol alignItems="center">
                 <IgnoreButton
                     alert={alert}
                 />
@@ -46,7 +49,7 @@ export const ShoutoutAlertCard = (props: ShoutoutAlertCardProps) => {
                     text="Copy !so"
                     command={`!so ${alert.userData.login}`}
                 />
-            </FlexRow>
+            </FlexCol>
         </FlexRow>
     </React.Fragment>
 
