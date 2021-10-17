@@ -1,8 +1,8 @@
 import RaidHandler from "./raids/RaidHandler";
 import { TwitchEventHandlers } from "./TwitchEventHandler";
 
-const broadcasterLogin = "thesongery";
+export const broadcasterLogin = "sashiboom";
 
-export const TheSongeryHandlers: TwitchEventHandlers = {
+export const TestHandlers: TwitchEventHandlers = {
     "channel.raid": new RaidHandler(broadcasterLogin)
 }

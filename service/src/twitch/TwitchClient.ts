@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Config from "../Config";
 import { TwitchSubscription } from "./TwitchSubscription";
 
-const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc-prod.hoagieman.net" : "https://hoagietools-svc.hoagieman.net";
+const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc.hoagieman.net" : "https://hoagietools-svc-development.hoagieman.net";
 
 export interface ValidatedSession {
     expires_in: number
@@ -11,6 +11,8 @@ export interface ValidatedSession {
 }
 
 export default class TwitchClient {
+    private userIdCache: Promise<any> | undefined;
+
     authToken?: {
         access_token: string,
         expires_in: number,
@@ -20,15 +22,25 @@ export default class TwitchClient {
     constructor() {
     }
 
-    async getUserId(username: string) {
-        const authToken = await this.getAuthToken();
-        console.log(`https://api.twitch.tv/helix/users?login=${username}`);
-        const response = await axios.get<any>(`https://api.twitch.tv/helix/users?login=${username}`, {
-            headers: {
-                "Client-ID": `${Config.twitchClientId}`,
-                Authorization: `Bearer ${authToken?.access_token}`
-            }
-        });
+    async getUserId(username: string): Promise<string | undefined> {
+        const url = `https://api.twitch.tv/helix/users?login=${username}`;
+        let request = this.userIdCache;
+        if (!request) {
+            console.log(url);
+            request = (async () => {
+                const authToken = await this.getAuthToken();
+                return axios.get<any>(`https://api.twitch.tv/helix/users?login=${username}`, {
+                    headers: {
+                        "Client-ID": `${Config.twitchClientId}`,
+                        Authorization: `Bearer ${authToken?.access_token}`
+                    }
+                });
+            })();
+            
+            this.userIdCache = request;
+        }
+     
+        const response = await request;
         if (response.status === 200 && response.data?.data && response.data?.data?.length === 1) {
             return response.data.data[0].id;
         }
@@ -53,19 +65,23 @@ export default class TwitchClient {
         };
     }
 
-    public async createSubscription(username: string, type: string) {
+    public async createSubscription(username: string, type: string, condition: Record<string, string>) {
         const client = new TwitchClient();
+        console.log(`Getting userId for ${username}`)
         const userId = await client.getUserId(username);
+        console.log({userId});
+        if (!userId) {
+            return;
+        }
 
         const authToken = await this.getAuthToken();
 
         const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
+        console.log({url});
         const data = {
             type,
             version: "1",
-            condition: {
-                "broadcaster_user_id": userId.toString(),
-            },
+            condition,
             transport: {
                 method: "webhook",
                 callback: `${subscriptionCallbackHost}/api/twitchcallback`,
@@ -81,6 +97,7 @@ export default class TwitchClient {
             }
         };
         const response = await axios.post(url, data, config);
+        console.log("SUBSCRIPTIONS");
         return response.data;
     }
 
