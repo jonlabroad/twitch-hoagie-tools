@@ -11,7 +11,6 @@ import { AppState, defaultAppState, StateContextType } from "../state/AppState";
 import { appStateReducer, LoginAction } from "../state/AppStateReducer";
 import CacheManager from "../util/CacheManager";
 import LocalStorage from "../util/LocalStorage";
-import LoginUtil from "../util/LoginUtil";
 import { EmbeddedVideo } from "../video/EmbeddedVideo";
 import { AlertContainer } from "./alerts/AlertContainer";
 import { ChannelHeader } from "./ChannelHeader";
@@ -20,6 +19,8 @@ import { EmbeddedChat } from "./chat/EmbeddedChat";
 import { ChatMessage } from "./chat/SimpleChatDisplay";
 import { ChatEvaluatorContainer } from "./chatEval/ChatEvaluatorContainer";
 import { EventsContainer } from "./events/EventsContainer";
+import { PageHeader } from "./PageHeader";
+import { RaidContainer } from "./raid/RaidContainer";
 import { SongQueue } from "./ssl/SongQueue";
 import { StreamerLinks } from "./StreamerLinks";
 import { FlexRow } from "./util/FlexBox";
@@ -60,17 +61,6 @@ export const MainPage = (props: MainPageProps) => {
     const alertGenerator = useRef<AlertGenerator | undefined>(undefined);
     const caches = useRef(new CacheManager());
 
-    const [] = useLogin((username: string | undefined, accessToken: string, isLoggedIn: boolean) => {
-        if (username) {
-            appStateDispatch({
-                type: "login",
-                username,
-                accessToken,
-                isLoggedIn,
-            } as LoginAction);
-        }
-    });
-
     useEffect(() => {
         if (appState.accessToken && !twitchClient.current) {
             const client = new TwitchClient(appState.accessToken, caches.current);
@@ -92,40 +82,7 @@ export const MainPage = (props: MainPageProps) => {
                 dispatch: appStateDispatch,
                 state: appState,
             }}>
-                <AppBar style={{
-                    backgroundColor: "#3C474B",
-                    color: "#dbdbf8"
-                }} position="static">
-                    <Toolbar variant="dense">
-                        <FlexRow style={{ width: "100%" }} justifyContent="space-between" alignItems="center">
-                            <Typography variant="h6" style={{ marginRight: "20px" }}>
-                                Hoagie Tools
-                            </Typography>
-                            {appState.isLoggedIn ?
-                                <FlexRow alignItems="center">
-                                    <div>{appState.username}</div>
-                                    <Button
-                                        style={{
-                                            marginLeft: 10
-                                        }}
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={() => LoginUtil.logout()}
-                                    >
-                                        Log Out
-                                </Button>
-                                </FlexRow>
-                                :
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    href={`https://id.twitch.tv/oauth2/authorize?scope=${Config.scopes}&client_id=${Config.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
-                                >
-                                    Login
-                    </Button>}
-                        </FlexRow>
-                    </Toolbar>
-                </AppBar>
+                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={Config.scopes} />
                 <Grid container spacing={3}>
                     <Grid item xs={3}>
                         <ChannelHeader />
@@ -153,6 +110,11 @@ export const MainPage = (props: MainPageProps) => {
                         />
                     </Grid>
                     <ChatEvaluatorContainer lastMessage={lastMessage} twitchClient={twitchClient.current} />
+                </Grid>
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <RaidContainer />
+                    </Grid>
                 </Grid>
                 <EventsContainer />
             </StateContext.Provider>

@@ -11,6 +11,8 @@ import TwitchAuthorizer from "./src/twitch/TwitchAuthorizer";
 import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
+import { TestHandlers } from "./src/eventsub/TestHandlers";
+import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -24,7 +26,8 @@ export const noCacheHeaders = {
 
 const handlers = new TwitchEventhandler(
     [
-        TheSongeryHandlers
+        TheSongeryHandlers,
+        TestHandlers,
     ]
 );
 
@@ -47,6 +50,9 @@ module.exports.twitchwebhook = async (event: APIGatewayProxyEvent) => {
             body: verificationResponse
         }
     }
+
+    const body = JSON.parse(event.body ?? "{}") as TwitchWebhookEvent<any>;
+    await handlers.handle(body);
 
     return {
         statusCode: 200,
@@ -125,10 +131,11 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
             return authResponse;
         }
 
-        const username = event.queryStringParameters?.["username"] ?? "";
+        const streamerLogin = event.queryStringParameters?.["channelname"] ?? "";
+        console.log(`Creating subscriptions for ${streamerLogin}`);
         return {
             statusCode: 200,
-            body: JSON.stringify(await CreateSubscriptions.create(username), null, 2),
+            body: JSON.stringify(await CreateSubscriptions.create(streamerLogin), null, 2),
             headers: {
                 ...corsHeaders,
                 ...noCacheHeaders,

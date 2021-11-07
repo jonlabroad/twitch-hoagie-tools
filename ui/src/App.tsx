@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { LoginRedirect } from './components/LoginRedirect';
 
 import 'fontsource-roboto';
+import { StreamerDashboard } from './components/auth/StreamerDashboard';
 
+const testStreamerName = "sashiboom";
 
 function App() {
   return (
@@ -15,6 +17,24 @@ function App() {
           </Route>
           <Route path="/loginRedirect">
             <LoginRedirect />
+          </Route>
+          <Route path="/config/thesongery">
+            <StreamerDashboard
+              streamerName="thesongery"
+              scopes={"channel:read:redemptions"}
+            />
+          </Route>
+          <Route path={`/config/${testStreamerName}`}>
+            <StreamerDashboard
+              streamerName={testStreamerName}
+              scopes={"channel:read:redemptions"}
+            />
+          </Route>
+          <Route path="/config/hoagieman5000">
+            <StreamerDashboard
+              streamerName="hoagieman5000"
+              scopes={"channel:read:redemptions"}
+            />
           </Route>
         </Switch>
       </Router>

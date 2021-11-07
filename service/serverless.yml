@@ -14,6 +14,13 @@ custom:
     domain: hoagietools-svc-${self:custom.myStage}.hoagieman.net
     certificate: arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2
     compress: true
+    headers:
+      - Origin
+      - Authorization
+      - Access-Control-Request-Method
+      - Access-Control-Allow-Origin
+      - Access-Control-Request-Headers
+      - Access-Control-Allow-Credentials
     # Unfortunately, the DefaultTTL must be set manually
 
 provider:
@@ -65,8 +72,11 @@ functions:
           method: POST
           path: /api/twitchcallback
     environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       SUBSCRIPTION_SECRET: ${file(secrets.yml):twitchWebhookSecret}
       STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
 
   listsubscriptions:
     handler: twitch.listsubscriptions
@@ -92,6 +102,7 @@ functions:
           parameters:
             querystrings:
               username: true
+              channelname: true
           cors: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}

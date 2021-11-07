@@ -20,13 +20,15 @@ export default class RaidDbClient {
 
         const broadcasterId = await (new TwitchClient()).getUserId(this.broadcasterLogin);
 
+        const date = new Date();
         const request: any = {
             TableName: Config.tableName,
             Item: {
                 CategoryKey: `${broadcasterId}_${RaidDbClient.RAID_CATEGORY}`,
-                SubKey: new Date().toISOString(),
+                SubKey: date.toISOString(),
                 Value: {
-                    ...raid
+                    ...raid,
+                    timestamp: date.getTime()
                 }
             }
         };

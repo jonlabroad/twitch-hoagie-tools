@@ -1,4 +1,4 @@
-import * as Perspective from 'perspective-api-client';
+import Perspective from 'perspective-api-client';
 
 export default class PerspectiveClient {
     client: Perspective;
@@ -13,7 +13,7 @@ export default class PerspectiveClient {
         );
     }
 
-    async analyze(text: string): Promise<Record<string, number> | undefined> {
+    async analyze(text: string): Promise<{ results: Record<string, number> | undefined, error: any }> {
         let result: Record<string, number> | undefined = undefined;
         try {
             const response = await this.client.analyze(text, {
@@ -33,7 +33,14 @@ export default class PerspectiveClient {
             }
         } catch (err) {
             console.error(err);
+            return {
+                results: undefined,
+                error: `${(err as any).message}`,
+            }
         }
-        return result;
+        return {
+            results: result,
+            error: undefined,
+        }
     }
 }

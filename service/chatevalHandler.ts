@@ -2,6 +2,16 @@
 
 import PerspectiveClient from "./src/PerspectiveClient";
 
+export const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Credentials': true,
+};
+
+export const cacheHeaders = {
+    "Cache-Control": "max-age=3600"
+}
+
 module.exports.eval = async (event: any) => {
     const apiKey = process.env.PERSPECTIVE_API_KEY;
     if (!apiKey) {
@@ -15,18 +25,28 @@ module.exports.eval = async (event: any) => {
     const client = new PerspectiveClient(apiKey);
     const response = await client.analyze(message);
 
-    return {
-        statusCode: 200,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': true,
-        },
-        body: JSON.stringify(
-            {
-                evaluation: response
+    if (!response.error) {
+        return {
+            statusCode: 200,
+            headers: {
+                ...corsHeaders,
+                ...cacheHeaders,
             },
-            null,
-            2
-        ),
-    };
+            body: JSON.stringify(
+                {
+                    evaluation: response.results
+                },
+                null,
+                2
+            ),
+        };
+    }
+    return {
+        statusCode: 500,
+        headers: {
+            ...corsHeaders
+        },
+        body: response.error ?? "unknown error"
+    }
+
 };

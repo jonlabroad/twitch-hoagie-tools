@@ -1,3 +1,4 @@
 /ui/src/secrets
 /service/secrets.yml
 /service/node_modules
+/service/.serverless

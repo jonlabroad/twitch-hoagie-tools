@@ -58,7 +58,6 @@ export const ChatParticipants = (props: ChatParticipantsProps) => {
                 const userDatas = await props.twitchClient.getUsers([user]);
                 const userData = userDatas[0];
                 const follows = await props.twitchClient.getUserFollows(state.streamerData.userData.id, userData.id);
-                console.log({ userData, follows });
 
                 const existingUser = usersInChat.find(u => u.userData.id === userData.id);
                 if (existingUser) {

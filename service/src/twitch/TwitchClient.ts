@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import Config from "../Config";
 import { TwitchSubscription } from "./TwitchSubscription";
 
-const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc.hoagieman.net" : "https://hoagietools-svc-development.hoagieman.net";
+const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc-prod.hoagieman.net" : "https://hoagietools-svc-development.hoagieman.net";
 
 export interface ValidatedSession {
     expires_in: number

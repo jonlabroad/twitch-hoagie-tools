@@ -1,0 +1,28 @@
+.highlighted-chat-message {
+    background-color: darkolivegreen;
+}
+
+.evaluation-container {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 5px;
+    padding: 0 3px 0 3px;
+    margin-top: 2px;
+
+    background-color: darkgrey;
+
+    color: black;
+    font-size: small;
+    font-weight: 600;
+}
+
+.evaluation-type {
+    margin-right: 5px;
+}
+
+.evaluation-rating {
+    font-weight: 500;
+}

@@ -21,6 +21,20 @@ export interface ChannelData {
     title: string
 }
 
+export interface LiveChannelData {
+    broadcaster_language: string
+    broadcaster_login: string
+    display_name: string
+    game_id: string
+    game_name: string
+    id: string
+    is_live: boolean
+    started_at: string
+    tag_ids: string[]
+    thumbnail_url: string
+    title: string
+}
+
 export interface UserSubscriptions {
     broadcaster_id: string
     broadcaster_name: string
@@ -55,6 +69,12 @@ export interface StreamData {
     is_mature: false
 }
 
+export interface Game {
+    id: string
+    name: string
+    box_art_url: string
+}
+
 export interface UsersFollows {
     total: number,
     data: {
@@ -65,6 +85,34 @@ export interface UsersFollows {
         to_name: string
         followed_at: string
     }[]
+    pagination: {
+        cursor: string
+    }
+}
+
+export interface TwitchSubscription {
+    id: string
+    status: string
+    type: string
+    version: string
+    cost: string
+    condition: {
+        broadcaster_user_id: string
+    },
+    created_at: string
+    transport: {
+        method: string
+        callback: string
+    }
+}
+
+export interface DataResponse<T> {
+    data: T
+}
+
+export interface Paginated<T> {
+    total: number
+    data: T
     pagination: {
         cursor: string
     }
