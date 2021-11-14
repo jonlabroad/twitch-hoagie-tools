@@ -179,3 +179,32 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
         }
     }
 }
+
+module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
+    try {
+        Config.validate();
+
+        const authResponse = await TwitchAuthorizer.auth(event, "admin");
+        if (authResponse) {
+            console.log(`Unauthorized: ${authResponse.statusCode}`);
+            return authResponse;
+        }
+
+        const streamerLogin = event.queryStringParameters?.["streamerLogin"] ?? "";
+        return {
+            statusCode: 200,
+            body: JSON.stringify(await RaidProvider.get(streamerLogin), null, 2),
+            headers: {
+                ...corsHeaders,
+                ...noCacheHeaders,
+            },
+        };
+    } catch (err) {
+        console.error(err.message, err);
+        return {
+            statusCode: 500,
+            headers: corsHeaders,
+            body: `${err.message}`
+        }
+    }
+}

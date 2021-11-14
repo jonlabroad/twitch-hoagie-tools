@@ -78,6 +78,46 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  spotifytoken:
+    handler: spotifyplaylist.settoken
+    timeout: 10
+    events:
+      - http:
+          method: POST
+          path: /api/spotify/settoken
+          cors: true
+          parameters:
+            querystrings:
+              username: true
+    environment:
+      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
+      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  spotifyplaylist:
+    handler: spotifyplaylist.generate
+    timeout: 600
+    events:
+      - http:
+          method: POST
+          path: /api/spotify/createplaylist
+          cors: true
+          parameters:
+            querystrings:
+              username: true
+#    events:
+#      - schedule: rate(24 hours)
+    environment:
+      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
+      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
   listsubscriptions:
     handler: twitch.listsubscriptions
     events:
@@ -152,6 +192,22 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  getraiddata:
+    handler: twitch.getraiddata
+    events:
+      - http:
+          method: GET
+          path: /api/raiddata
+          parameters:
+            querystrings:
+              username: true
+              streamerId: true
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
 
 resources:
   Resources:
