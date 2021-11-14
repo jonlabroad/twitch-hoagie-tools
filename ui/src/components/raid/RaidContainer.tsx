@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLiveChannels, useRaidTargets } from "../../hooks/raidTargetHooks";
 import TwitchClient from "../../service/TwitchClient";
 import { ChannelData, LiveChannelData, StreamData, UserData } from "../../service/TwitchClientTypes";
+import StreamSorter from "../../util/StreamSorter";
 import { CountupTimer } from "../CountdownTimer";
 import { StateContext } from "../MainPage";
 import { FlexCol } from "../util/FlexBox";
@@ -50,7 +51,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
         return <CircularProgress />
     }
 
-    const sortedChannels = Object.values(liveStreamsToDisplay).sort((c1, c2) => c1.user_name.localeCompare(c2.user_name));
+    const sortedChannels = Object.values(liveStreamsToDisplay).sort((c1, c2) => StreamSorter.sort(c1, c2));
     const numChannels = sortedChannels.length;
     console.log({userInfo});
     return <FlexCol>
@@ -59,12 +60,13 @@ export const RaidContainer = (props: RaidContainerProps) => {
             <TableBody>
                 {sortedChannels.map(stream => (
                     <TableRow>
+                        <TableCell>{StreamSorter.getSortRank(stream)}</TableCell>
                         <TableCell><ChannelLink username={stream.user_name}><img style={{ borderRadius: 25, height: 50, width: "auto" }} src={userInfo[stream.user_name]?.profile_image_url} /></ChannelLink></TableCell>
                         <TableCell><Typography variant="subtitle1">{stream.user_name}</Typography></TableCell>
                         <TableCell><ChannelLink username={stream.user_name}><img style={{ height: 90 }} src={stream?.thumbnail_url.replace('{width}', '440').replace('{height}', '248')} /></ChannelLink></TableCell>
+                        <TableCell><CountupTimer startDate={new Date(stream.started_at)} /></TableCell>
                         <TableCell>{stream?.viewer_count}</TableCell>
                         <TableCell>{stream.title}</TableCell>
-                        <TableCell><CountupTimer startDate={new Date(stream.started_at)} /></TableCell>
                     </TableRow>
                 ))}
             </TableBody>

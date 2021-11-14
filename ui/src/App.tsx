@@ -4,6 +4,7 @@ import { LoginRedirect } from './components/LoginRedirect';
 
 import 'fontsource-roboto';
 import { StreamerDashboard } from './components/auth/StreamerDashboard';
+import { SpotifyConfig } from './components/spotify/SpotifyConfig';
 
 const testStreamerName = "sashiboom";
 
@@ -35,6 +36,9 @@ function App() {
               streamerName="hoagieman5000"
               scopes={"channel:read:redemptions"}
             />
+          </Route>
+          <Route path="/spotify/config">
+            <SpotifyConfig />
           </Route>
         </Switch>
       </Router>

@@ -11,7 +11,7 @@ export default class StreamerSongListDbClient {
     public static async setToken(username: string, token: string) {
         const client = new DynamoDB.DocumentClient();
 
-        const userId = await (new TwitchClient()).getUserId(username);
+        const userId = await (new TwitchClient()).getUserId(username) ?? "ERROR";
         console.log(userId);
 
         const request: any = {
@@ -31,7 +31,7 @@ export default class StreamerSongListDbClient {
 
     public static async getToken(streamerName: string) {
         const client = new DynamoDB.DocumentClient();
-        const userId = await (new TwitchClient()).getUserId(streamerName);
+        const userId = await (new TwitchClient()).getUserId(streamerName) ?? "ERROR";
 
         const request: any = {
             TableName: Config.tableName,

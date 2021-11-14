@@ -64,4 +64,29 @@ export default class HoagieClient {
         });
         return response.data;
     }
+
+    async writeSpotifyToken(twitchUsername: string, accessToken: string, spotifyToken: string, redirectUri: string) {
+        const url = `${this.BASE_URL}spotify/settoken?username=${twitchUsername}`;
+        const response = await axios.post(url, {
+            token: spotifyToken,
+            redirectUri,
+        }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        })
+        return response.data;
+    }
+
+    async createSpotifyPlaylist(requestorUsername: string, streamerName: string, accessToken: string) {
+        const url = `${this.BASE_URL}spotify/createplaylist?username=${requestorUsername}`;
+        const response = await axios.post(url, {
+            streamerName: streamerName
+        }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        })
+        return response.data;
+    }
 }

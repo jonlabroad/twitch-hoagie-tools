@@ -2,3 +2,4 @@
 /service/secrets.yml
 /service/node_modules
 /service/.serverless
+/service/.build
