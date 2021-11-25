@@ -201,7 +201,7 @@ functions:
           parameters:
             querystrings:
               username: true
-              streamerId: true
+              streamerLogin: true
           cors: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}

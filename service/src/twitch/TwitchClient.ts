@@ -67,9 +67,7 @@ export default class TwitchClient {
 
     public async createSubscription(username: string, type: string, condition: Record<string, string>) {
         const client = new TwitchClient();
-        console.log(`Getting userId for ${username}`)
         const userId = await client.getUserId(username);
-        console.log({userId});
         if (!userId) {
             return;
         }

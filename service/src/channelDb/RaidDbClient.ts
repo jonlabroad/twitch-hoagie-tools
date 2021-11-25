@@ -1,5 +1,4 @@
 import { DynamoDB } from "aws-sdk";
-import { PutItemInput } from "aws-sdk/clients/dynamodb";
 import Config from "../Config";
 import { RaidEvent } from "../eventsub/events/RaidEvent";
 
@@ -7,7 +6,6 @@ import TwitchClient from "../twitch/TwitchClient";
 
 export default class RaidDbClient {
     public static readonly RAID_CATEGORY = "RAID";
-    public static readonly STREAMER_SONGLIST_SUBCAT = "streamerSongListToken";
 
     private broadcasterLogin: string;
 
@@ -39,16 +37,16 @@ export default class RaidDbClient {
     public async readRaids(): Promise<RaidEvent[]> {
         const client = new DynamoDB.DocumentClient();
 
-        const broadcasterId = (await new TwitchClient()).getUserId(this.broadcasterLogin);
+        const broadcasterId = await (new TwitchClient()).getUserId(this.broadcasterLogin);
 
         const request: any = {
             TableName: Config.tableName,
-            Key: {
-                CategoryKey: `${broadcasterId}_${RaidDbClient.RAID_CATEGORY}`,
+            KeyConditionExpression: "CategoryKey = :ckey",
+            ExpressionAttributeValues: {
+                ":ckey": `${broadcasterId}_${RaidDbClient.RAID_CATEGORY}`
             }
         }
-
         const response = await client.query(request).promise();
-        return response?.Items as RaidEvent[];
+        return response?.Items?.map(item => item.Value) as RaidEvent[];
     }
 }

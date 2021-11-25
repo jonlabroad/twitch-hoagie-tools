@@ -13,6 +13,7 @@ import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
 import { TestHandlers } from "./src/eventsub/TestHandlers";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
+import RaidProvider from "./src/twitch/RaidProvider";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -191,9 +192,12 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
         }
 
         const streamerLogin = event.queryStringParameters?.["streamerLogin"] ?? "";
+        
         return {
             statusCode: 200,
-            body: JSON.stringify(await RaidProvider.get(streamerLogin), null, 2),
+            body: JSON.stringify({
+                raids: await RaidProvider.get(streamerLogin)
+            }, null, 2),
             headers: {
                 ...corsHeaders,
                 ...noCacheHeaders,

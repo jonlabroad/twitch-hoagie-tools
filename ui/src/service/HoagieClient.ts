@@ -1,4 +1,5 @@
 import axios from "axios";
+import { RaidEvent } from "../components/raid/RaidEvent";
 
 export default class HoagieClient {
     readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
@@ -88,5 +89,17 @@ export default class HoagieClient {
             }
         })
         return response.data;
+    }
+
+    async getRaids(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}raiddata?username=${username}&streamerLogin=${streamerName}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        console.log({datadata: response.data});
+        return response.data as {
+            raids: RaidEvent[];
+        }
     }
 }
