@@ -26,6 +26,10 @@ export const noCacheHeaders = {
     "Cache-Control": "no-cache"
 }
 
+const followCacheHeaders = {
+    "Cache-Control": "max-age=5"
+}
+
 const handlers = new TwitchEventhandler(
     [
         TheSongeryHandlers,
@@ -230,14 +234,16 @@ module.exports.getuserfollows = async (event: APIGatewayProxyEvent) => {
             }, null, 2),
             headers: {
                 ...corsHeaders,
-                ...noCacheHeaders,
+                ...followCacheHeaders
             },
         };
     } catch (err) {
         console.error(err.message, err);
         return {
             statusCode: 500,
-            headers: corsHeaders,
+            headers: {
+                ...corsHeaders,
+            },
             body: `${err.message}`
         }
     }

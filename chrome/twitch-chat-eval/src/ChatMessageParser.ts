@@ -1,17 +1,18 @@
 export interface ChatMessage {
     username: string
     message: string
-    fullMessage: string
 }
 
 export default class ChatMessageParser {
-    public static parse(rawMsg: string): ChatMessage {
-        console.log({rawMsg});
-        const matches = rawMsg.match(/(\d{1,2}:\d{1,2})?(?<username>.[^:]+): (?<message>.+)/);
-        return {
-            username: matches?.groups?.username?.trim() ?? "",
-            message: matches?.groups?.message?.trim() ?? "",
-            fullMessage: matches?.groups?.message ?? "",
+    public static parse(element: Element | Node): ChatMessage | undefined {
+        const message = (element as Element).querySelectorAll('[data-a-target="chat-message-text"]').item(0)?.textContent;
+        const username = (element as Element).querySelectorAll('[data-a-target="chat-message-username"]').item(0)?.textContent;
+        if (message && username) {
+            return {
+                username,
+                message,
+            }
         }
+        return undefined;
     }
 }
