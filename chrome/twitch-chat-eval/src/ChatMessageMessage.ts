@@ -1,7 +1,4 @@
-export interface ChatMessageMessage {
-    type: string,
-    data: {
-        tab?: number;
-        message: string
-    }
+export interface ChatMessageData {
+    username: string
+    message: string
 }

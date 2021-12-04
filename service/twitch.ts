@@ -14,6 +14,7 @@ import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
 import { TestHandlers } from "./src/eventsub/TestHandlers";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 import RaidProvider from "./src/twitch/RaidProvider";
+import TwitchProvider from "./src/twitch/TwitchProvider";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -212,3 +213,33 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
         }
     }
 }
+
+module.exports.getuserfollows = async (event: APIGatewayProxyEvent) => {
+    try {
+        Config.validate();
+
+        const streamerLogin = event.queryStringParameters?.["streamerName"] ?? "";
+        const userLogin = event.queryStringParameters?.["userName"] ?? "";
+        
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                userLogin,
+                streamerLogin,
+                follows: await TwitchProvider.doesUserFollow(streamerLogin, userLogin)
+            }, null, 2),
+            headers: {
+                ...corsHeaders,
+                ...noCacheHeaders,
+            },
+        };
+    } catch (err) {
+        console.error(err.message, err);
+        return {
+            statusCode: 500,
+            headers: corsHeaders,
+            body: `${err.message}`
+        }
+    }
+}
+

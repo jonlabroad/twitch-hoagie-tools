@@ -1,10 +1,11 @@
-import { ChatMessageMessage } from "./ChatMessageMessage";
-import ChatMessageParser from "./ChatMessageParser";
+import { ChatMessageData } from "./ChatMessageMessage";
 import Config from "./Config";
-import HoagieClient from "./HoagieClient";
+import HoagieClient, { FollowResponse } from "./HoagieClient";
+import { Message } from "./Message";
+import { StreamerNameData } from "./StreamerNameData";
 import ChromeStorage from "./util/chrome/ChromeStorage";
 
-const blacklist = [
+const whitelist = [
     "nightbot",
     "streamelements",
     "streamlabs",
@@ -13,36 +14,62 @@ const blacklist = [
     "insertirony",
     "beverly_hills_ninja",
     "daemonarchy",
+    "thesongery",
 ];
 
 export default class Background {
+    private streamerName: Record<number, string> = {};
+
     public init() {
         const self = this;
-        chrome.runtime.onMessage.addListener(function (request, sender) {
+        chrome.runtime.onMessage.addListener(function (request: any, sender: chrome.runtime.MessageSender) {
             if (request.type === "chat-message") {
-                self.handleChatMessage(request, sender);
+                const req = request as Message<ChatMessageData>;
+                self.handleChatMessage(req, sender);
+                self.lookupUserFollow(req, sender);
+            } else if (request.type === "streamer-name") {
+                const req = request as Message<StreamerNameData>;
+                self.streamerName[sender.tab?.id ?? 9999] = req.data.streamerName;
             }
         });
     }
 
-    public async handleChatMessage(chatMessage: ChatMessageMessage, sender: chrome.runtime.MessageSender) {
-        const message = ChatMessageParser.parse(chatMessage.data.message);
+    public async handleChatMessage(chatMessage: Message<ChatMessageData>, sender: chrome.runtime.MessageSender) {
         const hoagieClient = new HoagieClient();
         const options = await (new ChromeStorage().getSync([Config.useChatEval]));
         if (options[Config.useChatEval]) {
-            if (message.message && !blacklist.includes(message.username.toLowerCase())) {
-                const result = await hoagieClient.analyze(message.message);
+            if (chatMessage.data.message && !whitelist.includes(chatMessage.data.username.toLowerCase())) {
+                const result = await hoagieClient.analyze(chatMessage.data.message);
                 chrome.tabs.sendMessage(sender.tab?.id ?? 0, {
                     type: "message-analysis",
-                    message: message,
+                    message: chatMessage.data.message,
                     results: result
                 });
             }
         }
     }
 
-    public isBlacklistedUser(username: string) {
+    public async lookupUserFollow(chatMessage: Message<ChatMessageData>, sender: chrome.runtime.MessageSender) {
+        const userName = chatMessage.data.username;
+        if (whitelist.includes(chatMessage.data.username.toLowerCase())) {
+            return {
+                userLogin: userName,
+                streamerLogin: this.streamerName[sender.tab?.id ?? 9999],
+                follows: true,
+            } as FollowResponse;
+        }
 
+        if (this.streamerName) {
+            const hoagieClient = new HoagieClient();
+            const follows = await hoagieClient.getFollow(this.streamerName[sender.tab?.id ?? 9999], userName);
+            chrome.tabs.sendMessage(sender.tab?.id ?? 0, {
+                type: "follow-result",
+                follows,
+            });
+            console.log({[userName]: follows.follows})
+        }
+
+        return undefined;
     }
 }
 (new Background).init();

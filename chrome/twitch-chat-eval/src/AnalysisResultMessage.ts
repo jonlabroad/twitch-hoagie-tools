@@ -2,6 +2,6 @@ import { ChatMessage } from "./ChatMessageParser";
 
 export interface AnalysisResultMessage {
     type: "message-analysis",
-    message: ChatMessage,
+    message: string,
     results: Record<string, number>
 }

@@ -209,6 +209,23 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  getuserfollows:
+    handler: twitch.getuserfollows
+    events:
+      - http:
+          method: GET
+          path: /api/getuserfollows
+          parameters:
+            querystrings:
+              username: true
+              streamerLogin: true
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
 resources:
   Resources:
     GatewayResponseDefault4XX:

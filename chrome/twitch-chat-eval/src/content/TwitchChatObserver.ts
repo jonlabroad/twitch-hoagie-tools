@@ -1,5 +1,5 @@
 import { AnalysisResultMessage } from "../AnalysisResultMessage";
-import ChatMessageParser, { ChatMessage } from "../ChatMessageParser";
+import { FollowResponse } from "../HoagieClient";
 import NaughtyFinder from "../NaughtyFinder";
 
 export default class TwitchChatObserver {
@@ -8,15 +8,20 @@ export default class TwitchChatObserver {
     public init() {
         const self = this;
 
+        this.sendStreamerName();
+
         const chatLineObserver = new MutationObserver(function (mutations, observer) {
             mutations.forEach(function (mutation) {
                 mutation.addedNodes.forEach(addedNode => {
                     if (self.isAChatMessageNode(addedNode)) {
                         const element = addedNode as Element;
+                        const message = element.querySelectorAll('[data-a-target="chat-message-text"]').item(0)?.textContent;
+                        const username = element.querySelectorAll('[data-a-target="chat-message-username"]').item(0)?.textContent;
                         chrome.runtime.sendMessage({
                             type: "chat-message",
                             data: {
-                                message: element.textContent
+                                username,
+                                message
                             }
                         })
                     }
@@ -35,10 +40,13 @@ export default class TwitchChatObserver {
                                 console.log(`Found a chat container`);
                                 self.chatParentElements.push(chatParent);
                                 chatLineObserver.observe(chatParent, { childList: true });
+                                const message = element.querySelectorAll('[data-a-target="chat-message-text"]').item(0)?.textContent;
+                                const username = element.querySelectorAll('[data-a-target="chat-message-username"]').item(0)?.textContent;
                                 chrome.runtime.sendMessage({
                                     type: "chat-message",
                                     data: {
-                                        message: element.textContent
+                                        username,
+                                        message
                                     }
                                 })
                             }
@@ -53,6 +61,9 @@ export default class TwitchChatObserver {
             if (request.type === "message-analysis") {
                 console.log({ receivedAnalysis: request.results });
                 self.handleMessageAnalysis(request);
+            } else if (request.type === "follow-result") {
+                console.log({ followResult: request.follows });
+                self.handleFollowResult(request.follows);
             }
             sendResponse();
         });
@@ -62,6 +73,7 @@ export default class TwitchChatObserver {
         if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
             if (this.isAChatMessageElement(element)) {
+                console.log({ attr: element.attributes });
                 return true;
             }
         }
@@ -69,7 +81,20 @@ export default class TwitchChatObserver {
     }
 
     isAChatMessageElement(element: Element) {
-        return element.getAttribute("class")?.startsWith("chat-line");
+        return element.attributes.getNamedItem("data-a-target")?.value === "chat-line-message";
+    }
+
+    sendStreamerName() {
+        const matches = window.location.pathname.match(/\/((.+)\/)?(?<streamerName>.+)/);
+        const streamerName = matches?.groups?.streamerName;
+        if (streamerName) {
+            chrome.runtime.sendMessage({
+                type: "streamer-name",
+                data: {
+                    streamerName
+                }
+            })
+        }
     }
 
     handleMessageAnalysis(request: AnalysisResultMessage) {
@@ -80,9 +105,12 @@ export default class TwitchChatObserver {
                 const item = this.chatParentElements[0].children.item(i);
                 if (item?.nodeType === Node.ELEMENT_NODE) {
                     const element = item as Element;
-                    if (element.getAttribute("class")?.startsWith("chat-line") && element.textContent) {
-                        const currentMsg = ChatMessageParser.parse(element.textContent);
-                        if (currentMsg.fullMessage === request.message.fullMessage) {
+                    const message = element.querySelectorAll('[data-a-target="chat-message-text"]').item(0)?.textContent;
+                    const username = element.querySelectorAll('[data-a-target="chat-message-username"]').item(0)?.textContent;
+                    console.log({ message, username });
+                    console.log({ message, reqMsg: request.message });
+                    if (username && message) {
+                        if (message === request.message) {
                             const currentClass = element.getAttribute("class") ?? "";
                             element.setAttribute("class", `${currentClass} highlighted-chat-message`);
 
@@ -92,18 +120,43 @@ export default class TwitchChatObserver {
                             const evalTypeDiv = document.createElement("div");
                             evalTypeDiv.setAttribute("class", "evaluation-type");
                             evalTypeDiv.innerText = `${naughtyScores[0][0]}`;
-                            
+
                             const evalValDiv = document.createElement("div");
                             evalValDiv.setAttribute("class", "evaluation-rating");
                             evalValDiv.innerText = `${Math.round(naughtyScores[0][1] * 100)}%`;
-                            
+
                             containerDiv.appendChild(evalTypeDiv);
                             containerDiv.appendChild(evalValDiv);
                             element.appendChild(containerDiv);
                         }
                     }
+                    //}
                 }
             }
+        }
+    }
+
+    handleFollowResult(follow: FollowResponse) {
+        // Find the user's chats
+        if (this.chatParentElements[0]) {
+            const parent = this.chatParentElements[0];
+            const usernameElements = parent.querySelectorAll('[data-a-target="chat-message-username"]');
+            usernameElements.forEach(el => {
+                if (el.textContent?.toLowerCase() === follow.userLogin.toLowerCase()) {
+                    const existingIcon = el.querySelector(".non-follower-icon");
+                    if (!follow.follows) {
+                        if (!existingIcon) {
+                            const icon = document.createElement("span");
+                            icon.setAttribute("class", "non-follower-icon");
+                            el.append(icon);
+                        }
+                    } else {
+                        if (existingIcon) {
+                            existingIcon.remove();
+                        }
+                    }
+                }
+            });
         }
     }
 }

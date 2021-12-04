@@ -6,6 +6,7 @@ export interface ChatMessage {
 
 export default class ChatMessageParser {
     public static parse(rawMsg: string): ChatMessage {
+        console.log({rawMsg});
         const matches = rawMsg.match(/(\d{1,2}:\d{1,2})?(?<username>.[^:]+): (?<message>.+)/);
         return {
             username: matches?.groups?.username?.trim() ?? "",

@@ -1,5 +1,11 @@
 import axios from "axios";
 
+export interface FollowResponse {
+    userLogin: string
+    streamerLogin: string
+    follows: boolean
+}
+
 export default class HoagieClient {
     readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
 
@@ -15,5 +21,10 @@ export default class HoagieClient {
             console.error(err);
         }
         return result;
+    }
+
+    async getFollow(streamerLogin: string, userLogin: string): Promise<FollowResponse> {
+        const response = await axios.get<FollowResponse>(`${this.BASE_URL}getuserfollows?streamerName=${streamerLogin}&userName=${userLogin}`);
+        return response.data;
     }
 }

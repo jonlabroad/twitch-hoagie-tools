@@ -26,3 +26,17 @@
 .evaluation-rating {
     font-weight: 500;
 }
+
+.non-follower-icon {
+    background-color: red;
+    border-radius: 5px;
+    width: 10px;
+    height: 10px;
+    margin-right: 3px;
+    margin-left: 3px;
+    display: inline-block;
+}
+
+.non-follower-highlight {
+    background-color: #330000;
+}

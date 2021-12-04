@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import Config from "../Config";
+import TwitchProvider from "./TwitchProvider";
 import { TwitchSubscription } from "./TwitchSubscription";
 
 const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc-prod.hoagieman.net" : "https://hoagietools-svc-development.hoagieman.net";
@@ -10,8 +11,17 @@ export interface ValidatedSession {
     user_id: string
 }
 
+export interface UserFollows {
+    from_id: string
+    from_login: string
+    from_name: string
+    to_id: string
+    to_name: string
+    followed_at: string
+}
+
 export default class TwitchClient {
-    private userIdCache: Promise<any> | undefined;
+    private userIdCache: Record<string, Promise<any> | undefined> = {};
 
     authToken?: {
         access_token: string,
@@ -24,7 +34,7 @@ export default class TwitchClient {
 
     async getUserId(username: string): Promise<string | undefined> {
         const url = `https://api.twitch.tv/helix/users?login=${username}`;
-        let request = this.userIdCache;
+        let request = this.userIdCache[username.toLowerCase()];
         if (!request) {
             console.log(url);
             request = (async () => {
@@ -36,10 +46,10 @@ export default class TwitchClient {
                     }
                 });
             })();
-            
-            this.userIdCache = request;
+
+            this.userIdCache[username.toLowerCase()] = request;
         }
-     
+
         const response = await request;
         if (response.status === 200 && response.data?.data && response.data?.data?.length === 1) {
             return response.data.data[0].id;
@@ -75,7 +85,7 @@ export default class TwitchClient {
         const authToken = await this.getAuthToken();
 
         const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
-        console.log({url});
+        console.log({ url });
         const data = {
             type,
             version: "1",
@@ -109,6 +119,18 @@ export default class TwitchClient {
             }
         });
         return response.data;
+    }
+
+    async getUserFollows(broadcasterId: string, userId: string): Promise<UserFollows[]> {
+        const url = `https://api.twitch.tv/helix/users/follows?to_id=${broadcasterId}&from_id=${userId}`;
+        const authToken = await this.getAuthToken();
+        const data = await axios.get<{ data: UserFollows[] }>(url, {
+            headers: {
+                "Authorization": `Bearer ${authToken?.access_token}`,
+                "Client-ID": Config.twitchClientId,
+            }
+        });
+        return data.data.data;
     }
 
     // Confirm that this Twitch user is who they say they are
