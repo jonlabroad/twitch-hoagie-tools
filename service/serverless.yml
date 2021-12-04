@@ -209,12 +209,12 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
-  getuserfollows:
-    handler: twitch.getuserfollows
+  getuserinfo:
+    handler: twitch.getuserinfo
     events:
       - http:
           method: GET
-          path: /api/getuserfollows
+          path: /api/getuserinfo
           parameters:
             querystrings:
               username: true

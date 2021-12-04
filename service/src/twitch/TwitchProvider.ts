@@ -1,7 +1,23 @@
 import TwitchClient from "./TwitchClient";
+import { UserData } from "./TwitchClientTypes";
+
+interface Response {
+    userData: UserData;
+    follows: boolean;
+}
 
 export default class TwitchProvider {
-    public static async doesUserFollow(streamerLogin: string, userLogin: string) {
+    public static async getUserData(streamerLogin: string, userLogin: string): Promise<Response> {
+        const follows = await this.doesFollow(streamerLogin, userLogin);
+        const userData = await this.getUser(userLogin);
+        console.log({userData});
+        return {
+            follows,
+            userData,
+        }
+    }
+
+    private static async doesFollow(streamerLogin: string, userLogin: string) {
         if (streamerLogin.toLowerCase() === userLogin.toLowerCase()) {
             return true;
         }
@@ -11,12 +27,17 @@ export default class TwitchProvider {
             client.getUserId(streamerLogin),
             client.getUserId(userLogin)
         ]);
-        console.log({streamerId, userId});
+
         if (streamerId && userId) {
             const follows = await client.getUserFollows(streamerId, userId);
             console.log({follows});
             return follows.length > 0;
         }
         return false;
+    }
+
+    private static async getUser(userLogin: string) {
+        const client = new TwitchClient();
+        return await client.getUserData(userLogin);
     }
 }

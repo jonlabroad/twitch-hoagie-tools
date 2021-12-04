@@ -1,8 +1,9 @@
 import { AnalysisResultMessage } from "../AnalysisResultMessage";
 import ChatMessageFinder from "../ChatMessageFinder";
 import ChatMessageParser from "../ChatMessageParser";
-import { FollowResponse } from "../HoagieClient";
+import { FollowResponse, UserDataResponse } from "../HoagieClient";
 import NaughtyFinder from "../NaughtyFinder";
+import { UserData } from "../TwitchClientTypes";
 import ChatEvalIndicator from "./ChatEvalIndicator";
 import ContentMessages from "./ContentMessages";
 import FollowerIndicator from "./FollowerIndicator";
@@ -49,8 +50,9 @@ export default class TwitchChatObserver {
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (request.type === "message-analysis") {
                 self.handleMessageAnalysis(request);
-            } else if (request.type === "follow-result") {
-                self.handleFollowResult(request.follows);
+            } else if (request.type === "user-data-result") {
+                console.log({request});
+                self.handleUserDataResult(request);
             }
             sendResponse();
         });
@@ -85,14 +87,14 @@ export default class TwitchChatObserver {
         }
     }
 
-    handleFollowResult(follow: FollowResponse) {
+    handleUserDataResult(userData: UserDataResponse) {
         // Find the user's chats
         if (this.chatParentElements[0]) {
             const parent = this.chatParentElements[0];
             const usernameElements = ChatMessageFinder.findUsernameElements(parent);
             usernameElements.forEach(el => {
-                if (el.textContent?.toLowerCase() === follow.userLogin.toLowerCase()) {
-                    FollowerIndicator.setIndicator(el, follow);
+                if (el.textContent?.toLowerCase() === userData.userLogin.toLowerCase()) {
+                    FollowerIndicator.setIndicator(el, userData);
                 }
             });
         }

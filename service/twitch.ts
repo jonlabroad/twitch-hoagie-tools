@@ -197,7 +197,7 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
         }
 
         const streamerLogin = event.queryStringParameters?.["streamerLogin"] ?? "";
-        
+
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -218,19 +218,19 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     }
 }
 
-module.exports.getuserfollows = async (event: APIGatewayProxyEvent) => {
+module.exports.getuserinfo = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
         const streamerLogin = event.queryStringParameters?.["streamerName"] ?? "";
         const userLogin = event.queryStringParameters?.["userName"] ?? "";
-        
+
         return {
             statusCode: 200,
             body: JSON.stringify({
                 userLogin,
                 streamerLogin,
-                follows: await TwitchProvider.doesUserFollow(streamerLogin, userLogin)
+                ...(await TwitchProvider.getUserData(streamerLogin, userLogin)),
             }, null, 2),
             headers: {
                 ...corsHeaders,

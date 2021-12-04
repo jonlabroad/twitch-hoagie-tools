@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import Config from "../Config";
+import { UserData } from "./TwitchClientTypes";
 import TwitchProvider from "./TwitchProvider";
 import { TwitchSubscription } from "./TwitchSubscription";
 
@@ -153,6 +154,19 @@ export default class TwitchClient {
                 validatedSession: null
             }
         }
+    }
+
+    async getUserData(userLogin: string): Promise<UserData> {
+        const url = `https://api.twitch.tv/helix/users?login=${userLogin}`;
+        const authToken = await this.getAuthToken();
+        const response = await axios.get<{ data: UserData[] }>(url, {
+            headers: {
+                "Authorization": `Bearer ${authToken?.access_token}`,
+                "Client-ID": Config.twitchClientId,
+            }
+        });
+        console.log({response});
+        return response.data.data[0];
     }
 
     async getAuthToken() {

@@ -26,7 +26,7 @@ export default class Background {
             if (request.type === "chat-message") {
                 const req = request as Message<ChatMessageData>;
                 self.handleChatMessage(req, sender);
-                self.lookupUserFollow(req, sender);
+                self.lookupUserData(req, sender);
             } else if (request.type === "streamer-name") {
                 const req = request as Message<StreamerNameData>;
                 self.streamerName[sender.tab?.id ?? 9999] = req.data.streamerName;
@@ -49,7 +49,7 @@ export default class Background {
         }
     }
 
-    public async lookupUserFollow(chatMessage: Message<ChatMessageData>, sender: chrome.runtime.MessageSender) {
+    public async lookupUserData(chatMessage: Message<ChatMessageData>, sender: chrome.runtime.MessageSender) {
         const userName = chatMessage.data.username;
         if (whitelist.includes(chatMessage.data.username.toLowerCase())) {
             return {
@@ -59,14 +59,13 @@ export default class Background {
             } as FollowResponse;
         }
 
-        if (this.streamerName) {
+        if (this.streamerName[sender.tab?.id ?? 9999]) {
             const hoagieClient = new HoagieClient();
-            const follows = await hoagieClient.getFollow(this.streamerName[sender.tab?.id ?? 9999], userName);
+            const userData = await hoagieClient.getUserData(this.streamerName[sender.tab?.id ?? 9999], userName);
             chrome.tabs.sendMessage(sender.tab?.id ?? 0, {
-                type: "follow-result",
-                follows,
+                type: "user-data-result",
+                ...userData,
             });
-            console.log({[userName]: follows.follows})
         }
 
         return undefined;

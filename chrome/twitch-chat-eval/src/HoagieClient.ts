@@ -1,9 +1,17 @@
 import axios from "axios";
+import { UserData } from "./TwitchClientTypes";
 
 export interface FollowResponse {
     userLogin: string
     streamerLogin: string
     follows: boolean
+}
+
+export interface UserDataResponse {
+    userLogin: string;
+    streamerLogin: string;
+    userData: UserData;
+    follows: boolean;
 }
 
 export default class HoagieClient {
@@ -23,8 +31,8 @@ export default class HoagieClient {
         return result;
     }
 
-    async getFollow(streamerLogin: string, userLogin: string): Promise<FollowResponse> {
-        const response = await axios.get<FollowResponse>(`${this.BASE_URL}getuserfollows?streamerName=${streamerLogin}&userName=${userLogin}`);
+    async getUserData(streamerLogin: string, userLogin: string): Promise<UserDataResponse> {
+        const response = await axios.get<UserDataResponse>(`${this.BASE_URL}getuserinfo?streamerName=${streamerLogin}&userName=${userLogin}`);
         return response.data;
     }
 }
