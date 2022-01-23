@@ -15,6 +15,11 @@ import { TestHandlers } from "./src/eventsub/TestHandlers";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 import RaidProvider from "./src/twitch/RaidProvider";
 import TwitchProvider from "./src/twitch/TwitchProvider";
+import DonoProvider from "./src/twitch/DonoProvider";
+import * as tmi from "tmi.js"
+import ModsDbClient from "./src/channelDb/ModsDbClient";
+import ModAuthorizer from "./src/twitch/ModAuthorizer";
+import ConfigProvider from "./src/config/ConfigProvider";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -101,7 +106,7 @@ module.exports.listsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+        const authResponse = await TwitchAuthorizer.auth(event);
         if (authResponse) {
             return authResponse;
         }
@@ -132,7 +137,7 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+        const authResponse = await TwitchAuthorizer.auth(event);
         if (authResponse) {
             return authResponse;
         }
@@ -161,7 +166,7 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+        const authResponse = await TwitchAuthorizer.auth(event);
         if (authResponse) {
             console.log(`Unauthorized: ${authResponse.statusCode}`);
             return authResponse;
@@ -190,7 +195,7 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event, "admin");
+        const authResponse = await TwitchAuthorizer.auth(event);
         if (authResponse) {
             console.log(`Unauthorized: ${authResponse.statusCode}`);
             return authResponse;
@@ -222,8 +227,8 @@ module.exports.getuserinfo = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const streamerLogin = event.queryStringParameters?.["streamerName"] ?? "";
-        const userLogin = event.queryStringParameters?.["userName"] ?? "";
+        const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+        const userLogin = event.queryStringParameters?.["username"] ?? "";
 
         return {
             statusCode: 200,
@@ -249,3 +254,90 @@ module.exports.getuserinfo = async (event: APIGatewayProxyEvent) => {
     }
 }
 
+module.exports.donodata = async (event: APIGatewayProxyEvent) => {
+    try {
+        Config.validate();
+
+        const auth = await ModAuthorizer.auth(event);
+        if (auth) {
+            return auth;
+        }
+
+        const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+        const userLogin = event.queryStringParameters?.["username"] ?? "";
+
+        const authResponse = await TwitchAuthorizer.auth(event);
+        if (authResponse) {
+            console.log(`Unauthorized: ${authResponse.statusCode}`);
+            return authResponse;
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                userLogin,
+                streamerLogin,
+                donos: await DonoProvider.get(streamerLogin),
+            }, null, 2),
+            headers: {
+                ...corsHeaders,
+                ...followCacheHeaders
+            },
+        };
+    } catch (err) {
+        console.error(err.message, err);
+        return {
+            statusCode: 500,
+            headers: {
+                ...corsHeaders,
+            },
+            body: `${err.message}`
+        }
+    }
+}
+
+module.exports.refreshmods = async (event: any) => {
+    try {
+        Config.validate();
+
+        const blacklist = ["songlistbot", "streamelements", "nightbot", "streamlabs"];
+        
+        const config = await ConfigProvider.get();
+        const channels = config?.streamers ?? [];
+        const client = new tmi.Client({
+            channels,
+            identity: {
+                username: config?.chatUsername,
+                password: config?.chatToken,
+            }
+        });
+
+        let done = false;
+
+        client.connect();
+        client.on("connected", async (address, port) => {
+            const allData = await Promise.all(channels.map(async rawChannel => {
+                const mods = await client.mods(rawChannel);
+                const channel = rawChannel.replace("#", "");
+                return { channel, mods };
+            }));
+            await Promise.all(allData.map(async data => {
+                const client = new ModsDbClient(data.channel);
+                const filtered = data.mods.filter(mod => !blacklist.includes(mod.toLowerCase()))
+                await client.writeMods(filtered);
+            }));
+            done = true;
+        })
+
+        while (!done) {
+            console.log("Sleeping...");
+            await sleep(1000);
+        }
+    } catch (err) {
+        return `${err.message}`
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

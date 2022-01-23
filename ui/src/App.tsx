@@ -2,11 +2,12 @@ import { MainPage } from './components/MainPage';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { LoginRedirect } from './components/LoginRedirect';
 
-import 'fontsource-roboto';
 import { StreamerDashboard } from './components/auth/StreamerDashboard';
 import { SpotifyConfig } from './components/spotify/SpotifyConfig';
+import { DonoPage } from './components/dono/DonoPage';
 
-const testStreamerName = "sashiboom";
+import 'fontsource-roboto';
+import { AdminPage } from './components/admin/AdminPage';
 
 function App() {
   return (
@@ -25,20 +26,20 @@ function App() {
               scopes={"channel:read:redemptions"}
             />
           </Route>
-          <Route path={`/config/${testStreamerName}`}>
-            <StreamerDashboard
-              streamerName={testStreamerName}
-              scopes={"channel:read:redemptions"}
-            />
-          </Route>
           <Route path="/config/hoagieman5000">
             <StreamerDashboard
               streamerName="hoagieman5000"
               scopes={"channel:read:redemptions"}
             />
           </Route>
+          <Route path="/dono/:streamer">
+            <DonoPage />
+          </Route>
           <Route path="/spotify/config">
             <SpotifyConfig />
+          </Route>
+          <Route path="/admin">
+            <AdminPage />
           </Route>
         </Switch>
       </Router>

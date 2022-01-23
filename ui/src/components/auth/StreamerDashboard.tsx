@@ -82,7 +82,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
             <Grid item xs={12}>
                 <FlexCol className="subscriptions-container">
                     <FlexRow alignItems="center">
-                        <h2 style={{ marginRight: 20 }}>Channel Point Redemption</h2>
+                        <h2 style={{ marginRight: 20 }}>Raids</h2>
                         {!subscriptionsToDisplay && <CircularProgress size={20} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length > 0 && <LinkIcon style={{ color: "green", marginRight: 10 }} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length <= 0 && <LinkOffIcon style={{ color: "red", marginRight: 10 }} />}

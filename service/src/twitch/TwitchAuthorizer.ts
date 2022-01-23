@@ -6,7 +6,7 @@ import TwitchClient from "./TwitchClient";
 export type AuthLevel = "admin" | "streamer";
 
 export default class TwitchAuthorizer {
-    public static async auth(event: APIGatewayProxyEvent, level: AuthLevel) {
+    public static async auth(event: APIGatewayProxyEvent) {
         const username = event.queryStringParameters?.["username"];
         const authHeader = event.headers["Authorization"];
         const authToken = authHeader?.replace("Bearer ", "");

@@ -32,7 +32,7 @@ export default class HoagieClient {
     }
 
     async getUserData(streamerLogin: string, userLogin: string): Promise<UserDataResponse> {
-        const response = await axios.get<UserDataResponse>(`${this.BASE_URL}getuserinfo?streamerName=${streamerLogin}&userName=${userLogin}`);
+        const response = await axios.get<UserDataResponse>(`${this.BASE_URL}getuserinfo?streamername=${streamerLogin}&username=${userLogin}`);
         return response.data;
     }
 }

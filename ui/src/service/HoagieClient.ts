@@ -1,8 +1,28 @@
 import axios from "axios";
 import { RaidEvent } from "../components/raid/RaidEvent";
 
+export interface DonoData {
+    SubKey: string
+    dono: number
+    cheer: number
+    data: any
+    sub: number
+    subgift: number
+    value: number
+}
+
+export interface AdminData {
+    CategoryKey: string
+    SubKey: string
+
+    chatUsername: string
+    chatToken: string
+    streamers: string[]
+}
+
 export default class HoagieClient {
-    readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
+    //readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
+    readonly BASE_URL = 'https://hoagietools-svc-prod.hoagieman.net/api/';
 
     async analyze(text: string): Promise<Record<string, number> | undefined> {
         let result = undefined;
@@ -97,9 +117,51 @@ export default class HoagieClient {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-        console.log({datadata: response.data});
+        console.log({ datadata: response.data });
         return response.data as {
             raids: RaidEvent[];
         }
+    }
+
+    async getDonos(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        console.log({ datadata: response.data });
+        return response.data as {
+            donos: DonoData[]
+        }
+    }
+
+    async getAdminConfig(username: string, accessToken: string) {
+        const response = await axios.get(`${this.BASE_URL}admin/config?username=${username}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        console.log({ datadata: response.data });
+        return response.data as AdminData | undefined;
+    }
+
+    async adminSetStreamers(streamers: string[], username: string, accessToken: string) {
+        await axios.post(`${this.BASE_URL}admin/setstreamers?username=${username}`, {
+            streamers
+        }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+    }
+
+    async adminSetConfig(config: AdminData, username: string, accessToken: string) {
+        await axios.post(`${this.BASE_URL}admin/setconfig?username=${username}`, {
+            config
+        }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
     }
 }

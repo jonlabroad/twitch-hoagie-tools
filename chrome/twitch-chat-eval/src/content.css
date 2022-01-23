@@ -37,6 +37,18 @@
     display: inline-block;
 }
 
+.new-account-icon {
+    border-color: yellow;
+    border-width: 2px;
+    border-radius: 5px;
+    border-style: solid;
+    width: 10px;
+    height: 10px;
+    margin-right: 3px;
+    margin-left: 3px;
+    display: inline-block;
+}
+
 .non-follower-highlight {
     background-color: #330000;
 }

@@ -18,7 +18,7 @@ export interface CreatePlaylistRequestBody {
 module.exports.generate = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event, "admin");
+    const authResponse = await TwitchAuthorizer.auth(event);
     if (authResponse) {
         return authResponse;
     }
@@ -34,7 +34,7 @@ module.exports.generate = async (event: any) => {
 module.exports.settoken = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+    const authResponse = await TwitchAuthorizer.auth(event);
     if (authResponse) {
         return authResponse;
     }

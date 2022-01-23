@@ -226,6 +226,88 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  donodata:
+    handler: twitch.donodata
+    events:
+      - http:
+          method: GET
+          path: /api/donodata
+          parameters:
+            querystrings:
+              username: true
+              channelname: true
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  adddono:
+    handler: twitch-dono.adddono
+    events:
+      - http:
+          method: POST
+          path: /api/adddono
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  refreshmods:
+    handler: twitch.refreshmods
+    events:
+      - schedule: rate(2 hours)
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  getadminconfig:
+    handler: admin.getconfig
+    events:
+      - http:
+          method: GET
+          path: /api/admin/config
+          parameters:
+            querystrings:
+              username: true
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+      
+  adminsetstreamers:
+    handler: admin.setstreamers
+    events:
+      - http:
+          method: POST
+          path: /api/admin/setstreamers
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  adminsetconfig:
+    handler: admin.setconfig
+    events:
+      - http:
+          method: POST
+          path: /api/admin/setconfig
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
 resources:
   Resources:
     GatewayResponseDefault4XX:

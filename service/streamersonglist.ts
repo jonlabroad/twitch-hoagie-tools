@@ -23,7 +23,7 @@ interface SetTokenRequestBody {
 module.exports.settoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+    const authResponse = await TwitchAuthorizer.auth(event);
     if (authResponse) {
         return authResponse;
     }
@@ -49,7 +49,7 @@ module.exports.settoken = async (event: APIGatewayProxyEvent) => {
 module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event, "streamer");
+    const authResponse = await TwitchAuthorizer.auth(event);
     if (authResponse) {
         return authResponse;
     }

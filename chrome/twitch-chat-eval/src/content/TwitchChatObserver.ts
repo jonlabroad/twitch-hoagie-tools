@@ -1,12 +1,11 @@
 import { AnalysisResultMessage } from "../AnalysisResultMessage";
 import ChatMessageFinder from "../ChatMessageFinder";
 import ChatMessageParser from "../ChatMessageParser";
-import { FollowResponse, UserDataResponse } from "../HoagieClient";
+import { UserDataResponse } from "../HoagieClient";
 import NaughtyFinder from "../NaughtyFinder";
-import { UserData } from "../TwitchClientTypes";
 import ChatEvalIndicator from "./ChatEvalIndicator";
 import ContentMessages from "./ContentMessages";
-import FollowerIndicator from "./FollowerIndicator";
+import UserDataIndicator from "./UserDataIndicator";
 
 export default class TwitchChatObserver {
     private chatParentElements: Element[] = [];
@@ -94,7 +93,7 @@ export default class TwitchChatObserver {
             const usernameElements = ChatMessageFinder.findUsernameElements(parent);
             usernameElements.forEach(el => {
                 if (el.textContent?.toLowerCase() === userData.userLogin.toLowerCase()) {
-                    FollowerIndicator.setIndicator(el, userData);
+                    UserDataIndicator.setIndicator(el, userData);
                 }
             });
         }
