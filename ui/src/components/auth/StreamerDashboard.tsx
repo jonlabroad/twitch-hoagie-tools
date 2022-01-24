@@ -79,10 +79,11 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
     return <React.Fragment>
         <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={scopes} />
         <Grid container spacing={3}>
+            <SongListConfig appState={appState} />
             <Grid item xs={12}>
                 <FlexCol className="subscriptions-container">
                     <FlexRow alignItems="center">
-                        <h2 style={{ marginRight: 20 }}>Raids</h2>
+                        <h2 style={{ marginRight: 20 }}>Raid Watcher</h2>
                         {!subscriptionsToDisplay && <CircularProgress size={20} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length > 0 && <LinkIcon style={{ color: "green", marginRight: 10 }} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length <= 0 && <LinkOffIcon style={{ color: "red", marginRight: 10 }} />}
@@ -126,7 +127,6 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
                     }
                 </FlexCol>
             </Grid>
-            <SongListConfig appState={appState} />
         </Grid>
     </React.Fragment>
 }

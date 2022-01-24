@@ -37,11 +37,11 @@ export const DonoTable = (props: DonoTableProps) => {
                     {donoData && donoData?.map(userdata => (
                         <StyledTableRow>
                             <TableCell>{userdata.SubKey}</TableCell>
-                            <TableCell align="right">{userdata.dono}</TableCell>
+                            <TableCell align="right">{userdata.dono ? Math.round(userdata.dono * 100)/100 : ""}</TableCell>
                             <TableCell align="right">{userdata.cheer}</TableCell>
                             <TableCell align="right">{userdata.sub}</TableCell>
                             <TableCell align="right">{userdata.subgift}</TableCell>
-                            <TableCell align="right">${userdata.value.toString()}</TableCell>
+                            <TableCell align="right">${Math.round(userdata.value * 100)/100}</TableCell>
                         </StyledTableRow>
                     ))}
                 </TableBody>

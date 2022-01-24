@@ -1,4 +1,3 @@
-import { Response } from "aws-sdk";
 import axios, { AxiosResponse } from "axios";
 
 interface GetStreamerResponse {

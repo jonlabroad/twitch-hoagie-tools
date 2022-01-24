@@ -86,7 +86,6 @@ export const RaidContainer = (props: RaidContainerProps) => {
 
     const sortedChannels = Object.values(liveStreamsToDisplay).sort((c1, c2) => StreamSorter.sort(c1, c2));
     const numChannels = sortedChannels.length;
-    console.log({ raids });
     return <FlexCol>
         <Typography variant="h3">{`Raid Candidates ${numChannels > 0 ? `(${sortedChannels.length})` : ""}`}</Typography>
         <Table size="small">
