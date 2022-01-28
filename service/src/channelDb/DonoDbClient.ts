@@ -4,12 +4,13 @@ import Config from "../Config";
 
 export interface DonoData {
     SubKey: string
-    dono: number; z
+    dono: number;
     cheer: number
     data: any
     sub: number
     subgift: number
     value: number
+    tier: number | undefined
 }
 
 export default class DonoDbClient {
@@ -26,6 +27,7 @@ export default class DonoDbClient {
 
         // Get latest stream id
         const latestStreamId = await this.getLatestStreamId();
+        console.log({ latestStreamId });
         if (latestStreamId) {
             const request: any = {
                 TableName: Config.tableName,
@@ -44,6 +46,7 @@ export default class DonoDbClient {
     public async add(request: SetDonoRequest) {
         try {
             const latestStreamId = await this.getLatestStreamId();
+            console.log({ request });
             if (latestStreamId) {
                 switch (request.type) {
                     case "cheer":
@@ -54,10 +57,10 @@ export default class DonoDbClient {
                         return await this.addDono(request.userLogin, latestStreamId, request.amount);
                     case "sub":
                         console.log("Adding sub");
-                        return await this.addSub(request.userLogin, latestStreamId);
+                        return await this.addSub(request.userLogin, latestStreamId, request.tier ?? 1);
                     case "subgift":
                         console.log("Adding subgift");
-                        return await this.addGiftSubs(request.userLogin, latestStreamId);
+                        return await this.addGiftSubs(request.userLogin, latestStreamId, request.tier ?? 1);
                     default:
                         console.error(`Do not understand dono type ${request.type}`);
                 }
@@ -128,7 +131,7 @@ export default class DonoDbClient {
         }
     }
 
-    public async addSub(username: string, streamId: string) {
+    public async addSub(username: string, streamId: string, tier: number) {
         try {
             const client = new DynamoDB.DocumentClient();
             const key = {
@@ -138,10 +141,11 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #sub = :sub, #data = :data",
-                ExpressionAttributeNames: { "#sub": "sub", "#data": "data" },
+                UpdateExpression: "SET #sub = :sub, #data = :data, #tier = :tier",
+                ExpressionAttributeNames: { "#sub": "sub", "#data": "data", "#tier": "tier" },
                 ExpressionAttributeValues: {
                     ":sub": 1,
+                    ":tier": tier,
                     ":data": {
                         username: username.toLowerCase(),
                         streamId: streamId.toLowerCase(),
@@ -149,13 +153,14 @@ export default class DonoDbClient {
                     },
                 }
             }
+            console.log({ input });
             await client.update(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-    public async addGiftSubs(username: string, streamId: string) {
+    public async addGiftSubs(username: string, streamId: string, tier: number) {
         try {
             const client = new DynamoDB.DocumentClient();
             const subs = 1;
@@ -166,11 +171,12 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #subgift = if_not_exists(#subgift, :start) + :subs, #data = :data",
-                ExpressionAttributeNames: { "#subgift": "subgift", "#data": "data" },
+                UpdateExpression: "SET #subgift = if_not_exists(#subgift, :start) + :subs, #data = :data, #tier = :tier",
+                ExpressionAttributeNames: { "#subgift": "subgift", "#data": "data", "#tier": "tier" },
                 ExpressionAttributeValues: {
                     ":start": 0,
                     ":subs": subs,
+                    ":tier": tier,
                     ":data": {
                         username: username.toLowerCase(),
                         streamId: streamId.toLowerCase(),

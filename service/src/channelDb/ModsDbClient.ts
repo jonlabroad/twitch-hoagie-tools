@@ -26,6 +26,7 @@ export default class ModsDbClient {
             }
         }
         const response = await client.get(request).promise();
+        console.log({ mods: response.Item});
         return (response?.Item) as ModsData | undefined;
     }
 

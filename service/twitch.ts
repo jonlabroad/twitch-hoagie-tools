@@ -7,7 +7,7 @@ import CryptoJS from "crypto-js";
 import Config from "./src/Config";
 import ListSubscriptions from "./src/twitch/ListSubscriptions";
 import CreateSubscriptions from "./src/twitch/CreateSubscriptions";
-import TwitchAuthorizer from "./src/twitch/TwitchAuthorizer";
+import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
 import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
@@ -106,9 +106,14 @@ module.exports.listsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event);
+        const authResponse = await TwitchAuthenticator.auth(event);
         if (authResponse) {
             return authResponse;
+        }
+
+        const authenticationResponse = await ModAuthorizer.auth(event);
+        if (authenticationResponse) {
+            return authenticationResponse;
         }
 
         return {
@@ -137,9 +142,14 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event);
+        const authResponse = await TwitchAuthenticator.auth(event);
         if (authResponse) {
             return authResponse;
+        }
+
+        const authenticationResponse = await ModAuthorizer.auth(event);
+        if (authenticationResponse) {
+            return authenticationResponse;
         }
 
         const streamerLogin = event.queryStringParameters?.["channelname"] ?? "";
@@ -166,10 +176,15 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event);
+        const authResponse = await TwitchAuthenticator.auth(event);
         if (authResponse) {
             console.log(`Unauthorized: ${authResponse.statusCode}`);
             return authResponse;
+        }
+
+        const authenticationResponse = await ModAuthorizer.auth(event);
+        if (authenticationResponse) {
+            return authenticationResponse;
         }
 
         const id = event.queryStringParameters?.["id"] ?? "";
@@ -195,10 +210,15 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthorizer.auth(event);
+        const authResponse = await TwitchAuthenticator.auth(event);
         if (authResponse) {
             console.log(`Unauthorized: ${authResponse.statusCode}`);
             return authResponse;
+        }
+
+        const authenticationResponse = await ModAuthorizer.auth(event);
+        if (authenticationResponse) {
+            return authenticationResponse;
         }
 
         const streamerLogin = event.queryStringParameters?.["streamerLogin"] ?? "";
@@ -258,18 +278,12 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const auth = await ModAuthorizer.auth(event);
-        if (auth) {
-            return auth;
-        }
-
         const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
         const userLogin = event.queryStringParameters?.["username"] ?? "";
 
-        const authResponse = await TwitchAuthorizer.auth(event);
-        if (authResponse) {
-            console.log(`Unauthorized: ${authResponse.statusCode}`);
-            return authResponse;
+        const auth = await ModAuthorizer.auth(event);
+        if (auth) {
+            return auth;
         }
 
         return {
@@ -301,7 +315,7 @@ module.exports.refreshmods = async (event: any) => {
         Config.validate();
 
         const blacklist = ["songlistbot", "streamelements", "nightbot", "streamlabs"];
-        
+
         const config = await ConfigProvider.get();
         const channels = config?.streamers ?? [];
         const client = new tmi.Client({

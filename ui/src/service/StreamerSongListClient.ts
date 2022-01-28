@@ -13,6 +13,7 @@ export interface SongListSong {
         nonlistSong: string
         donationAmount: number
         createdAt: string
+        playedAt: string
         songId: number
         streamerId: number
         position: number
@@ -23,6 +24,10 @@ export interface SongListSong {
             id: number
             title: string
         }
+        requests: {
+            id: number
+            name: string
+        }[]
 }
 
 export interface GetQueueResponse {
@@ -30,6 +35,10 @@ export interface GetQueueResponse {
     status: {
         string: number
     },
+}
+
+export interface GetHistoryResponse {
+    items: SongListSong[],
 }
 
 export default class StreamerSongListClient {
@@ -42,6 +51,11 @@ export default class StreamerSongListClient {
 
     public async getQueue(streamerId: number): Promise<GetQueueResponse> {
         const response = await axios.get(`${StreamerSongListClient.baseUrl}/v1/streamers/${streamerId}/queue`);
+        return response.data;
+    }
+
+    public async getStreamHistory(streamerId: number): Promise<GetHistoryResponse> {
+        const response = await axios.get(`${StreamerSongListClient.baseUrl}/v1/streamers/${streamerId}/playHistory?size=100&current=0&type=playedAt&order=desc&period=stream`);
         return response.data;
     }
 }

@@ -1,7 +1,7 @@
 import AlertType, { AlertTypeType } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
-import { GetQueueResponse } from "../service/StreamerSongListClient";
+import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
 import { StreamData, UserData } from "../service/TwitchClientTypes";
 
 export interface StateContextType {
@@ -42,6 +42,7 @@ export interface AppState {
     event: EventState;
     modActions: ModActionState;
     songQueue?: GetQueueResponse;
+    songHistory?: GetHistoryResponse;
 }
 
 export interface ChatState {

@@ -5,7 +5,7 @@ import TwitchClient from "./TwitchClient";
 
 export type AuthLevel = "admin" | "streamer";
 
-export default class TwitchAuthorizer {
+export default class TwitchAuthenticator {
     public static async auth(event: APIGatewayProxyEvent) {
         const username = event.queryStringParameters?.["username"];
         const authHeader = event.headers["Authorization"];
@@ -24,15 +24,6 @@ export default class TwitchAuthorizer {
             return {
                 statusCode: 401,
                 body: "Invalid username and token",
-                headers: corsHeaders,
-            }
-        }
-
-        const isAuthorized = Config.isAdminOrStreamer(username);
-        if (!isAuthorized) {
-            return {
-                statusCode: 403,
-                body: "Unauthorized",
                 headers: corsHeaders,
             }
         }

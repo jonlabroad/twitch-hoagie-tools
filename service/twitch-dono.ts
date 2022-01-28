@@ -23,6 +23,7 @@ export interface SetDonoRequest {
     userLogin: string
     type: "cheer" | "dono" | "sub" | "subgift"
     amount: number
+    tier: 1 | 2 | 3;
 }
 
 module.exports.adddono = async (event: APIGatewayProxyEvent) => {
@@ -32,7 +33,7 @@ module.exports.adddono = async (event: APIGatewayProxyEvent) => {
         // TODO auth using token
 
         const data = JSON.parse(event.body ?? "{}") as SetDonoRequest;
-
+        console.log({ data });
         return {
             statusCode: 200,
             body: JSON.stringify({

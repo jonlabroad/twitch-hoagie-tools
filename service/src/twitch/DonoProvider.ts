@@ -5,15 +5,16 @@ export default class DonoProvider {
     public static async get(streamerLogin: string) {
         const client = new DonoDbClient(streamerLogin);
         const donos = await client.readLatestDonos();
+        console.log({ donos });
         donos.forEach(dono => {
-            console.log({dono});
+            console.log({ dono });
             dono.value = this.getValue(dono);
         })
         return donos;
     }
 
     static getValue(dono: DonoData) {
-        return (dono.dono ?? 0) + (dono.cheer ?? 0) / 100 + (dono.sub ?? 0) * 5 + (dono.subgift ?? 0) * 5;
+        return (dono.dono ?? 0) + (dono.cheer ?? 0) / 100 + (dono.sub ?? 0) * (5 * (dono.tier ?? 1)) + (dono.subgift ?? 0) * (5 * (dono.tier ?? 1));
     }
 
     public static async setDono(request: SetDonoRequest) {

@@ -3,7 +3,8 @@
 import Config from "./src/Config";
 import SpotifyCreatePlaylist from "./src/spotify/SpotifyCreatePlaylist";
 import SpotifySetToken from "./src/spotify/SpotifySetToken";
-import TwitchAuthorizer from "./src/twitch/TwitchAuthorizer";
+import ModAuthorizer from "./src/twitch/ModAuthorizer";
+import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
 import { corsHeaders } from "./streamersonglist";
 
 interface SetTokenRequestBody {
@@ -18,7 +19,7 @@ export interface CreatePlaylistRequestBody {
 module.exports.generate = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event);
+    const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
     }
@@ -34,9 +35,14 @@ module.exports.generate = async (event: any) => {
 module.exports.settoken = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event);
+    const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
+    }
+
+    const authenticationResponse = await ModAuthorizer.auth(event);
+    if (authenticationResponse) {
+        return authenticationResponse;
     }
 
     try {

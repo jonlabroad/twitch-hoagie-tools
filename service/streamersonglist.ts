@@ -3,7 +3,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import Config from "./src/Config";
 import StreamerSongListToken from "./src/StreamerSongList/StreamerSongListSetToken";
-import TwitchAuthorizer from "./src/twitch/TwitchAuthorizer";
+import ModAuthorizer from "./src/twitch/ModAuthorizer";
+import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -23,9 +24,14 @@ interface SetTokenRequestBody {
 module.exports.settoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event);
+    const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
+    }
+
+    const authenticationResponse = await ModAuthorizer.auth(event);
+    if (authenticationResponse) {
+        return authenticationResponse;
     }
 
     try {
@@ -49,9 +55,14 @@ module.exports.settoken = async (event: APIGatewayProxyEvent) => {
 module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthorizer.auth(event);
+    const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
+    }
+
+    const authenticationResponse = await ModAuthorizer.auth(event);
+    if (authenticationResponse) {
+        return authenticationResponse;
     }
 
     let tokenValidated = false;

@@ -9,6 +9,8 @@ import { useSaveLastPath } from "../../hooks/LastPathHooks";
 
 import "../../styles/Dono.scss";
 import { useParams } from "react-router";
+import { Grid } from "@material-ui/core";
+import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 
 export interface DonoPageProps {
 }
@@ -29,7 +31,9 @@ export const DonoPage = (props: DonoPageProps) => {
             state: appState,
         }}>
             <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} />
-            <DonoTableContainer />
+            <Grid container spacing={3}>
+                <DonoTableContainer />
+            </Grid>
         </StateContext.Provider>
     </>
 }

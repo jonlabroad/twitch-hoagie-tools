@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import StreamerSongListClient from '../service/StreamerSongListClient';
 import { AppState, StateContextType } from '../state/AppState';
-import { UpdateSongQueueAction } from '../state/AppStateReducer';
+import { UpdateSongHistoryAction, UpdateSongQueueAction } from '../state/AppStateReducer';
 
 export const useStreamerSongListEvents = (stateContext: StateContextType) => {
     const client = useRef<any>(undefined);
@@ -26,10 +26,21 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
         return queue;
     }
 
+    const getHistory = async (streamerId: number) => {
+        const client = new StreamerSongListClient();
+        const history = await client.getStreamHistory(streamerId);
+
+        stateContext.dispatch({
+            type: "update_songhistory",
+            history
+        } as UpdateSongHistoryAction);
+    }
+
     useEffect(() => {
         async function init() {
             if (streamerId) {
-                const queue = await getQueue(streamerId);
+                await getQueue(streamerId);
+                await getHistory(streamerId);
             }
         }
         init();
@@ -62,14 +73,17 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
                 client.current.emit('join-room', `${streamerId}`);
                 client.current.on('queue-update', () => {
                     console.log("queue-update");
+                    getHistory(streamerId);
                     getQueue(streamerId);
                 });
                 client.current.on('update-playhistory', () => {
                     // the history has been updated, should refetch
+                    getHistory(streamerId);
                     console.log("update-playhistory");
                 });
                 client.current.on('reload-song-list', async () => {
                     getQueue(streamerId);
+                    getHistory(streamerId);
                     console.log("reload-song-list");
                 });
             });

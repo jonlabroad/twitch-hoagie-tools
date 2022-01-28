@@ -3,12 +3,12 @@ import { stringify } from "qs";
 import AlertType, { AlertTypeType } from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
-import { GetQueueResponse } from "../service/StreamerSongListClient";
+import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
 import { ChannelData, StreamData, UserData } from "../service/TwitchClientTypes";
 import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection" | "update_songqueue";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
 }
 
 export interface AddAlertAction extends AppStateAction {
@@ -52,6 +52,10 @@ export interface SetChatConnectionAction extends AppStateAction {
 
 export interface UpdateSongQueueAction extends AppStateAction {
     queue: GetQueueResponse;
+}
+
+export interface UpdateSongHistoryAction extends AppStateAction {
+    history: GetHistoryResponse;
 }
 
 export const appStateReducer = (state: AppState, action: AppStateAction): AppState => {
@@ -159,6 +163,14 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
                 songQueue: updateQueue.queue,
             };
         }
+        case "update_songhistory": {
+            const updateHistory = action as UpdateSongHistoryAction;
+            return {
+                ...state,
+                songHistory: updateHistory.history,
+            };
+        }
+
         default:
             console.error(`Do not know how to process ${action.type}`);
     }
