@@ -82,40 +82,32 @@ export const MainPage = (props: MainPageProps) => {
                 dispatch: appStateDispatch,
                 state: appState,
             }}>
-                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={Config.scopes} clientId={Config.clientId}/>
-                <Grid container spacing={3}>
-                    <Grid item xs={3}>
-                        <ChannelHeader />
-                    </Grid>
-                    <Grid item xs={3} >
-                    </Grid>
-                    <Grid item xs={3} >
-                    </Grid>
-                    <Grid item xs={1} >
-                        <StreamerLinks />
-                    </Grid>
-                </Grid>
-                <Grid container spacing={3}>
-                    <AlertContainer />
-                    <Hidden mdDown>
-                        <Grid item md={3}>
-                            <EmbeddedChat />
+                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={Config.scopes} clientId={Config.clientId} />
+                <div style={{ margin: 12 }}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={3}>
+                            <ChannelHeader />
                         </Grid>
-                    </Hidden>
-                    <Grid item xs={3}>
-                        <SongQueue />
-                        <EmbeddedVideo />
-                        <ChatParticipants
-                            twitchClient={twitchClient.current}
-                        />
+                        <Grid item xs={3} >
+                        </Grid>
+                        <Grid item xs={3} >
+                        </Grid>
+                        <Grid item xs={1} >
+                            <StreamerLinks />
+                        </Grid>
                     </Grid>
-                    <ChatEvaluatorContainer lastMessage={lastMessage} twitchClient={twitchClient.current} />
-                </Grid>
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <RaidContainer />
+                    <Grid container spacing={3}>
+                        <AlertContainer />
+                        <Grid item xs={6}>
+                            <SongQueue />
+                        </Grid>
                     </Grid>
-                </Grid>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12}>
+                            <RaidContainer />
+                        </Grid>
+                    </Grid>
+                </div>
                 <EventsContainer />
             </StateContext.Provider>
         </AlertContext.Provider>

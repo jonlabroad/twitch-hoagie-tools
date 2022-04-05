@@ -54,14 +54,8 @@ export const AlertContainer = (props: AlertContainerProps) => {
     const shoutoutAlerts = alert.alerts.filter(a => a.type === "shoutout").filter(alert => !stateContext.state.modActions.actions.find(action =>
         action.type === "ignore_shoutout" && ((action as IgnoreShoutoutModAction).alertKey === alert.key)));
 
-    let chatEvalAlerts = alert.alerts.map(a => a as EvaluatedMessageAlert)
-        .filter(alert =>
-            alert.type === "chat_eval" &&
-            !stateContext.state.modActions.actions.find(action => action.type === "ignore_chat_eval" && ((action as IgnoreShoutoutModAction).alertKey === alert.key)))
-        .sort((a: EvaluatedMessageAlert, b: EvaluatedMessageAlert) => Math.max(...Object.values(b.evaluation)) - Math.max(...Object.values(a.evaluation)));
-
     return (<React.Fragment>
-        <Grid item xs={5} md={4} lg={3}>
+        <Grid item xs={12} md={6} lg={6}>
             {shoutoutAlerts.map((alert, i) => (
                 <React.Fragment key={i}>
                     <AlertCard key={i}
@@ -71,18 +65,6 @@ export const AlertContainer = (props: AlertContainerProps) => {
                     </AlertCard>
                 </React.Fragment>
             ))}
-        </Grid>
-        <Grid item xs={4} md={3}>
-            {chatEvalAlerts
-                .map((alert, i) => (
-                    <React.Fragment key={i}>
-                        <AlertCard key={i}
-                            alert={alert}
-                        >
-                            <ChatEvalCard alert={alert as EvaluatedMessageAlert} />
-                        </AlertCard>
-                    </React.Fragment>
-                ))}
         </Grid>
     </React.Fragment>
     );

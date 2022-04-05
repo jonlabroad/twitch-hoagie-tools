@@ -4,7 +4,7 @@ import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/SongQueue.scss";
-import { Card } from "@material-ui/core";
+import { Card, Typography } from "@material-ui/core";
 
 export interface SongQueueProps {
 }
@@ -20,6 +20,7 @@ export const SongQueue = (props: SongQueueProps) => {
     return (
         <Card className="songqueue-card">
             <FlexCol className="songqueue-container">
+                <Typography>Song Queue</Typography>
                 {state.songQueue?.list?.slice(0, 5).map((song, i) => <React.Fragment>
                     <FlexRow className={`${i === 0 ? "songqueue-currentsong" : ""} songqueue-song`}>
                         <div className="songqueue-artist">{song.song?.artist}</div>
