@@ -1,19 +1,20 @@
 import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@material-ui/core"
 import React, { useEffect, useReducer, useState } from "react";
-import HoagieClient from "../../service/HoagieClient";
-import { TwitchSubscription } from "../../service/TwitchClientTypes";
-import { AppState, defaultAppState } from "../../state/AppState";
-import { appStateReducer } from "../../state/AppStateReducer";
-import LocalStorage from "../../util/LocalStorage";
-import { PageHeader } from "../PageHeader";
-import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/StreamerDashboard.scss";
-import TwitchClient from "../../service/TwitchClient";
-import { SongListConfig } from "./SongListConfig";
 
 import LinkIcon from '@material-ui/icons/Link';
 import LinkOffIcon from '@material-ui/icons/Link';
+import { AppState, defaultAppState } from "../../state/AppState";
+import { TwitchSubscription } from "../../service/TwitchClientTypes";
+import { appStateReducer } from "../../state/AppStateReducer";
+import HoagieOverlayClient from "../../service/HoagieOverlayClient";
+import LocalStorage from "../../util/LocalStorage";
+import TwitchClient from "../../service/TwitchClient";
+import { SongListConfig } from "../auth/SongListConfig";
+import { PageHeader } from "../PageHeader";
+import { FlexCol, FlexRow } from "../util/FlexBox";
+import HoagieClient from "../../service/HoagieClient";
 import Config from "../../Config";
 
 const chipColors: Record<string, any> = {
@@ -21,7 +22,7 @@ const chipColors: Record<string, any> = {
     "webhook_callback_verification_failed": "error"
 }
 
-export const StreamerDashboard = (props: { streamerName: string, scopes: string }) => {
+export const HoagieDashboard = (props: { streamerName: string, scopes: string }) => {
     const { streamerName, scopes } = props;
 
     const [appState, appStateDispatch] = useReducer(appStateReducer, {
@@ -34,7 +35,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
 
     async function createSubscriptions() {
         if (appState.accessToken && appState.username && appState.streamer) {
-            const client = new HoagieClient();
+            const client = new HoagieOverlayClient();
             const response = await client.createSubscriptions(appState.username, appState.streamer, appState.accessToken);
             getSubscriptions();
         }
@@ -42,7 +43,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
 
     async function getSubscriptions() {
         if (appState.username && appState.accessToken) {
-            const client = new HoagieClient();
+            const client = new HoagieOverlayClient();
             const subs = await client.listSubscriptions(appState.username, appState.accessToken);
             setSubscriptions(subs);
         }
@@ -78,13 +79,12 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
     }
 
     return <React.Fragment>
-        <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={scopes} clientId={Config.clientId}/>
+        <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={scopes} clientId={Config.overlayClientId} />
         <Grid container spacing={3}>
-            <SongListConfig appState={appState} />
             <Grid item xs={12}>
                 <FlexCol className="subscriptions-container">
                     <FlexRow alignItems="center">
-                        <h2 style={{ marginRight: 20 }}>Raid Watcher</h2>
+                        <h2 style={{ marginRight: 20 }}>Overlay Subscriptions</h2>
                         {!subscriptionsToDisplay && <CircularProgress size={20} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length > 0 && <LinkIcon style={{ color: "green", marginRight: 10 }} />}
                         {subscriptionsToDisplay && subscriptionsToDisplay.length <= 0 && <LinkOffIcon style={{ color: "red", marginRight: 10 }} />}
@@ -99,7 +99,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
                         <FlexCol style={{ maxWidth: 120 }}>
                             <Button color="primary" variant="contained" onClick={async () => {
                                 if (appState.username && appState.accessToken) {
-                                    const client = new HoagieClient();
+                                    const client = new HoagieOverlayClient();
                                     await Promise.all(subscriptionsToDisplay?.map(sub => client.deleteSubscription(sub.id, appState.username!, appState.accessToken!)) ?? []);
                                     getSubscriptions();
                                 }
@@ -116,7 +116,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
                                     <div className="sub-delete">
                                         <Button color="primary" variant="contained" className="sub-delete-button" onClick={async () => {
                                             if (appState.username && appState.accessToken) {
-                                                const client = new HoagieClient();
+                                                const client = new HoagieOverlayClient();
                                                 await client.deleteSubscription(sub.id, appState.username, appState.accessToken);
                                                 getSubscriptions();
                                             }

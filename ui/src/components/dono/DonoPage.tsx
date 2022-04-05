@@ -11,6 +11,7 @@ import "../../styles/Dono.scss";
 import { useParams } from "react-router";
 import { Grid } from "@material-ui/core";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
+import Config from "../../Config";
 
 export interface DonoPageProps {
 }
@@ -30,7 +31,7 @@ export const DonoPage = (props: DonoPageProps) => {
             dispatch: appStateDispatch,
             state: appState,
         }}>
-            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} />
+            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
                 <DonoTableContainer />
             </Grid>

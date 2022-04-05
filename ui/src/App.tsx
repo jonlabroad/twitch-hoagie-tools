@@ -8,6 +8,7 @@ import { DonoPage } from './components/dono/DonoPage';
 
 import 'fontsource-roboto';
 import { AdminPage } from './components/admin/AdminPage';
+import { HoagieDashboard } from './components/hoagie/HoagieDashboard';
 
 function App() {
   return (
@@ -40,6 +41,12 @@ function App() {
           </Route>
           <Route path="/admin">
             <AdminPage />
+          </Route>
+          <Route path="/hoagie">
+            <HoagieDashboard
+              streamerName="hoagieman5000"
+              scopes={"channel:read:subscriptions bits:read"}
+            />
           </Route>
         </Switch>
       </Router>

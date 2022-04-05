@@ -62,8 +62,11 @@ interface DonoTableRowProps {
 const DonoTableRow = (props: DonoTableRowProps) => {
     const { userdata, songQueue, songHistory } = props;
 
-    const queueSongs = songQueue?.list.filter(song => song.requests.filter(r => r.name.toLowerCase() === userdata.SubKey.toLowerCase()).length > 0);
-    const historySongs = songHistory?.items.filter(song => song.requests.filter(r => r.name.toLowerCase() === userdata.SubKey.toLowerCase()).length > 0);
+    const queueSongs = songQueue?.list.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.SubKey.toLowerCase()).length > 0);
+    const historySongs = songHistory?.items.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.SubKey.toLowerCase()).length > 0);
+
+    const queueSongTitles = queueSongs?.map(s => s?.song ? `${s?.song?.title} - ${s?.song?.artist}` : `${s?.nonlistSong ?? ""}`)
+    const historySongTitles = historySongs?.map(s => s?.song ? `${s?.song?.title} - ${s?.song?.artist}` : `${s?.nonlistSong ?? ""}`)
 
     return <>
         <StyledTableRow>
@@ -75,10 +78,10 @@ const DonoTableRow = (props: DonoTableRowProps) => {
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <TableCell align="left" style={{...tableHeaderStyle, width: "55%"}}>
                 <FlexRow>
-                    {queueSongs?.map(s => <Tooltip title={`${s.song.title} - ${s.song.artist}`}>
+                    {queueSongTitles?.map(s => <Tooltip title={s}>
                         <Chip style={{marginRight: 5}} label={"In Queue"} color="primary" variant="outlined" />
                     </Tooltip>)}
-                    {historySongs?.map(s => <Tooltip title={`${s.song.title} - ${s.song.artist}`}>
+                    {historySongTitles?.map(s => <Tooltip title={s}>
                         <Chip label={"Completed"} color="primary" />
                     </Tooltip>)}
                 </FlexRow>

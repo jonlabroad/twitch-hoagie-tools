@@ -82,7 +82,7 @@ export const MainPage = (props: MainPageProps) => {
                 dispatch: appStateDispatch,
                 state: appState,
             }}>
-                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={Config.scopes} />
+                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={Config.scopes} clientId={Config.clientId}/>
                 <Grid container spacing={3}>
                     <Grid item xs={3}>
                         <ChannelHeader />

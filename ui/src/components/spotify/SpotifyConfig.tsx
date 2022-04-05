@@ -56,7 +56,7 @@ export const SpotifyConfig = (props: SpotifyConfigProps) => {
     }, [appState.accessToken, appState.username]);
 
     return <React.Fragment>
-        <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={twitchScopes.join('')} />
+        <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={twitchScopes.join('')} clientId={Config.clientId}/>
         <Grid container spacing={3}>
             <Grid item xs={12}>
                 <FlexCol className="subscriptions-container">

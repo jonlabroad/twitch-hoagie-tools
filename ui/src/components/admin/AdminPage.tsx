@@ -1,5 +1,6 @@
 import { Grid } from "@material-ui/core";
 import { useEffect, useReducer, useState } from "react";
+import Config from "../../Config";
 import { useSaveLastPath } from "../../hooks/LastPathHooks";
 import HoagieClient, { AdminData } from "../../service/HoagieClient";
 import { AppState, defaultAppState } from "../../state/AppState";
@@ -39,7 +40,7 @@ export const AdminPage = (props: AdminPageProps) => {
             dispatch: appStateDispatch,
             state: appState,
         }}>
-            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} />
+            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
                 <Grid item style={{margin: 10}} xs={12}>
                     <StreamerListContainer streamers={adminData?.streamers ?? []} onChange={() => getAdminConfig()} />

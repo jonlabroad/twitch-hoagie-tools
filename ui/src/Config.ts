@@ -3,6 +3,7 @@ import { ModActionType } from "./state/AppState";
 
 export default class Config {
     public static clientId = process.env.NODE_ENV === "production" ? "ywktn54es8x9ipwm0305v3sj3vmy7l" : "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
+    public static overlayClientId = "tc1xzzxj1ct3a3fieahi0lqrjewk75";
     public static redirectUri = process.env.NODE_ENV === "production" ? "https://hoagietools.hoagieman.net/loginRedirect" : "http://localhost:3000/loginRedirect";
 
     public static spotifyClientId = "7bea1548c3534971ad8bd4c34de743a7";

@@ -314,10 +314,10 @@ module.exports.refreshmods = async (event: any) => {
     try {
         Config.validate();
 
-        const blacklist = ["songlistbot", "streamelements", "nightbot", "streamlabs"];
+        const blacklist = ["songlistbot", "streamelements", "nightbot", "streamlabs", "serybot"];
 
         const config = await ConfigProvider.get();
-        const channels = config?.streamers ?? [];
+        const channels = Array.from(config?.streamers.values ?? []);
         const client = new tmi.Client({
             channels,
             identity: {
@@ -326,28 +326,31 @@ module.exports.refreshmods = async (event: any) => {
             }
         });
 
-        let done = false;
+        let done = channels.map(c => false);
 
         client.connect();
         client.on("connected", async (address, port) => {
             const allData = await Promise.all(channels.map(async rawChannel => {
                 const mods = await client.mods(rawChannel);
                 const channel = rawChannel.replace("#", "");
+                console.log(JSON.stringify({channel, mods}, null, 2));
                 return { channel, mods };
             }));
-            await Promise.all(allData.map(async data => {
+            await Promise.all(allData.map(async (data, i) => {
                 const client = new ModsDbClient(data.channel);
                 const filtered = data.mods.filter(mod => !blacklist.includes(mod.toLowerCase()))
-                await client.writeMods(filtered);
+                await client.writeMods([...filtered, data.channel.replace("#", "").toLowerCase()]);
+                done[i] = true;
             }));
-            done = true;
         })
 
-        while (!done) {
+        console.log(done.findIndex(d => !d) >= 0 )
+        while (done.findIndex(d => !d) >= 0) {
             console.log("Sleeping...");
             await sleep(1000);
         }
     } catch (err) {
+        console.error(err);
         return `${err.message}`
     }
 }

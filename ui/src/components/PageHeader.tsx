@@ -6,7 +6,7 @@ import { LoginAction } from "../state/AppStateReducer"
 import LoginUtil from "../util/LoginUtil"
 import { FlexRow } from "./util/FlexBox"
 
-export const PageHeader = (props: { appState: AppState, appStateDispatch: any, scopes: string }) => {
+export const PageHeader = (props: { appState: AppState, appStateDispatch: any, scopes: string, clientId: string }) => {
     const { appState, appStateDispatch, scopes } = props;
 
     const [] = useLogin((username: string | undefined, accessToken: string, isLoggedIn: boolean) => {
@@ -48,7 +48,7 @@ export const PageHeader = (props: { appState: AppState, appStateDispatch: any, s
                         <Button
                             variant="contained"
                             color="secondary"
-                            href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}&client_id=${Config.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
+                            href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
                         >
                             Login
                         </Button>}

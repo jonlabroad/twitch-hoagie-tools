@@ -7,7 +7,9 @@ export interface AdminData {
 
     chatUsername: string
     chatToken: string
-    streamers: string[]
+    streamers: {
+        values: string[]
+    }
 }
 
 export default class AdminDbClient {

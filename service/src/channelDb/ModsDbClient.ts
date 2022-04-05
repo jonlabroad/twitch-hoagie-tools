@@ -42,7 +42,6 @@ export default class ModsDbClient {
                     channel: this.broadcasterLogin
                 }
             }
-            console.log({item: input.Item});
             await client.put(input).promise();
         } catch (err) {
             console.error(err);
