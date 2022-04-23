@@ -6,6 +6,9 @@ export default class Config {
     public static twitchClientSecret = process.env.TWITCH_CLIENT_SECRET ?? "";
     public static subscriptionSecret = process.env.SUBSCRIPTION_SECRET ?? "";
     public static tableName = process.env.TABLENAME ?? "";
+    public static GeniusClientId = "2vmZ-eHDI3UGd_QIiS_rMjVz37mwmRAOLbQIzbO6PhDtN0QHfuN11NyJ99XTHiqV";
+    public static GeniusClientSecret = process.env.GENIUS_CLIENT_SECRET ?? "";
+    public static BadWordsSecret = process.env.BAD_WORDS_SECRET ?? "";
 
     // TODO put in database and allow admins to add/remove other admins
     public static AdminUserNames = [

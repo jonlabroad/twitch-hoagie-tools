@@ -98,7 +98,7 @@ export const MainPage = (props: MainPageProps) => {
                     </Grid>
                     <Grid container spacing={3}>
                         <AlertContainer />
-                        <Grid item xs={6}>
+                        <Grid item xs={12} md={6}>
                             <SongQueue />
                         </Grid>
                     </Grid>

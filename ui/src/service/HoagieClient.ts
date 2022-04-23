@@ -164,4 +164,13 @@ export default class HoagieClient {
             }
         });
     }
+
+    async songEval(song: string, username: string, accessToken: string) {
+        const response = await axios.get(`${this.BASE_URL}songeval/eval?username=${username}&query=${song}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response?.data;
+    }
 }

@@ -55,7 +55,7 @@ export const AlertContainer = (props: AlertContainerProps) => {
         action.type === "ignore_shoutout" && ((action as IgnoreShoutoutModAction).alertKey === alert.key)));
 
     return (<React.Fragment>
-        <Grid item xs={12} md={6} lg={6}>
+        <Grid item xs={12} md={6}>
             {shoutoutAlerts.map((alert, i) => (
                 <React.Fragment key={i}>
                     <AlertCard key={i}

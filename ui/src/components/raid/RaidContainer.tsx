@@ -1,4 +1,4 @@
-import { CircularProgress, Table, TableBody, TableCell, TableRow, Typography } from "@material-ui/core";
+import { CircularProgress, Hidden, Table, TableBody, TableCell, TableRow, Typography } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
 import { useLiveChannels, useRaidTargets } from "../../hooks/raidTargetHooks";
 import HoagieClient from "../../service/HoagieClient";
@@ -7,8 +7,9 @@ import { StreamData, UserData } from "../../service/TwitchClientTypes";
 import StreamSorter from "../../util/StreamSorter";
 import { CountupTimer } from "../CountdownTimer";
 import { StateContext } from "../MainPage";
-import { FlexCol } from "../util/FlexBox";
+import { FlexCol, FlexRow } from "../util/FlexBox";
 import { RaidEvent } from "./RaidEvent";
+import { RaidHistory } from "./RaidHistory";
 
 interface RaidData {
     raidsIn: RaidEvent[]
@@ -66,7 +67,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
                     raidData.raids.forEach(raid => {
                         const direction = state?.streamer?.toLowerCase() === raid.to_broadcaster_user_login.toLowerCase() ? "in" : "out";
                         const key = direction === "in" ? raid.from_broadcaster_user_login.toLowerCase() : raid.to_broadcaster_user_login.toLowerCase();
-                        raidByStreamer[key] = raidByStreamer[key] ?? { raidsIn: [], raidsOut:[] };
+                        raidByStreamer[key] = raidByStreamer[key] ?? { raidsIn: [], raidsOut: [] };
                         if (direction === "in") {
                             raidByStreamer[key].raidsIn.push(raid);
                         } else {
@@ -92,15 +93,27 @@ export const RaidContainer = (props: RaidContainerProps) => {
             <TableBody>
                 {sortedChannels.map(stream => (
                     <TableRow>
-                        <TableCell>{StreamSorter.getSortRank(stream)}</TableCell>
-                        <TableCell><ChannelLink username={stream.user_name}><img style={{ borderRadius: 25, height: 50, width: "auto" }} src={userInfo[stream.user_name]?.profile_image_url} /></ChannelLink></TableCell>
-                        <TableCell><Typography variant="subtitle1">{stream.user_name}</Typography></TableCell>
-                        <TableCell><ChannelLink username={stream.user_name}><img style={{ height: 90 }} src={stream?.thumbnail_url.replace('{width}', '440').replace('{height}', '248')} /></ChannelLink></TableCell>
-                        <TableCell><CountupTimer startDate={new Date(stream.started_at)} /></TableCell>
-                        <TableCell>{stream?.viewer_count}</TableCell>
-                        <TableCell>{stream.title}</TableCell>
-                        <TableCell>{raids[stream.user_name.toLowerCase()]?.raidsIn?.length ?? ""}</TableCell>
-                        <TableCell>{raids[stream.user_name.toLowerCase()]?.raidsOut?.length ?? ""}</TableCell>
+                        <TableCell width="10%">
+                            <FlexRow alignItems="center">
+                                <div style={{marginRight: 10}}>{StreamSorter.getSortRank(stream)}</div>
+                                <ChannelLink username={stream.user_name}><img style={{ borderRadius: 25, height: 50, width: "auto" }} src={userInfo[stream.user_name]?.profile_image_url} /></ChannelLink>
+                                <Typography variant="subtitle1">{stream.user_name}</Typography>
+                            </FlexRow>
+                        </TableCell>
+                        <TableCell width="10%"><ChannelLink username={stream.user_name}><img style={{ height: 90 }} src={stream?.thumbnail_url.replace('{width}', '440').replace('{height}', '248')} /></ChannelLink></TableCell>
+                        <TableCell>
+                            <FlexCol alignItems="center">
+                                <div>{stream?.viewer_count}</div>
+                                <CountupTimer startDate={new Date(stream.started_at)} />
+                            </FlexCol>
+                        </TableCell>
+                        <Hidden smDown><TableCell>{stream.title}</TableCell></Hidden>
+                        <TableCell>
+                            <RaidHistory
+                                raidsIn={raids[stream.user_name.toLowerCase()]?.raidsIn ?? []}
+                                raidsOut={raids[stream.user_name.toLowerCase()]?.raidsOut ?? []}
+                            />
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -109,7 +122,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
 }
 
 const ChannelLink = (props: { username: string, children: JSX.Element | JSX.Element[] }) => {
-    return <a href={`https://www.twitch.tv/${props.username}`} target="_blank">
+    return <a style={{marginRight: 10}} href={`https://www.twitch.tv/${props.username}`} target="_blank">
         {props.children}
     </a>
 }

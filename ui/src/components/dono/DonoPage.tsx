@@ -12,6 +12,8 @@ import { useParams } from "react-router";
 import { Grid } from "@material-ui/core";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import Config from "../../Config";
+import { useSongQueueEval } from "../../hooks/songQueueEval";
+import { EvaluatedSongQueue } from "../ssl/EvaluatedSongQueue";
 
 export interface DonoPageProps {
 }
@@ -24,6 +26,8 @@ export const DonoPage = (props: DonoPageProps) => {
         streamer,
     } as AppState);
 
+    const [evaluations] = useSongQueueEval(appState);
+
     useSaveLastPath();
 
     return <>
@@ -33,6 +37,7 @@ export const DonoPage = (props: DonoPageProps) => {
         }}>
             <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
+                <EvaluatedSongQueue evaluations={evaluations} />
                 <DonoTableContainer />
             </Grid>
         </StateContext.Provider>

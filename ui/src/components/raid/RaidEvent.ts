@@ -6,4 +6,5 @@ export interface RaidEvent {
     to_broadcaster_user_login: string
     to_broadcaster_user_name: string
     viewers: number
+    timestamp: number
 }

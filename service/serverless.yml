@@ -118,6 +118,26 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  songeval:
+    handler: songeval.eval
+    timeout: 600
+    events:
+      - http:
+          method: GET
+          path: /api/songeval/eval
+          cors: true
+          parameters:
+            querystrings:
+              username: true
+              query: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+      GENIUS_CLIENT_SECRET: ${file(secrets.yml):geniusClientSecret}
+      BAD_WORDS_SECRET: ${file(secrets.yml):badWordsSecret}
+
   listsubscriptions:
     handler: twitch.listsubscriptions
     events:
