@@ -31,6 +31,7 @@ export interface SpotifyAlbum {
 export interface SpotifyArtist {
     name: string
     uri: string
+    href: string
 }
 
 export interface SpotifyProfile {
@@ -151,10 +152,21 @@ export default class SpotifyClient {
         const url = `	https://api.spotify.com/v1/playlists/${playlistId}/tracks?uris=${trackUris.join(',')}`;
         console.log(url);
         const response = await axios.post<any, any>(url, {}, {
-                headers: {
-                    "Authorization": `Bearer ${userToken}`
-                }
+            headers: {
+                "Authorization": `Bearer ${userToken}`
             }
+        }
+        );
+        return response.data;
+    }
+
+    public async getUrl(userToken: string, url: string) {
+        console.log(url);
+        const response = await axios.get<any, any>(url, {
+            headers: {
+                "Authorization": `Bearer ${userToken}`
+            }
+        }
         );
         return response.data;
     }

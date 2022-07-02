@@ -18,7 +18,7 @@ export const noCacheHeaders = {
 
 module.exports.getlyrics = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
-/*
+
     const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
@@ -28,11 +28,11 @@ module.exports.getlyrics = async (event: APIGatewayProxyEvent) => {
     if (authenticationResponse) {
         return authenticationResponse;
     }
-*/
+
     let body: any = "err";
     try {
         const query = event.queryStringParameters?.["query"] ?? "";
-        const geniusClient = new GeniusClient(Config.GeniusClientId, Config.GeniusClientSecret);
+        const geniusClient = new GeniusClient(Config.GeniusClientSecret);
         const geniusSong = await geniusClient.getSong(query);
         const lyrics = await geniusClient.getLyricsFromUrl(geniusSong.url);
 
@@ -53,7 +53,6 @@ module.exports.getlyrics = async (event: APIGatewayProxyEvent) => {
         statusCode: 200,
         headers: {
             ...corsHeaders,
-            ...noCacheHeaders,
         },
         body: JSON.stringify(body)
     };

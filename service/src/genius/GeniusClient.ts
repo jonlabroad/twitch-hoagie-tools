@@ -1,11 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 import { decode } from "html-entities";
-import fs from "fs";
 const JSSoup = require('jssoup').default;
-const phantom = require("x-ray-phantom");
-
-const accessToken = "4iwQ4dRz9fRO_Px79MBdGzWKNxStt3jaadzq0CVrnTirLnYzL1NuQazTsAJmc0Ct"; //NOCOMMIT
 
 export interface GeniusSearchResponse {
     response: {
@@ -30,18 +26,16 @@ export interface GeniusSearchResponse {
 }
 
 export default class GeniusClient {
-    private clientId;
-    private clientSecret;
+    private accessToken;
 
     private static baseUrl = "https://api.genius.com";
 
-    constructor(clientId: string, clientSecret: string) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+    constructor(accessToken: string) {
+        this.accessToken = accessToken;
     }
 
     public async getAccessToken() {
-        return Promise.resolve(accessToken);
+        return Promise.resolve(this.accessToken);
     }
 
     public async getSong(query: string) {
@@ -54,11 +48,9 @@ export default class GeniusClient {
         const headers = {
             Authorization: `Bearer ${accessToken}`
         }
-        console.log(request);
         const response = await axios.get<GeniusSearchResponse>(request, {
             headers
         });
-        console.log(response.data);
         const result = response.data.response.hits[0]?.result;
         return result;
     }
@@ -68,7 +60,6 @@ export default class GeniusClient {
         const soup = new JSSoup(pageResponse.data);
         const lyricsElements = soup.findAll('div', {"data-lyrics-container":"true"});
         const lyrics = decode(lyricsElements.map(el => el.getText("\n") ?? "").join("\n"));
-        //fs.writeFileSync("test.txt", lyrics);
         return lyrics;
     }
 }

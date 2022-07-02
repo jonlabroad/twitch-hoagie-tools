@@ -111,6 +111,16 @@ export default class HoagieClient {
         return response.data;
     }
 
+    async getSpotifySongs(requestorUsername: string, songs: { artist: string, title: string }[], accessToken: string) {
+        const url = `${this.BASE_URL}spotify/getsongs?username=${requestorUsername}`;
+        const response = await axios.post(url, { songs }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        })
+        return response.data;
+    }
+
     async getRaids(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}raiddata?username=${username}&streamerLogin=${streamerName}`, {
             headers: {

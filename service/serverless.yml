@@ -118,6 +118,25 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  spotifygetsongs:
+    handler: spotify.getsongs
+    timeout: 600
+    events:
+      - http:
+          method: POST
+          path: /api/spotify/getsongs
+          cors: true
+          parameters:
+            querystrings:
+              username: true
+    environment:
+      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
+      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
   songeval:
     handler: songeval.eval
     timeout: 600
