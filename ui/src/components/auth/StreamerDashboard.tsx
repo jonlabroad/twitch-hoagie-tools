@@ -62,7 +62,6 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
             if (appState.accessToken) {
                 const client = new TwitchClient(appState.accessToken);
                 const id = await client.getUserId(props.streamerName);
-                console.log({ id });
                 setStreamerId(id);
             }
         }
@@ -70,7 +69,6 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
     })
 
     const subscriptionsToDisplay = subscriptions;
-    console.log({subscriptionsToDisplay});
 
     let subConnectionStatus = "";
     if (subscriptionsToDisplay) {

@@ -42,8 +42,6 @@ export const useLiveChannels = (username?: string, accessToken?: string) => {
                     const liveStreams = await client.getStreamsByGame(game.id);
                     setLiveStreams(liveStreams);    
                 }
-
-                console.log({ liveStreams });
             }
         }
         get();

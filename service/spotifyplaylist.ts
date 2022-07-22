@@ -50,7 +50,7 @@ module.exports.settoken = async (event: any) => {
         const username = event.queryStringParameters?.["username"] ?? "";
         const token = request.token;
         const redirectUri = request.redirectUri;
-        await SpotifySetToken.setToken(username, token, redirectUri);       
+        await SpotifySetToken.setToken(username, token, redirectUri);
     } catch (err) {
         console.error(err);
         return {

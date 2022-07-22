@@ -95,17 +95,13 @@ export const MainPage = (props: MainPageProps) => {
                         <Grid item xs={1} >
                             <StreamerLinks />
                         </Grid>
-                    </Grid>
-                    <Grid container spacing={3}>
                         <AlertContainer />
                         <Grid item xs={12} md={6}>
                             <SongQueue />
                         </Grid>
                     </Grid>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                            <RaidContainer />
-                        </Grid>
+                    <Grid item xs={12}>
+                        <RaidContainer />
                     </Grid>
                 </div>
                 <EventsContainer />

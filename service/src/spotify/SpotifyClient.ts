@@ -14,6 +14,18 @@ export interface SearchResponse {
     }
 }
 
+export interface AudioAnalysisResponse {
+    track: {
+        loudness: number
+        tempo: number
+        tempo_confience: number
+        time_signature: number
+        time_signature_confidence: number
+        key: number
+        key_confidence: number
+    }
+}
+
 export interface SpotifySong {
     album: SpotifyAlbum
     artists: SpotifyArtist[]
@@ -21,6 +33,7 @@ export interface SpotifySong {
     name: string
     uri: string
     popularity: number
+    id: string
 }
 
 export interface SpotifyAlbum {
@@ -90,13 +103,50 @@ export default class SpotifyClient {
             }
         });
         const tokenData = response.data;
-        return tokenData.access_token;
+        return tokenData;
+    }
+
+    public async refreshToken(refreshToken: string) {
+        const params = new URLSearchParams();
+        params.append("grant_type", "refresh_token");
+        params.append("refresh_token", refreshToken);
+        const url = "https://accounts.spotify.com/api/token";
+        console.log(url);
+        console.log(params);
+        try {
+            const response = await axios.post<TokenResponse>(url, params as any, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`
+                }
+            });
+            const tokenData = response.data;
+            return tokenData;
+        } catch (err) {
+            throw new Error(`Could get new token: ${err.message}`);
+        }
     }
 
     public async getSong(token: string, artist: string, title: string) {
         const url = `https://api.spotify.com/v1/search?type=track&q=artist:${encodeURIComponent(artist)}+track:${encodeURIComponent(title)}`;
         console.log(url);
-        const response = await axios.get<SearchResponse>(url, {
+        try {
+            const response = await axios.get<SearchResponse>(url, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (err) {
+            console.log(err.message);
+        }
+        return undefined;
+    }
+
+    public async getAudioAnalysis(token: string, trackId: string) {
+        const url = `https://api.spotify.com/v1/audio-analysis/${trackId}`;
+        console.log(url);
+        const response = await axios.get<AudioAnalysisResponse>(url, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

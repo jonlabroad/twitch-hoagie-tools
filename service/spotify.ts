@@ -15,6 +15,7 @@ interface SetTokenRequestBody {
 
 export interface GetSongsRequestBody {
     songs: {
+        songKey: string
         artist: string
         title: string
     }[]
@@ -23,11 +24,12 @@ export interface GetSongsRequestBody {
 module.exports.getsongs = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
+    /*
     const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
     }
-
+    */
     try {
         const request = JSON.parse(event.body ?? "{}") as GetSongsRequestBody;
         console.log({ request });

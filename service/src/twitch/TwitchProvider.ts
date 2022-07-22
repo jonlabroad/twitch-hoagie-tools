@@ -10,7 +10,6 @@ export default class TwitchProvider {
     public static async getUserData(streamerLogin: string, userLogin: string): Promise<Response> {
         const follows = await this.doesFollow(streamerLogin, userLogin);
         const userData = await this.getUser(userLogin);
-        console.log({userData});
         return {
             follows,
             userData,
@@ -30,7 +29,6 @@ export default class TwitchProvider {
 
         if (streamerId && userId) {
             const follows = await client.getUserFollows(streamerId, userId);
-            console.log({follows});
             return follows.length > 0;
         }
         return false;

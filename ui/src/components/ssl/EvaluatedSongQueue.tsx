@@ -1,9 +1,14 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, Accordion, AccordionSummary, Collapse } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, Accordion, AccordionSummary, Collapse, LinearProgress } from "@material-ui/core";
 import { useContext, useState } from "react";
+import { GeniusLink } from "../links/GeniusLink";
+import { SpotifyLink } from "../links/SpotifyLink";
 import { StateContext } from "../MainPage";
+import { SpotifyEmbed } from "../spotify/SpotifyEmbed";
 import { FlexCol, FlexRow } from "../util/FlexBox";
+const format = require('format-duration')
 
 export interface EvaluatedSongQueueProps {
+    isLoading: boolean;
     evaluations: Record<string, any>;
 }
 
@@ -15,43 +20,77 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
 
     const [expandedIndex, setExpandedIndex] = useState<number | undefined>(undefined);
 
-    console.log({ e: evaluations });
-
-    console.log({ expandedIndex });
     return <Grid item xs={12}><TableContainer component={Paper} className="dono-table-container">
         <Table size="small">
             <TableHead>
                 <TableRow>
-                    <TableCell>SSL Song</TableCell>
-                    <TableCell>Resolved Song Name</TableCell>
-                    <TableCell># Bad Words</TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>SSL Song</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>User</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}># Bad Words</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>Duration</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>Time Signature</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>Genres</Typography></TableCell>
+                    <TableCell><Typography style={{fontWeight: 600}}>Links</Typography></TableCell>
                 </TableRow>
+                {props.isLoading && <TableRow><TableCell colSpan={7}><LinearProgress /></TableCell></TableRow>}
             </TableHead>
             <TableBody>
-                {Object.keys(evaluations ?? {}).map((songName, i) => {
-                    const badWordCounts = getBadWordsCounts(evaluations[songName].lyricsEval);
+                {evaluations.map((evaluation: any, i: number) => {
+                    const badWordCounts = getBadWordsCounts(evaluation.eval?.lyricsEval);
                     const totalBadWords = Object.values(badWordCounts).reduce((prev, curr) => curr + prev, 0);
-                    const resolvedSong = evaluations[songName].song;
-                    const genres = (evaluations[songName].songInfo?.artist?.genres ?? []) as string[];
+                    const resolvedSong = evaluation.eval?.song;
+                    const lyricsLink = resolvedSong?.url;
+                    const songName = evaluation.songKey;
+                    const spotifyInfo = evaluation.songInfo;
+                    const songAnalysis = spotifyInfo?.analysis;
+                    const spotifyLink = spotifyInfo?.track?.external_urls?.spotify;
+                    const durationMs = spotifyInfo?.track?.duration_ms ?? 0;
+                    const durationFormatted = format(durationMs);
+                    const genres = (evaluation.songInfo?.artist?.genres ?? []) as string[];
                     return (
                         <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>
-                                <TableCell><Typography>{songName}</Typography></TableCell>
-                                <TableCell><Typography>{resolvedSong.full_title}</Typography></TableCell>
+                                <TableCell>
+                                    <FlexCol>
+                                        <Typography>{songName}</Typography>
+                                        <Typography style={{ fontSize: 14, color: "grey"}}>{resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title} ` : ""}</Typography>
+                                    </FlexCol>
+                                </TableCell>
+                                <TableCell><Typography>{evaluation?.user}</Typography></TableCell>
                                 <TableCell><Typography>{totalBadWords}</Typography></TableCell>
+                                <TableCell><Typography>{durationFormatted}</Typography></TableCell>
+                                <TableCell><Typography>{songAnalysis?.track?.time_signature}/4 ({songAnalysis?.track?.time_signature_confidence})</Typography></TableCell>
                                 <TableCell><Typography>{genres.join(", ")}</Typography></TableCell>
+                                <TableCell>
+                                    <FlexRow>
+                                        {lyricsLink && <GeniusLink href={lyricsLink}/>}
+                                        {spotifyLink && <SpotifyLink href={spotifyLink} />}
+                                    </FlexRow>
+                                </TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                                <TableCell style={{ backgroundColor: "#eeeeee", paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                                     <Collapse in={expandedIndex === i} timeout="auto" unmountOnExit>
-                                        <Grid container>
+                                        <Grid container style={{ marginTop: 10, marginBottom: 10 }}>
                                             <Grid item xs={3}>
                                                 <FlexCol>
-                                                    <Typography component="h6">Words</Typography>
-                                                    {Object.keys(badWordCounts).sort((a, b) => badWordCounts[b] - badWordCounts[a]).map(word => (
+                                                    <Typography style={{fontWeight: 600}}>Bad Words</Typography>
+                                                    <Typography>{Object.keys(badWordCounts).sort((a, b) => badWordCounts[b] - badWordCounts[a]).map(word => (
                                                         <div style={{ marginRight: 5 }}>{`${word}(${badWordCounts[word]})`}</div>
                                                     ))}
+                                                    </Typography>
                                                 </FlexCol>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <FlexCol>
+                                                    <FlexRow><Typography style={{fontWeight: 600, marginRight: 10}}>Resolved Song: </Typography><Typography>{resolvedSong?.full_title}</Typography></FlexRow>
+                                                    <FlexRow><Typography style={{fontWeight: 600, marginRight: 10}}>Tempo: </Typography><Typography>{songAnalysis?.track?.tempo} ({songAnalysis?.track?.tempo_confidence})</Typography></FlexRow>
+                                                </FlexCol>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <SpotifyEmbed
+                                                    songId={spotifyInfo?.track?.id}
+                                                />
                                             </Grid>
                                         </Grid>
                                     </Collapse>

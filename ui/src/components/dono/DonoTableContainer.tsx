@@ -38,8 +38,6 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
 
     const isLoggedIn = state.isLoggedIn && state.accessToken && state.username;
 
-    console.log(state.songHistory);
-
     return <>
         {!isLoggedIn && <Grid item xs={12}>
             <LoginPrompt />

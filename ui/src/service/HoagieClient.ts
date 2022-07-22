@@ -111,13 +111,14 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async getSpotifySongs(requestorUsername: string, songs: { artist: string, title: string }[], accessToken: string) {
+    async getSpotifySongs(requestorUsername: string, songs: ({ songKey: string, artist: string, title: string } | undefined)[], accessToken: string) {
         const url = `${this.BASE_URL}spotify/getsongs?username=${requestorUsername}`;
         const response = await axios.post(url, { songs }, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
         })
+        console.log({response});
         return response.data;
     }
 

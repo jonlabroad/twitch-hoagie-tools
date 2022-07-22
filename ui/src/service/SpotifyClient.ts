@@ -44,7 +44,6 @@ export default class SpotifyClient {
             }
         });
         const tokenData = response.data;
-        console.log({tokenData});
         return tokenData.access_token;
     }
 }

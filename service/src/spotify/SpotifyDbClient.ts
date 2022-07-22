@@ -3,6 +3,15 @@ import { PutItemInput } from "aws-sdk/clients/dynamodb";
 import Config from "../Config";
 
 import TwitchClient from "../twitch/TwitchClient";
+import { TokenResponse } from "./SpotifyClient";
+
+export interface DbTokenValue {
+    username: string
+    access_token: string
+    expires_in: number
+    refresh_token: string
+    timestamp: string
+}
 
 export default class SpotifyDbClient {
     public static readonly SECRETS_CATEGORY = "SECRETS";
@@ -11,7 +20,7 @@ export default class SpotifyDbClient {
     public static readonly SPOTIFY_CATEGORY = "SPOTIFY";
     public static readonly PLAYLIST_SUBCAT = "playlist";
 
-    public static async setToken(username: string, token: string) {
+    public static async setToken(username: string, tokenData: TokenResponse, refresh_token?: string) {
         const client = new DynamoDB.DocumentClient();
 
         const userId = await (new TwitchClient()).getUserId(username) ?? "ERROR";
@@ -23,7 +32,9 @@ export default class SpotifyDbClient {
                 SubKey: this.STREAMER_SONGLIST_SUBCAT,
                 Value: {
                     username: username,
-                    token
+                    refresh_token,
+                    ...tokenData,
+                    timestamp: new Date().toISOString()
                 }
             }
         };
@@ -31,7 +42,7 @@ export default class SpotifyDbClient {
         console.log(response);
     }
 
-    public static async getToken(streamerName: string) {
+    public static async getToken(streamerName: string): Promise<any | undefined> {
         const client = new DynamoDB.DocumentClient();
         const userId = await (new TwitchClient()).getUserId(streamerName) ?? "ERROR";
 
@@ -43,7 +54,7 @@ export default class SpotifyDbClient {
             }
         }
         const response = await client.get(request).promise();
-        return response?.Item?.Value?.token;
+        return response?.Item?.Value;
     }
 
     public static async setPlaylist(streamerName: string, playlistId: string) {

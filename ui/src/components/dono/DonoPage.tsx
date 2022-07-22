@@ -26,7 +26,7 @@ export const DonoPage = (props: DonoPageProps) => {
         streamer,
     } as AppState);
 
-    const [evaluations] = useSongQueueEval(appState);
+    const [evaluations, evalIsLoading] = useSongQueueEval(appState);
 
     useSaveLastPath();
 
@@ -37,7 +37,7 @@ export const DonoPage = (props: DonoPageProps) => {
         }}>
             <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
-                {streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" && <EvaluatedSongQueue evaluations={evaluations} />}
+                {(streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery") && <EvaluatedSongQueue isLoading={evalIsLoading} evaluations={evaluations} />}
                 <DonoTableContainer />
             </Grid>
         </StateContext.Provider>

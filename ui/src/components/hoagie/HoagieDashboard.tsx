@@ -63,7 +63,6 @@ export const HoagieDashboard = (props: { streamerName: string, scopes: string })
             if (appState.accessToken) {
                 const client = new TwitchClient(appState.accessToken);
                 const id = await client.getUserId(props.streamerName);
-                console.log({ id });
                 setStreamerId(id);
             }
         }

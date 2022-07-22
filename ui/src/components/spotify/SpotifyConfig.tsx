@@ -45,7 +45,6 @@ export const SpotifyConfig = (props: SpotifyConfigProps) => {
                 /* eslint-disable-next-line */
                 history.replaceState(null, '', url);
 
-                console.log({ parsed });
                 if (parsed.code) {
                     const hoagieClient = new HoagieClient();
                     await hoagieClient.writeSpotifyToken(appState.username, appState.accessToken, parsed.code as string, redirectUri);

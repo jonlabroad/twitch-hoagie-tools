@@ -33,7 +33,6 @@ export const RaidContainer = (props: RaidContainerProps) => {
     const [raids, setRaids] = useState<RaidsByStreamer>({});
 
     useEffect(() => {
-        console.log({ myFollowed, theirFollowed })
         if (myFollowed && theirFollowed && liveStreams.length > 0) {
             const filtered: Record<string, StreamData> = {};
             liveStreams.filter(c =>
