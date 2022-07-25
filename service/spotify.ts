@@ -23,13 +23,12 @@ export interface GetSongsRequestBody {
 
 module.exports.getsongs = async (event: any) => {
     Config.validate(["TABLENAME"]);
-
-    /*
+    
     const authResponse = await TwitchAuthenticator.auth(event);
     if (authResponse) {
         return authResponse;
     }
-    */
+
     try {
         const request = JSON.parse(event.body ?? "{}") as GetSongsRequestBody;
         console.log({ request });
@@ -45,6 +44,7 @@ module.exports.getsongs = async (event: any) => {
             body: JSON.stringify(songInfos)
         };
     } catch (err) {
+        console.error(err);
         return {
             statusCode: 500,
             headers: corsHeaders,

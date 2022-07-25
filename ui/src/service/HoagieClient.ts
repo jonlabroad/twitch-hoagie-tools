@@ -140,8 +140,8 @@ export default class HoagieClient {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-        console.log({ datadata: response.data });
         return response.data as {
+            streamId: string
             donos: DonoData[]
         }
     }

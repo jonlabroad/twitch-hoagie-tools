@@ -286,12 +286,14 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
             return auth;
         }
 
+        const donos = await DonoProvider.get(streamerLogin);
+
         return {
             statusCode: 200,
             body: JSON.stringify({
                 userLogin,
                 streamerLogin,
-                donos: await DonoProvider.get(streamerLogin),
+                ...donos,
             }, null, 2),
             headers: {
                 ...corsHeaders,

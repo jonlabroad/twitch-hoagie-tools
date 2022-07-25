@@ -1,4 +1,5 @@
 import { DynamoDB } from "aws-sdk";
+import { stringify } from "querystring";
 import { SetDonoRequest } from "../../twitch-dono";
 import Config from "../Config";
 
@@ -22,11 +23,18 @@ export default class DonoDbClient {
         this.broadcasterLogin = broadcasterLogin;
     }
 
-    public async readLatestDonos(): Promise<DonoData[]> {
+    public async readLatestDonos(): Promise<{
+        stream:{
+            streamId: string,
+            timestamp: string
+        },
+        donos: DonoData[]
+    }> {
         const client = new DynamoDB.DocumentClient();
 
         // Get latest stream id
-        const latestStreamId = await this.getLatestStreamId();
+        const latestStream = await this.getLatestStream();
+        const latestStreamId = latestStream.streamId;
         console.log({ latestStreamId });
         if (latestStreamId) {
             const request: any = {
@@ -38,15 +46,27 @@ export default class DonoDbClient {
             }
             const response = await client.query(request).promise();
             console.log(response);
-            return (response?.Items ?? []) as DonoData[];
+            return {
+                stream: {
+                    streamId: latestStreamId,
+                    timestamp: latestStream.timestamp,
+                },
+                donos: (response?.Items ?? []) as DonoData[]
+            };
         }
-        return [];
+        return {
+            stream: {
+                streamId: "",
+                timestamp: ""
+            },
+            donos: []
+        };
     }
 
     public async add(request: SetDonoRequest) {
         try {
-            const latestStreamId = await this.getLatestStreamId();
-            console.log({ request });
+            const latestStream = await this.getLatestStream();
+            const latestStreamId = latestStream.streamId;
             if (latestStreamId) {
                 switch (request.type) {
                     case "cheer":
@@ -190,7 +210,10 @@ export default class DonoDbClient {
         }
     }
 
-    public async getLatestStreamId(): Promise<string> {
+    public async getLatestStream(): Promise<{
+        streamId: string,
+        timestamp: string
+    }> {
         const client = new DynamoDB.DocumentClient();
         const request: any = {
             TableName: Config.tableName,
@@ -202,7 +225,10 @@ export default class DonoDbClient {
         const response = await client.query(request).promise();
         const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
         const latest = sorted?.[0];
-        return latest?.SubKey;
+        return {
+            streamId: latest?.SubKey,
+            timestamp: latest?.timestamp,
+        }
     }
 
     getKey(channel: string, streamId: string) {

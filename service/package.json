@@ -7,7 +7,7 @@
     "deploy-dev": "serverless deploy --stage development",
     "deploy-prod": "serverless deploy --stage prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "serverless offline"
+    "local": "serverless offline --httpPort 3001"
   },
   "author": "",
   "license": "ISC",
