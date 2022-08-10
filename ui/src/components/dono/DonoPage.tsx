@@ -14,6 +14,7 @@ import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import Config from "../../Config";
 import { useSongQueueEval } from "../../hooks/songQueueEval";
 import { EvaluatedSongQueue } from "../ssl/EvaluatedSongQueue";
+import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
 
 export interface DonoPageProps {
 }
@@ -26,8 +27,6 @@ export const DonoPage = (props: DonoPageProps) => {
         streamer,
     } as AppState);
 
-    const [evaluations, evalIsLoading] = useSongQueueEval(appState);
-
     useSaveLastPath();
 
     return <>
@@ -37,7 +36,7 @@ export const DonoPage = (props: DonoPageProps) => {
         }}>
             <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
-                {(streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery") && <EvaluatedSongQueue isLoading={evalIsLoading} evaluations={evaluations} />}
+                {<EvaluatedSongQueueContainer />}
                 <DonoTableContainer />
             </Grid>
         </StateContext.Provider>

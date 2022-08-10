@@ -3,7 +3,7 @@ import SpotifyClient from "./SpotifyClient";
 import SpotifyGetToken from "./SpotifyGetToken";
 
 export default class SpotifyGetSongs {
-    public async getSongs(songs: { songKey: string, artist: string, title: string }[]) {
+    public async getSongs(songs: { songKey?: string, artist: string, title: string }[]) {
         const token = await SpotifyGetToken.getToken("hoagieman5000");
 
         if (!token) {

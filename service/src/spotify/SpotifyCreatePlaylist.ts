@@ -7,14 +7,14 @@ import SpotifyDbClient from "./SpotifyDbClient";
 export default class SpotifyCreatePlaylist {
     requestingUsername: string;
     streamerName: string;
-    
+
     constructor(streamerName: string, requestingUsername: string) {
         this.streamerName = streamerName;
         this.requestingUsername = requestingUsername;
     }
 
     public async create() {
-        const sslClient = new StreamerSongListClient();      
+        const sslClient = new StreamerSongListClient();
 
         console.log("Getting songs");
         const songlistSongs = await sslClient.getSongListSongs(this.streamerName);
@@ -36,9 +36,11 @@ export default class SpotifyCreatePlaylist {
         for (let song of streamerSonglistSongs) {
             console.log(`Finding ${song.artist} - ${song.title}`);
             const searchResult = await client.getSong(spotifyToken, song.artist.replace("Aly, The Songery", "The Songery"), song.title);
-            const spotifySong = this.selectSongFromResults(searchResult, song);
-            if (spotifySong) {
-                spotifySongs.push(spotifySong);
+            if (searchResult) {
+                const spotifySong = this.selectSongFromResults(searchResult, song);
+                if (spotifySong) {
+                    spotifySongs.push(spotifySong);
+                }
             }
         }
         return spotifySongs;
@@ -97,7 +99,7 @@ export default class SpotifyCreatePlaylist {
             //if (s2.titleRating !== s1.titleRating) {
             //    return s1.titleRating - s2.titleRating;
             //}
-            
+
             return s2.song.popularity - s1.song.popularity;
         });
 
@@ -110,7 +112,7 @@ export default class SpotifyCreatePlaylist {
         } else {
             console.warn(`After filtering, could not find ${sslSong.artist} - ${sslSong.title}`)
         }
-        
+
         return selectedSong;
     }
 }

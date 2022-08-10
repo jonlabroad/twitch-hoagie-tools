@@ -6,8 +6,20 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
     const songQueue = state.songQueue;
     const streamer = state.streamer;
 
-    const [evaluations, setEvaluations] = useState<any[]>([]);
+    const [evaluations, setEvaluations] = useState<any[] | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(false);
+
+    // TEST ONLY
+    useEffect(() => {
+        async function test() {
+            if (state.username && state.accessToken && state.streamer) {
+                const client = new HoagieClient();
+                //await client.addWhitelistWord("buttslol2", state.username, state.accessToken, state.streamer);
+                //await client.removeWhitelistWord("buttslol2", state.username, state.accessToken, state.streamer);
+            }
+        }
+        test();
+    }, [state.username, state.accessToken])
 
     useEffect(() => {
         async function evalSongs() {
@@ -40,21 +52,26 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                     title: evaluation?.eval?.song?.title,
                 } : undefined).filter(e => !!e);
 
-                const songInfos = await client.getSpotifySongs(state.username ?? "", formattedSongs, state.accessToken ?? "");
-                songInfos.forEach((songInfo: any) => {
-                    const evaluation = evals.find((e) => e?.songKey === songInfo?.songKey);
-                    evaluation.songInfo = songInfo;
-                });
+                formattedSongs.forEach(async (song) => {
+                    if (song?.artist && song?.title) {
+                        const spotifySong = await client.getSpotifySong(state.username ?? "", song?.artist, song?.title, state.accessToken ?? "");
+                        if (spotifySong) {
+                            setEvaluations((prev) => {
+                                const newEvals = prev ? [...prev] : evals;
+                                const evaluation = newEvals.find((e) => e?.songKey === song?.songKey);
+                                evaluation.songInfo = spotifySong;
+                                return newEvals;
+                            })
+                        }
+                    }
+                })
 
-                console.log({evals});
-                setEvaluations(evals);
                 setIsLoading(false);
-
             }
         }
         evalSongs();
     }, [state.username, state.accessToken, songQueue?.list]);
 
-    return [evaluations, isLoading];
+    return [evaluations ?? [], isLoading];
 
 }

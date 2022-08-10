@@ -122,6 +122,16 @@ export default class HoagieClient {
         return response.data;
     }
 
+    async getSpotifySong(requestorUsername: string, artist: string, title: string, accessToken: string) {
+        const url = `${this.BASE_URL}spotify/getsong?username=${requestorUsername}&artist=${artist}&title=${title}`;
+        const response = await axios.get(url, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        })
+        return response.data;
+    }
+
     async getRaids(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}raiddata?username=${username}&streamerLogin=${streamerName}`, {
             headers: {
@@ -178,6 +188,33 @@ export default class HoagieClient {
 
     async songEval(song: string, username: string, accessToken: string) {
         const response = await axios.get(`${this.BASE_URL}songeval/eval?username=${username}&query=${song}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response?.data;
+    }
+
+    async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
+        const response = await axios.put(`${this.BASE_URL}songeval/whitelistwords?username=${username}&streamername=${streamerName}&word=${word}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response?.data;
+    }
+
+    async removeWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
+        const response = await axios.put(`${this.BASE_URL}songeval/whitelistwords?username=${username}&streamername=${streamerName}&word=${word}&remove=true`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response?.data;
+    }
+
+    async readSongEvalConfig(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}songeval/config?username=${username}&streamername=${streamerName}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
