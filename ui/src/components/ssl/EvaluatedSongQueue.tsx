@@ -1,13 +1,11 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, Accordion, AccordionSummary, Collapse, LinearProgress, IconButton, AccordionDetails } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, Accordion, AccordionSummary, Collapse, LinearProgress, IconButton, AccordionDetails, Hidden } from "@material-ui/core";
 import { useContext, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
 import { StateContext } from "../MainPage";
-import { SpotifyEmbed } from "../spotify/SpotifyEmbed";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
-import CheckIcon from '@material-ui/icons/Check';
-import BlockIcon from '@material-ui/icons/Block';
+import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 const format = require('format-duration')
 
 export interface EvaluatedSongQueueProps {
@@ -16,6 +14,10 @@ export interface EvaluatedSongQueueProps {
     evaluations: Record<string, any>;
 
     onWordWhitelistChange: (word: string, type: "add" | "remove") => void
+}
+
+const headerStyle = {
+    fontWeight: 600
 }
 
 export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
@@ -29,14 +31,15 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
     return <Grid item xs={12}><TableContainer component={Paper} className="dono-table-container">
         <Table size="small">
             <TableHead>
-                <TableRow>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>SSL Song</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>User</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}># Bad Words</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>Duration</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>Time Signature</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>Genres</Typography></TableCell>
-                    <TableCell><Typography style={{ fontWeight: 600 }}>Links</Typography></TableCell>
+                <TableRow >
+                    <Hidden smDown><TableCell><Typography style={headerStyle}>Queue Pos</Typography></TableCell></Hidden>
+                    <TableCell><Typography style={headerStyle}>SSL Song</Typography></TableCell>
+                    <Hidden smDown><TableCell><Typography style={headerStyle}>User</Typography></TableCell></Hidden>
+                    <TableCell><Typography style={headerStyle}># Bad Words</Typography></TableCell>
+                    <TableCell><Typography style={headerStyle}>Duration</Typography></TableCell>
+                    <Hidden smDown><TableCell><Typography style={headerStyle}>Time Signature</Typography></TableCell></Hidden>
+                    <TableCell><Typography style={headerStyle}>Genres</Typography></TableCell>
+                    <TableCell><Typography style={headerStyle}>Links</Typography></TableCell>
                 </TableRow>
                 {props.isLoading && <TableRow><TableCell colSpan={7}><LinearProgress /></TableCell></TableRow>}
             </TableHead>
@@ -55,20 +58,43 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     const durationFormatted = format(durationMs);
                     const genres = (evaluation.songInfo?.artist?.genres ?? []) as string[];
                     const timeSignature = songAnalysis?.track?.time_signature;
+                    const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
+                    const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
+                    const genreText = genres.join(", ");
                     return (
                         <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>
+                                <Hidden smDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
                                 <TableCell>
                                     <FlexCol>
                                         <Typography>{songName}</Typography>
-                                        <Typography style={{ fontSize: 14, color: "grey" }}>{resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title} ` : ""}</Typography>
+                                        <Typography style={{ fontSize: 14, color: "grey" }}>
+                                            {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title} ` : ""}
+                                        </Typography>
                                     </FlexCol>
                                 </TableCell>
-                                <TableCell><Typography>{evaluation?.user}</Typography></TableCell>
-                                <TableCell><Typography>{evaluation?.eval ? totalBadWords : ""}</Typography></TableCell>
-                                <TableCell><Typography>{evaluation?.eval ? durationFormatted : ""}</Typography></TableCell>
-                                <TableCell><Typography>{timeSignature ? `${timeSignature}/4 (${songAnalysis?.track?.time_signature_confidence})` : ""}</Typography></TableCell>
-                                <TableCell><Typography>{genres.join(", ")}</Typography></TableCell>
+                                <Hidden smDown>
+                                    <TableCell>
+                                        <Typography>{evaluation?.user}</Typography>
+                                    </TableCell>
+                                </Hidden>
+                                <TableCell>
+                                    <Typography>{evaluation?.eval ? totalBadWords : ""}</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography>{evaluation?.eval ? durationFormatted : ""}</Typography>
+                                </TableCell>
+                                <Hidden smDown>
+                                    <TableCell>
+                                        <FlexRow alignItems="center" mr={3}>
+                                            <Typography>{timeSignatureText}&nbsp;</Typography>
+                                            <Typography variant="body2" color="textSecondary">{timeSignatureConfidenceText}</Typography>
+                                        </FlexRow>
+                                    </TableCell>
+                                </Hidden>
+                                <TableCell>
+                                    <Typography>{genreText}</Typography>
+                                </TableCell>
                                 <TableCell>
                                     <FlexRow>
                                         {lyricsLink && <GeniusLink href={lyricsLink} />}
@@ -78,47 +104,15 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ backgroundColor: "#eeeeee", paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                                    <Collapse in={expandedIndex === i} timeout="auto" unmountOnExit>
-                                        <Grid container style={{ marginTop: 10, marginBottom: 10 }}>
-                                            <Grid item xs={3}>
-                                                <FlexCol>
-                                                    <Typography style={{ fontWeight: 600 }}>Bad Words</Typography>
-                                                    <Typography>{Object.keys(badWordCounts).filter(w => !badWordCounts[w].isWhitelisted).sort((a, b) => badWordCounts[b]?.count - badWordCounts[a]?.count).map(word => (
-                                                        <FlexRow alignItems="center">
-                                                            <div style={{ marginRight: 5 }}>{`${word}(${badWordCounts[word].count})`}</div>
-                                                            <IconButton onClick={() => props.onWordWhitelistChange(word, "add")}><CheckIcon fontSize="small" color="primary"/></IconButton>
-                                                        </FlexRow>
-                                                    ))}
-                                                    </Typography>
-                                                    <Accordion>
-                                                        <AccordionSummary>
-                                                            <Typography style={{ fontWeight: 600 }} variant="body2">Whitelisted</Typography>
-                                                        </AccordionSummary>
-                                                        <AccordionDetails>
-                                                        <Typography variant="body2">{Object.keys(badWordCounts).filter(w => badWordCounts[w].isWhitelisted).sort((a, b) => badWordCounts[b]?.count - badWordCounts[a]?.count).map(word => (
-                                                        <FlexRow alignItems="center">
-                                                            <div style={{ marginRight: 5 }}>{`${word}(${badWordCounts[word].count})`}</div>
-                                                            <IconButton onClick={() => props.onWordWhitelistChange(word, "remove")}><BlockIcon fontSize="small" color="primary"/></IconButton>
-                                                        </FlexRow>
-                                                    ))}
-                                                    </Typography>
-                                                    </AccordionDetails>
-                                                    </Accordion>
-                                                </FlexCol>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <FlexCol>
-                                                    <FlexRow><Typography style={{ fontWeight: 600, marginRight: 10 }}>Resolved Song: </Typography><Typography>{resolvedSong?.full_title}</Typography></FlexRow>
-                                                    <FlexRow><Typography style={{ fontWeight: 600, marginRight: 10 }}>Tempo: </Typography><Typography>{songAnalysis?.track?.tempo} ({songAnalysis?.track?.tempo_confidence})</Typography></FlexRow>
-                                                </FlexCol>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <SpotifyEmbed
-                                                    songId={spotifyInfo?.track?.id}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </Collapse>
+                                    <EvaluatedSongDetails
+                                        expanded={expandedIndex === i}
+                                        badWordCounts={badWordCounts}
+                                        spotifyInfo={spotifyInfo}
+                                        resolvedSong={resolvedSong}
+                                        songAnalysis={songAnalysis}
+
+                                        onWordWhitelistChange={props.onWordWhitelistChange}
+                                    />
                                 </TableCell>
                             </TableRow>
                         </>
