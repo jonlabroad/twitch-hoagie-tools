@@ -78,11 +78,12 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                         const spotifySong = await client.getSpotifySong(state.username ?? "", song?.artist, song?.title, state.accessToken ?? "");
                         if (spotifySong) {
                             setEvaluations((prev) => {
-                                const evaluation = evals.find((e) => e?.songKey === song?.songKey);
+                                const newEvals = [...evals];
+                                const evaluation = newEvals.find((e) => e?.songKey === song?.songKey);
                                 if (evaluation) {
                                     evaluation.songInfo = spotifySong;
                                 }
-                                return evals;
+                                return newEvals;
                             })
                         }
                     }
