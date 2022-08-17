@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, Accordion, AccordionSummary, Collapse, LinearProgress, IconButton, AccordionDetails, Hidden } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, LinearProgress, Hidden } from "@material-ui/core";
 import { useContext, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";

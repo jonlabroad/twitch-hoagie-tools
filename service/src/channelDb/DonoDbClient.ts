@@ -35,7 +35,6 @@ export default class DonoDbClient {
         // Get latest stream id
         const latestStream = await this.getLatestStream();
         const latestStreamId = latestStream.streamId;
-        console.log({ latestStreamId });
         if (latestStreamId) {
             const request: any = {
                 TableName: Config.tableName,
@@ -224,7 +223,9 @@ export default class DonoDbClient {
         }
         const response = await client.query(request).promise();
         const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
+        console.log({sorted});
         const latest = sorted?.[0];
+        console.log({t1: new Date(sorted?.[0].timestamp).getTime(), t2: new Date(sorted?.[1].timestamp).getTime()})
         return {
             streamId: latest?.SubKey,
             timestamp: latest?.timestamp,
