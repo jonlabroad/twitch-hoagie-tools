@@ -36,12 +36,12 @@ export const RaidHistory = (props: RaidHistoryProps) => {
     const sortedRaidsOut = raidsOut.sort((r1, r2) => r2.timestamp - r1.timestamp);
 
     return <FlexCol>
-        {sortedRaidsIn.length > 0 && <Typography style={{fontSize: 14, fontWeight: "bold", color: "green"}}>In ({raidsIn.length})</Typography>}
+        {sortedRaidsIn.length > 0 && <Typography style={{fontSize: 14, fontWeight: "bold"}}>In ({raidsIn.length})</Typography>}
         {sortedRaidsIn.map(raid => (
             <RaidInfo timestamp={raid.timestamp} viewers={raid.viewers} />
         ))}
         <div style={{marginBottom: 10}}></div>
-        {sortedRaidsOut.length > 0 && <Typography style={{fontSize: 14, fontWeight: "bold", color: "blue"}}>Out ({raidsOut.length})</Typography>}
+        {sortedRaidsOut.length > 0 && <Typography style={{fontSize: 14, fontWeight: "bold"}}>Out ({raidsOut.length})</Typography>}
         {sortedRaidsOut.map(raid => (
             <RaidInfo timestamp={raid.timestamp} viewers={raid.viewers} />
         ))}

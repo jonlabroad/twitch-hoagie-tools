@@ -108,7 +108,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                 </TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell style={{ backgroundColor: "#eeeeee", paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
                                     <EvaluatedSongDetails
                                         expanded={expandedIndex === i}
                                         badWordCounts={badWordCounts}

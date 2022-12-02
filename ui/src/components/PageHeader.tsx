@@ -4,6 +4,7 @@ import { useLogin } from "../hooks/loginHooks"
 import { AppState } from "../state/AppState"
 import { LoginAction } from "../state/AppStateReducer"
 import LoginUtil from "../util/LoginUtil"
+import { DarkModeSwitch } from "./DarkModeSwitch"
 import { FlexRow } from "./util/FlexBox"
 
 export const PageHeader = (props: { appState: AppState, appStateDispatch: any, scopes: string, clientId: string }) => {
@@ -21,10 +22,7 @@ export const PageHeader = (props: { appState: AppState, appStateDispatch: any, s
     });
 
     return (
-        <AppBar style={{
-            backgroundColor: "#3C474B",
-            color: "#dbdbf8"
-        }} position="static">
+        <AppBar position="static">
             <Toolbar variant="dense">
                 <FlexRow style={{ width: "100%" }} justifyContent="space-between" alignItems="center">
                     <Typography variant="h6" style={{ marginRight: "20px" }}>
@@ -32,6 +30,7 @@ export const PageHeader = (props: { appState: AppState, appStateDispatch: any, s
                     </Typography>
                     {appState.isLoggedIn ?
                         <FlexRow alignItems="center">
+                            <DarkModeSwitch />
                             <div>{appState.username}</div>
                             <Button
                                 style={{

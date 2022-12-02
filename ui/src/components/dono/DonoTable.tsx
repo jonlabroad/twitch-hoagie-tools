@@ -11,7 +11,7 @@ const tableHeaderStyle = {
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
-        backgroundColor: "#F9F9F9"
+        backgroundColor: theme.palette.action.hover
     },
 }));
 
@@ -43,7 +43,7 @@ export const DonoTable = (props: DonoTableProps) => {
                     {eligibleDonoData?.map(userdata => (
                         <DonoTableRow userdata={userdata} songQueue={songQueue} songHistory={songHistory} />
                     ))}
-                    <TableRow><TableCell colSpan={7} style={{ height: 20, backgroundColor: "grey" }}></TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} style={{ height: 20 }}></TableCell></TableRow>
                     {notEligibleDonoData?.map(userdata => (
                         <DonoTableRow userdata={userdata} />
                     ))}
