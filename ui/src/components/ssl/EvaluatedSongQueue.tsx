@@ -6,12 +6,13 @@ import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
+import { Evaluations } from "../../hooks/songQueueEval";
 const format = require('format-duration')
 
 export interface EvaluatedSongQueueProps {
     config?: SongEvalConfig;
     isLoading: boolean;
-    evaluations: Record<string, any>;
+    evaluations: Evaluations;
 
     onWordWhitelistChange: (word: string, type: "add" | "remove") => void
 }
@@ -27,6 +28,8 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
     const { state } = stateContext;
 
     const [expandedIndex, setExpandedIndex] = useState<number | undefined>(undefined);
+
+    const songQueue = state.songQueue?.list ?? [];
 
     return <Grid item xs={12}><TableContainer component={Paper} className="dono-table-container">
         <Table size="small">
@@ -44,19 +47,21 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                 {props.isLoading && <TableRow><TableCell colSpan={7}><LinearProgress /></TableCell></TableRow>}
             </TableHead>
             <TableBody>
-                {evaluations.map((evaluation: any, i: number) => {
-                    const sslSong = state.songQueue?.list?.[i]?.song;
-                    const badWordCounts = getBadWordsCounts(evaluation.eval?.lyricsEval, config?.whitelist ?? []);
+                {songQueue?.map((queueSong: any, i: number) => {
+                    const sslListSong = queueSong?.song;
+                    const nonListSong = queueSong?.nonlistSong;
+                    const songKey = nonListSong ?? `${sslListSong?.artist} - ${sslListSong?.title}`;
+                    const evaluation = evaluations[songKey] as any | undefined;
+                    const badWordCounts = getBadWordsCounts(evaluation?.eval?.lyricsEval, config?.whitelist ?? []);
                     const totalBadWords = Object.values(badWordCounts).filter(w => !w.isWhitelisted).reduce((prev, curr) => curr.count + prev, 0);
-                    const resolvedSong = evaluation.eval?.song;
+                    const resolvedSong = evaluation?.eval?.song;
                     const lyricsLink = resolvedSong?.url;
-                    const songName = evaluation.songKey ?? `${sslSong?.artist} - ${sslSong?.title}`;
-                    const spotifyInfo = evaluation.songInfo;
+                    const spotifyInfo = evaluation?.songInfo;
                     const songAnalysis = spotifyInfo?.analysis;
                     const spotifyLink = spotifyInfo?.track?.external_urls?.spotify;
                     const durationMs = spotifyInfo?.track?.duration_ms ?? 0;
                     const durationFormatted = format(durationMs);
-                    const genres = (evaluation.songInfo?.artist?.genres ?? []) as string[];
+                    const genres = (evaluation?.songInfo?.artist?.genres ?? []) as string[];
                     const timeSignature = songAnalysis?.track?.time_signature;
                     const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
                     const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
@@ -67,7 +72,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                 <Hidden smDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
                                 <TableCell>
                                     <FlexCol>
-                                        <Typography>{songName}</Typography>
+                                        <Typography>{songKey}</Typography>
                                         <Typography style={{ fontSize: 14, color: "grey" }}>
                                             {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title} ` : ""}
                                         </Typography>

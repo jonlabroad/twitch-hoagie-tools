@@ -10,10 +10,7 @@ import { useSaveLastPath } from "../../hooks/LastPathHooks";
 import "../../styles/Dono.scss";
 import { useParams } from "react-router";
 import { Grid } from "@material-ui/core";
-import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import Config from "../../Config";
-import { useSongQueueEval } from "../../hooks/songQueueEval";
-import { EvaluatedSongQueue } from "../ssl/EvaluatedSongQueue";
 import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
 
 export interface DonoPageProps {

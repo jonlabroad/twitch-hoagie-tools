@@ -16,7 +16,7 @@ export const corsHeaders = {
 };
 
 export const cacheHeaders = {
-    "Cache-Control": "max-age=3600"
+    "Cache-Control": "max-age=14400"
 }
 
 module.exports.eval = async (event: APIGatewayProxyEvent) => {
