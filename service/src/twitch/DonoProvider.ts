@@ -5,9 +5,7 @@ export default class DonoProvider {
     public static async get(streamerLogin: string) {
         const client = new DonoDbClient(streamerLogin);
         const donoData = await client.readLatestDonos();
-        console.log({ donoData });
         donoData.donos.forEach(dono => {
-            console.log({ dono });
             dono.value = this.getValue(dono);
         })
         return donoData;

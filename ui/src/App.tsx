@@ -11,27 +11,42 @@ import { AdminPage } from './components/admin/AdminPage';
 import { HoagieDashboard } from './components/hoagie/HoagieDashboard';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DarkModeContext } from './components/DarkModeSwitch';
+import LocalStorage from './util/LocalStorage';
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false)
 
-  const theme = useMemo(() => createMuiTheme({
-    palette: {
-      type: darkMode ? "dark" : "light",
-      primary: {
-        main: "#3A5639"
-      },
-      secondary: {
-        main: "#F05D01"
-      },
+  useEffect(() => {
+    const preference = LocalStorage.get("darkMode")
+    setDarkMode(preference === "true")
+  }, [])
+
+  const theme = useMemo(() => {
+    return createMuiTheme({
+      palette: {
+        type: darkMode ? "dark" : "light",
+        primary: {
+          main: "#3A5639"
+        },
+        secondary: {
+          main: "#F05D01"
+        },
+      }
+    })
+  },
+    [darkMode])
+
+  useEffect(() => {
+    async function savePreference() {
+      LocalStorage.set("darkMode", darkMode)
     }
-  }),
-  [darkMode])
+    savePreference()
+  }, [darkMode])
 
   return (
-    <DarkModeContext.Provider value={{darkMode, setDarkMode: (val: boolean) => setDarkMode(val)}}>
+    <DarkModeContext.Provider value={{ darkMode, setDarkMode: (val: boolean) => setDarkMode(val) }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         <div className="App">

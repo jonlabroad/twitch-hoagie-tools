@@ -50,7 +50,6 @@ export default class TwitchChatObserver {
             if (request.type === "message-analysis") {
                 self.handleMessageAnalysis(request);
             } else if (request.type === "user-data-result") {
-                console.log({request});
                 self.handleUserDataResult(request);
             }
             sendResponse();

@@ -20,7 +20,6 @@ export default class StreamerSongListDbClient {
             }
         };
         const response = await client.put(request).promise();
-        console.log(response);
     }
 
     public static async getToken(streamerName: string) {
@@ -33,10 +32,8 @@ export default class StreamerSongListDbClient {
                 SubKey: this.STREAMER_SONGLIST_SUBCAT,
             }
         }
-        console.log(request);
 
         const response = await client.get(request).promise();
-        console.log({item: response?.Item});
         return response?.Item;
     }
 }

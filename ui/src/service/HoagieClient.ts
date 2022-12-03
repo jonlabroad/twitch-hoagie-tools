@@ -118,7 +118,6 @@ export default class HoagieClient {
                 "Authorization": `Bearer ${accessToken}`
             }
         })
-        console.log({response});
         return response.data;
     }
 
@@ -138,7 +137,6 @@ export default class HoagieClient {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-        console.log({ datadata: response.data });
         return response.data as {
             raids: RaidEvent[];
         }
@@ -162,7 +160,6 @@ export default class HoagieClient {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-        console.log({ datadata: response.data });
         return response.data as AdminData | undefined;
     }
 

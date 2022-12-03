@@ -60,7 +60,6 @@ export default class TwitchClient {
         const broadcasterId = await this.getUserId(broadcasterLogin);
         do {
             const url = `https://api.twitch.tv/helix/users/follows?from_id=${broadcasterId}&first=100${after ? `&after=${after}` : ``}`;
-            console.log(url);
             const page = await this.getRequest(url, true) as Paginated<UserFollows[]>;
             follows.push(...page.data);
             after = page.pagination?.cursor;

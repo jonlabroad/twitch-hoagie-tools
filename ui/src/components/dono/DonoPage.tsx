@@ -9,7 +9,7 @@ import { useSaveLastPath } from "../../hooks/LastPathHooks";
 
 import "../../styles/Dono.scss";
 import { useParams } from "react-router";
-import { Grid } from "@material-ui/core";
+import { Container, Grid } from "@material-ui/core";
 import Config from "../../Config";
 import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
 
@@ -31,11 +31,13 @@ export const DonoPage = (props: DonoPageProps) => {
             dispatch: appStateDispatch,
             state: appState,
         }}>
-            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
-            <Grid container spacing={3}>
-                {<EvaluatedSongQueueContainer />}
-                <DonoTableContainer />
-            </Grid>
+            <Container maxWidth={false}>
+                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId} />
+                <Grid container spacing={3}>
+                    {<EvaluatedSongQueueContainer />}
+                    <DonoTableContainer />
+                </Grid>
+            </Container>
         </StateContext.Provider>
     </>
 }
