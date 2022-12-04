@@ -28,10 +28,12 @@ function App() {
       palette: {
         type: darkMode ? "dark" : "light",
         primary: {
-          main: "#3A5639"
+          //main: "#3A5639"
+          main: "#538D5B"
         },
         secondary: {
-          main: "#F05D01"
+          //main: "#F05D01"
+          main: "#F86624"
         },
       }
     })

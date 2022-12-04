@@ -31,10 +31,10 @@ export const DonoPage = (props: DonoPageProps) => {
             dispatch: appStateDispatch,
             state: appState,
         }}>
+            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId} />
             <Container maxWidth={false}>
-                <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId} />
                 <Grid container spacing={3}>
-                    {<EvaluatedSongQueueContainer />}
+                    <EvaluatedSongQueueContainer />
                     <DonoTableContainer />
                 </Grid>
             </Container>
