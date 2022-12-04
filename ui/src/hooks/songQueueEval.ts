@@ -21,6 +21,8 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<SongEvalConfig | undefined>(undefined);
 
+    console.log({evaluations})
+
     useEffect(() => {
         updateConfig();
     }, [state.username, state.accessToken])
@@ -49,46 +51,61 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
             if (state.username && state.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
                 setIsLoading(true);
                 const client = new HoagieClient();
-                const newEvals = {
-                    ...evaluations
-                };
                 await Promise.all(songQueue.list.map(async (el) => {
                     const songName = el.nonlistSong;
                     if (songName) {
-                        const doEval = !newEvals[songName];
+                        const doEval = !(evaluations ?? {})[songName];
                         if (doEval) {
+                            let e: any | undefined = undefined;
                             try {
-                                const e = await client.songEval(el.nonlistSong, state.username ?? "", state.accessToken ?? "");
-                                newEvals[songName] = {
-                                    songKey: songName,
-                                    user: el.requests?.map(r => r.name)?.join(' '),
-                                    eval: e
+                                e = await client.songEval(el.nonlistSong, state.username ?? "", state.accessToken ?? "");
+                            } catch (err) {
+                                console.error(err);
+                                setEvaluations((prev) => ({
+                                    ...(prev ?? {}),
+                                    [songName]: {
+                                        songKey: songName,
+                                        eval: undefined,
+                                    }
+                                }))
+                            }
+
+                            if (e) {
+                                const artist = e?.song?.artist_names;
+                                const title = e?.song?.title;
+                                const doLookup = !e?.songInfo;
+                                let spotifySong: any | undefined = undefined;
+                                if (doLookup && artist && title) {
+                                    spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "");
                                 }
-                            } catch (e) {
-                                console.error(e);
-                                newEvals[songName] = {
-                                    songKey: songName,
-                                    eval: undefined,
-                                }
+
+                                setEvaluations((prev) => ({
+                                    ...(prev ?? {}),
+                                    [songName]: {
+                                        songKey: songName,
+                                        user: el.requests?.map(r => r.name)?.join(' '),
+                                        eval: e,
+                                        songInfo: spotifySong
+                                    }
+                                }))
                             }
                         }
                     }
                 }));
-
-                await Promise.all(Object.keys(newEvals).map(async songKey => {
-                    const evaluation = newEvals[songKey];
-                    const artist = evaluation?.eval?.song?.artist_names;
-                    const title = evaluation?.eval?.song?.title;
-                    const doLookup = !evaluation?.songInfo;
-                    if (doLookup && artist && title) {
-                        const spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "");
-                        if (spotifySong) {
-                            evaluation.songInfo = spotifySong;
-                        }
-                    }
-                }))
-
-                setEvaluations(newEvals);
+                /*
+                                await Promise.all(Object.keys(newEvals).map(async songKey => {
+                                    const evaluation = newEvals[songKey];
+                                    const artist = evaluation?.eval?.song?.artist_names;
+                                    const title = evaluation?.eval?.song?.title;
+                                    const doLookup = !evaluation?.songInfo;
+                                    if (doLookup && artist && title) {
+                                        const spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "");
+                                        if (spotifySong) {
+                                            evaluation.songInfo = spotifySong;
+                                        }
+                                    }
+                                }))
+                */
                 setIsLoading(false);
             }
         }
