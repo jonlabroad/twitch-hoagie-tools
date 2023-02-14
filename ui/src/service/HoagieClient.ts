@@ -142,16 +142,32 @@ export default class HoagieClient {
         }
     }
 
-    async getDonos(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}`, {
+    async getDonos(username: string, accessToken: string, streamerName: string, streamId?: string) {
+        console.log({streamId})
+        const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}${streamId ? `&streamId=${streamId}` : ''}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
         return response.data as {
-            streamId: string
+            stream: {
+                streamId: string
+                timestamp: string
+            },
             donos: DonoData[]
         }
+    }
+
+    async getStreamHistory(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}streamhistory?username=${username}&streamername=${streamerName}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response.data as {
+            streamId: string,
+            timestamp: string,
+        }[]
     }
 
     async getAdminConfig(username: string, accessToken: string) {

@@ -6,6 +6,10 @@ import { BadWordInfos, BadWordsDetails } from "./BadWordsDetails"
 export interface EvaluatedSongDetailsProps {
     expanded: boolean
     badWordCounts: BadWordInfos
+    badWordStatus?: {
+        statusCode: number,
+        statusMessage: string
+    }
     spotifyInfo: any
     resolvedSong: any
     songAnalysis: any
@@ -14,7 +18,7 @@ export interface EvaluatedSongDetailsProps {
 }
 
 export const EvaluatedSongDetails = (props: EvaluatedSongDetailsProps) => {
-    const { expanded, badWordCounts, spotifyInfo, resolvedSong, songAnalysis } = props;
+    const { expanded, badWordCounts, spotifyInfo, resolvedSong, songAnalysis, badWordStatus } = props;
 
     return <>
         <Collapse in={expanded} timeout="auto" unmountOnExit>

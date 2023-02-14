@@ -20,6 +20,7 @@ import * as tmi from "tmi.js"
 import ModsDbClient from "./src/channelDb/ModsDbClient";
 import ModAuthorizer from "./src/twitch/ModAuthorizer";
 import ConfigProvider from "./src/config/ConfigProvider";
+import DonoDbClient from "./src/channelDb/DonoDbClient";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -280,13 +281,14 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
 
         const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
         const userLogin = event.queryStringParameters?.["username"] ?? "";
+        const streamId = event.queryStringParameters?.["streamId"] ?? "";
 
         const auth = await ModAuthorizer.auth(event);
         if (auth) {
             return auth;
         }
 
-        const donos = await DonoProvider.get(streamerLogin);
+        const donos = await DonoProvider.get(streamerLogin, streamId);
 
         return {
             statusCode: 200,
@@ -294,6 +296,45 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
                 userLogin,
                 streamerLogin,
                 ...donos,
+            }, null, 2),
+            headers: {
+                ...corsHeaders,
+                ...followCacheHeaders
+            },
+        };
+    } catch (err) {
+        console.error(err.message, err);
+        return {
+            statusCode: 500,
+            headers: {
+                ...corsHeaders,
+            },
+            body: `${err.message}`
+        }
+    }
+}
+
+module.exports.streamhistory = async (event: APIGatewayProxyEvent) => {
+    try {
+        Config.validate();
+
+        const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+        const userLogin = event.queryStringParameters?.["username"] ?? "";
+
+        const auth = await ModAuthorizer.auth(event);
+        if (auth) {
+            return auth;
+        }
+
+        const client = new DonoDbClient(streamerLogin);
+        const streams = await client.getStreamHistory();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                userLogin,
+                streamerLogin,
+                ...streams,
             }, null, 2),
             headers: {
                 ...corsHeaders,

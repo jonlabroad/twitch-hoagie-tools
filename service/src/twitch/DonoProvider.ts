@@ -1,10 +1,15 @@
 import { SetDonoRequest } from "../../twitch-dono";
-import DonoDbClient, { DonoData } from "../channelDb/DonoDbClient";
+import DonoDbClient, { DonoData, DonoResponse } from "../channelDb/DonoDbClient";
 
 export default class DonoProvider {
-    public static async get(streamerLogin: string) {
+    public static async get(streamerLogin: string, streamId?: string) {
         const client = new DonoDbClient(streamerLogin);
-        const donoData = await client.readLatestDonos();
+        let donoData: DonoResponse | undefined = undefined
+        if (!streamId) {
+            donoData = await client.readLatestDonos();
+        } else {
+            donoData = await client.readDonos(streamId);
+        }
         donoData.donos.forEach(dono => {
             dono.value = this.getValue(dono);
         })

@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, LinearProgress, Hidden, useTheme } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, LinearProgress, Hidden, useTheme, Tooltip } from "@material-ui/core";
 import { useContext, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
@@ -50,10 +50,11 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                 {songQueue?.map((queueSong: any, i: number) => {
                     const sslListSong = queueSong?.song;
                     const nonListSong = queueSong?.nonlistSong;
-                    const songKey = nonListSong ?? `${sslListSong?.artist} - ${sslListSong?.title}`;
+                    const songKey = nonListSong ?? `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
                     const evaluation = evaluations[songKey] as any | undefined;
+                    const badWordStatus = evaluation?.eval?.lyricsEval?.status
                     const badWordCounts = getBadWordsCounts(evaluation?.eval?.lyricsEval, config?.whitelist ?? []);
-                    const totalBadWords = Object.values(badWordCounts).filter(w => !w.isWhitelisted).reduce((prev, curr) => curr.count + prev, 0);
+                    const totalBadWords = !badWordStatus?.isError ? Object.values(badWordCounts).filter(w => !w.isWhitelisted).reduce((prev, curr) => curr.count + prev, 0) : "X";
                     const resolvedSong = evaluation?.eval?.song;
                     const lyricsLink = resolvedSong?.url;
                     const spotifyInfo = evaluation?.songInfo;
@@ -74,7 +75,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                     <FlexCol>
                                         <Typography>{songKey}</Typography>
                                         <Typography style={{ fontSize: 14, color: "grey" }}>
-                                            {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title} ` : ""}
+                                            {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title}` : ""}
                                         </Typography>
                                     </FlexCol>
                                 </TableCell>
@@ -84,7 +85,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                     </TableCell>
                                 </Hidden>
                                 <TableCell>
-                                    <Typography>{evaluation?.eval ? totalBadWords : ""}</Typography>
+                                    <Tooltip title={badWordStatus?.statusMessage}><Typography>{evaluation?.eval ? totalBadWords : ""}</Typography></Tooltip>
                                 </TableCell>
                                 <TableCell>
                                     <Typography>{evaluation?.eval ? durationFormatted : ""}</Typography>
@@ -112,6 +113,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                     <EvaluatedSongDetails
                                         expanded={expandedIndex === i}
                                         badWordCounts={badWordCounts}
+                                        badWordStatus={badWordStatus}
                                         spotifyInfo={spotifyInfo}
                                         resolvedSong={resolvedSong}
                                         songAnalysis={songAnalysis}

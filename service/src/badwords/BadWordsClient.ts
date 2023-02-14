@@ -4,6 +4,19 @@ import qs from "qs";
 
 const cache = new NodeCache();
 
+export interface BadWordsResponse {
+    bad_words_list: {
+        original: string
+        word: string,
+    }[],
+    status: {
+        isError: boolean
+        statusCode: number | string
+        statusMessage: string
+        api: string
+    }
+}
+
 export default class BadWordsClient {
     private clientSecret;
 
@@ -13,11 +26,18 @@ export default class BadWordsClient {
         this.clientSecret = clientSecret;
     }
 
-    public async eval(fullTitle: string, text: string) {
-
-        let result = cache.get(fullTitle.toLowerCase());
+    public async eval(fullTitle: string, text: string): Promise<BadWordsResponse> {
+        let result = cache.get(fullTitle.toLowerCase()) as any;
         if (result) {
-            return result;
+            return {
+                ...result,
+                status: {
+                    isError: false,
+                    statusCode: 200,
+                    statusMessage: "OK (memcache)",
+                    api: "BadWords (cached)"
+                }
+            }
         }
 
         const queryString = qs.stringify({
@@ -33,13 +53,30 @@ export default class BadWordsClient {
             response = await axios.post(request, data, {
                 headers
             });
+            result = response?.data as any;
         } catch (err) {
             console.error(err);
+            return {
+                bad_words_list: [],
+                status: {
+                    isError: err.response?.status !== 404,
+                    statusCode: err.response?.status,
+                    statusMessage: err.response?.statusText ?? "",
+                    api: "BadWords"
+                }
+            }
         }
-        result = response?.data;
         if (result) {
             cache.set(fullTitle.toLowerCase(), result, 600);
         }
-        return result;
+        return {
+            ...result ?? {},
+            status: {
+                isError: false,
+                statusCode: response?.status,
+                statusMessage: response?.statusText ?? "",
+                api: "BadWords"
+            }
+        }
     }
 }

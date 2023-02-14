@@ -25,7 +25,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   httpApi:
     cors: true
   iamRoleStatements:
@@ -294,6 +294,24 @@ functions:
             querystrings:
               username: true
               channelname: true
+              streamId: false
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  streamhistory:
+    handler: twitch.streamhistory
+    events:
+      - http:
+          method: GET
+          path: /api/streamhistory
+          parameters:
+            querystrings:
+              username: true
+              channelname: true
           cors: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
@@ -358,7 +376,9 @@ functions:
   refreshmods:
     handler: twitch.refreshmods
     events:
-      - schedule: rate(2 hours)
+      - schedule:
+        rate: rate(2 hours)
+        enabled: false
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}

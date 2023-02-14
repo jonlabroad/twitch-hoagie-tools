@@ -52,13 +52,13 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                 setIsLoading(true);
                 const client = new HoagieClient();
                 await Promise.all(songQueue.list.map(async (el) => {
-                    const songName = el.nonlistSong;
+                    const songName = el.nonlistSong ?? `${el.song?.artist?.trim()} - ${el.song?.title?.trim()}`;
                     if (songName) {
                         const doEval = !(evaluations ?? {})[songName];
                         if (doEval) {
                             let e: any | undefined = undefined;
                             try {
-                                e = await client.songEval(el.nonlistSong, state.username ?? "", state.accessToken ?? "");
+                                e = await client.songEval(songName, state.username ?? "", state.accessToken ?? "");
                             } catch (err) {
                                 console.error(err);
                                 setEvaluations((prev) => ({
@@ -92,20 +92,6 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                         }
                     }
                 }));
-                /*
-                                await Promise.all(Object.keys(newEvals).map(async songKey => {
-                                    const evaluation = newEvals[songKey];
-                                    const artist = evaluation?.eval?.song?.artist_names;
-                                    const title = evaluation?.eval?.song?.title;
-                                    const doLookup = !evaluation?.songInfo;
-                                    if (doLookup && artist && title) {
-                                        const spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "");
-                                        if (spotifySong) {
-                                            evaluation.songInfo = spotifySong;
-                                        }
-                                    }
-                                }))
-                */
                 setIsLoading(false);
             }
         }
