@@ -22,7 +22,6 @@ function getStreamGroups(streamHistory: StreamInfo[]) {
         remainingHistory = remainingHistory.slice(newGroup.length)
 
         if (closeStreams.length <= 0) {
-            console.log("WUT")
             break
         }
 
@@ -50,7 +49,6 @@ export function useStreamSelection(state: AppState, streamHistory: StreamInfo[] 
     const streamHistoryGrouped = getStreamGroups(streamHistory ?? [])
     const currentStreamIds = currentStreams?.map((currentStream => currentStream.streamId)) ?? []
     const currentStreamIndex = (streamHistoryGrouped ?? []).findIndex(sh => !!sh[0] && currentStreamIds[0] === sh[0].streamId)
-    //console.log({streamHistory, currentStream, currentStreamIndex})
 
     const getNextStream = (direction: number) => {
         const nextStream = streamHistoryGrouped?.[(currentStreamIndex ?? 1000000) + direction]

@@ -5,8 +5,6 @@ import { AppState } from "../state/AppState";
 import { defaultDonoState, DonoState } from "../state/DonoState";
 import { donoStateReducer, SetDonoLoadingAction, SetDonosAction } from "../state/DonoStateReducer";
 
-const eligibleThreshold = 5; // TODO configurable
-
 export function useDonoData(state: AppState, currentStreams: StreamInfo[] | undefined): [DonoState, any, () => any] {
 
     const [donoState, donoStateDispatch] = useReducer(donoStateReducer, {
@@ -15,7 +13,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
     } as DonoState);
 
     async function getDonos() {
-        if (state.username && state.accessToken && state.streamer && currentStreams) {
+        if (state.username && state.accessToken && state.streamer && currentStreams && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",
                 loading: true,

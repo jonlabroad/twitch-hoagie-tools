@@ -70,7 +70,6 @@ export const HoagieDashboard = (props: { streamerName: string, scopes: string })
     })
 
     const subscriptionsToDisplay = subscriptions;
-    console.log({subscriptionsToDisplay});
 
     let subConnectionStatus = "";
     if (subscriptionsToDisplay) {

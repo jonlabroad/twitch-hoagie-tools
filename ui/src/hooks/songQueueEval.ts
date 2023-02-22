@@ -21,8 +21,6 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<SongEvalConfig | undefined>(undefined);
 
-    console.log({evaluations})
-
     useEffect(() => {
         updateConfig();
     }, [state.username, state.accessToken])

@@ -20,7 +20,6 @@ export const BotConfigModule = (props: BotConfigModuleProps) => {
         if (appState.username && appState.accessToken) {
             const client = new HoagieClient();
             const response = await client.getBotToken(appState.username, appState.accessToken, streamerName);
-            console.log({response})
             setToken(response?.botToken)
         }
     }
