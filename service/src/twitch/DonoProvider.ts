@@ -2,18 +2,41 @@ import { SetDonoRequest } from "../../twitch-dono";
 import DonoDbClient, { DonoData, DonoResponse } from "../channelDb/DonoDbClient";
 
 export default class DonoProvider {
-    public static async get(streamerLogin: string, streamId?: string) {
+    public static async get(streamerLogin: string, streamIds?: string[]) {
         const client = new DonoDbClient(streamerLogin);
-        let donoData: DonoResponse | undefined = undefined
-        if (!streamId) {
-            donoData = await client.readLatestDonos();
+        let donoDatas: DonoResponse[] = []
+        if (!streamIds) {
+            donoDatas = [await client.readLatestDonos()];
         } else {
-            donoData = await client.readDonos(streamId);
+            donoDatas = await Promise.all(streamIds.map((streamId) => client.readDonos(streamId)));
         }
-        donoData.donos.forEach(dono => {
+        donoDatas.forEach(donoData => donoData.donos.forEach(dono => {
             dono.value = this.getValue(dono);
+        }))
+        const donoData = donoDatas[0]
+        donoDatas.slice(1).forEach(otherData => donoData.donos.push(...otherData.donos))
+
+        const combinedDonos: DonoData[] = []
+        donoDatas.forEach(donoData => {
+            donoData.donos.forEach(dono => {
+                const existingDono = combinedDonos.find(d => d.SubKey.toLowerCase() === dono.SubKey.toLowerCase())
+                if (existingDono) {
+                    existingDono.cheer += dono.cheer
+                    existingDono.dono += dono.dono
+                    existingDono.sub += dono.sub
+                    existingDono.subgift += dono.subgift
+                    existingDono.value += dono.value
+                } else {
+                    combinedDonos.push(dono)
+                }
+            })
         })
-        return donoData;
+        const combinedDonoData: DonoResponse = {
+            donos: combinedDonos.sort((a, b) => a.SubKey.localeCompare(b.SubKey)),
+            stream: donoData.stream
+        }
+
+        return combinedDonoData;
     }
 
     static getValue(dono: DonoData) {

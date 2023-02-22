@@ -7,12 +7,16 @@ import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 import { Evaluations } from "../../hooks/songQueueEval";
+import { DonoData } from "../../service/HoagieClient";
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+
 const format = require('format-duration')
 
 export interface EvaluatedSongQueueProps {
     config?: SongEvalConfig;
     isLoading: boolean;
     evaluations: Evaluations;
+    donoData?: DonoData[]
 
     onWordWhitelistChange: (word: string, type: "add" | "remove") => void
 }
@@ -21,8 +25,12 @@ const headerStyle = {
     fontWeight: 600
 }
 
+const DonoIcon = (props: { donoData: DonoData }) => {
+    return <Tooltip title={`\$${props.donoData?.value}`}><div style={{ height: 30, width: 30, color: "gold" }}><MonetizationOnIcon /></div></Tooltip>
+}
+
 export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
-    const { evaluations, config } = props;
+    const { evaluations, config, donoData } = props;
 
     const stateContext = useContext(StateContext);
     const { state } = stateContext;
@@ -67,6 +75,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
                     const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
                     const genreText = genres.join(", ");
+                    const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase() === evaluation?.user?.toLowerCase()) : undefined
                     return (
                         <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>
@@ -81,7 +90,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                 </TableCell>
                                 <Hidden smDown>
                                     <TableCell>
-                                        <Typography>{evaluation?.user}</Typography>
+                                        <FlexRow>{userDonoData ? <DonoIcon donoData={userDonoData}/> : ""}<Typography>{evaluation?.user}</Typography></FlexRow>
                                     </TableCell>
                                 </Hidden>
                                 <TableCell>

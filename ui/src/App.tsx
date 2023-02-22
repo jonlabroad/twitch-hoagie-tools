@@ -14,6 +14,7 @@ import { CssBaseline } from '@material-ui/core';
 import { useEffect, useMemo, useState } from 'react';
 import { DarkModeContext } from './components/DarkModeSwitch';
 import LocalStorage from './util/LocalStorage';
+import { StreamerConfigPage } from './components/config/StreamerConfigPage';
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false)
@@ -60,6 +61,7 @@ function App() {
               <Route path="/loginRedirect">
                 <LoginRedirect />
               </Route>
+              {/*
               <Route path="/config/thesongery">
                 <StreamerDashboard
                   streamerName="thesongery"
@@ -71,6 +73,10 @@ function App() {
                   streamerName="hoagieman5000"
                   scopes={"channel:read:redemptions"}
                 />
+              </Route>
+              */}
+              <Route path="/config/:streamer">
+                <StreamerConfigPage />
               </Route>
               <Route path="/dono/:streamer">
                 <DonoPage />

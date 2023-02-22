@@ -1,14 +1,18 @@
-import { Button, CircularProgress, Grid, TextField } from "@material-ui/core";
-import { useEffect, useState } from "react";
-import { setTokenSourceMapRange } from "typescript";
-import HoagieClient from "../../service/HoagieClient";
-import { AppState } from "../../state/AppState";
-import { FlexCol, FlexRow } from "../util/FlexBox";
+import { Grid, CircularProgress, TextField, Button } from "@material-ui/core";
+import { useState, useEffect } from "react";
+import HoagieClient from "../../../service/HoagieClient";
+import { FlexCol, FlexRow } from "../../util/FlexBox";
 import LinkIcon from '@material-ui/icons/Link';
 import LinkOffIcon from '@material-ui/icons/Link';
+import { AppState } from "../../../state/AppState";
 
-export const SongListConfig = (props: { appState: AppState }) => {
-    const { appState } = props;
+export interface StreamerSongListConfigModuleProps {
+    appState: AppState
+    streamerName: string
+}
+
+export const StreamerSongListConfigModule = (props: StreamerSongListConfigModuleProps) => {
+    const { appState, streamerName } = props;
 
     const [sslStatus, setSSLStatus] = useState("");
     const [token, setToken] = useState<string | undefined>(undefined);
@@ -18,7 +22,7 @@ export const SongListConfig = (props: { appState: AppState }) => {
     async function retrieveConnectionStatus() {
         if (appState.username && appState.accessToken) {
             const client = new HoagieClient();
-            const status = await client.getSSLStatus(appState.username, appState.accessToken, appState.streamer ?? "");
+            const status = await client.getSSLStatus(appState.username, appState.accessToken, streamerName);
             setSSLStatus(status);
         }
     }
@@ -27,7 +31,7 @@ export const SongListConfig = (props: { appState: AppState }) => {
         if (token && token.length > 0 && appState.username && appState.accessToken) {
             const tokenStripped = token.replaceAll('"', "");
             const client = new HoagieClient();
-            const response = await client.setSSLToken(tokenStripped, appState.username, appState.accessToken, appState.streamer ?? "");
+            const response = await client.setSSLToken(tokenStripped, appState.username, appState.accessToken, streamerName);
             retrieveConnectionStatus();
         }
     }
@@ -41,10 +45,10 @@ export const SongListConfig = (props: { appState: AppState }) => {
             <FlexCol className="songlist-config-container">
                 <FlexRow alignItems="center">
                     <h2 style={{ marginRight: 20 }}>Streamer Song List</h2>
-                    {!sslStatus && <CircularProgress size={20}/>}
+                    {!sslStatus && <CircularProgress size={20} />}
                     {sslStatus && connected && <LinkIcon style={{ color: "green", marginRight: 10 }} />}
                     {sslStatus && !connected && <LinkOffIcon style={{ color: "red", marginRight: 10 }} />}
-                    <div style={{color: sslStatus === "CONNECTED" ? "green" : "red"}}>{sslStatus}</div>
+                    <div style={{ color: sslStatus === "CONNECTED" ? "green" : "red" }}>{sslStatus}</div>
                 </FlexRow>
 
                 <FlexRow alignItems="center">

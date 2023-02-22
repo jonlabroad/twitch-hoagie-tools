@@ -1,9 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 
-interface GetStreamerResponse {
-    id: number
-}
-
 interface GetSongsResponse {
     items: StreamerSongListSong[]
     total: number
@@ -16,8 +12,51 @@ export interface StreamerSongListSong {
     timesPlayed: number
 }
 
+export interface GetStreamerResponse {
+    id: number
+    userId: number
+    name: string
+}
+
+export interface SongListSong {
+        id: number
+        note: string
+        botRequestBy: string
+        nonlistSong: string
+        donationAmount: number
+        createdAt: string
+        playedAt: string
+        songId: number
+        streamerId: number
+        position: number
+        song: {
+            artist: string
+            attributeIds: any[]
+            createdAt: string
+            id: number
+            title: string
+        }
+        requests: {
+            id: number
+            name: string
+            inChat: boolean
+            lastInChatTime: string
+            note?: string
+            amount: number
+        }[]
+}
+
+export interface GetQueueResponse {
+    list: SongListSong[],
+    status: {
+        string: number
+    },
+}
+
 export default class StreamerSongListClient {
     private readonly token: string;
+
+    private static baseUrl = "https://api.streamersonglist.com";
 
     constructor(token?: string) {
         this.token = token ?? "";
@@ -62,5 +101,10 @@ export default class StreamerSongListClient {
             current++;
         } while (songs.length > 0);
         return allSongs;
+    }
+    
+    public async getQueue(streamerId: number): Promise<GetQueueResponse> {
+        const response = await axios.get(`${StreamerSongListClient.baseUrl}/v1/streamers/${streamerId}/queue`);
+        return response.data;
     }
 }

@@ -9,6 +9,7 @@ import { useLogin } from "../hooks/loginHooks";
 import TwitchClient from "../service/TwitchClient";
 import { AppState, defaultAppState, StateContextType } from "../state/AppState";
 import { appStateReducer, LoginAction } from "../state/AppStateReducer";
+import { defaultDonoState, DonoStateContextType } from "../state/DonoState";
 import CacheManager from "../util/CacheManager";
 import LocalStorage from "../util/LocalStorage";
 import { EmbeddedVideo } from "../video/EmbeddedVideo";
@@ -36,6 +37,12 @@ export const StateContext = createContext<StateContextType>({
 
 export const AlertContext = createContext<AlertContextType>({
     alertGenerator: undefined,
+})
+
+export const DonoContext = createContext<DonoStateContextType>({
+    dispatch: undefined,
+    state: defaultDonoState,
+    refreshDonos: () => { throw new Error("refreshDonos not defined") }
 })
 
 export const MainPage = (props: MainPageProps) => {

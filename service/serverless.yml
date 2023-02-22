@@ -5,9 +5,13 @@ plugins:
   - serverless-plugin-typescript
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-prune-plugin
 frameworkVersion: '2'
 
 custom:
+  prune:
+    automatic: false
+    number: 2
   myStage: ${opt:stage, self:provider.stage}
   myTableName: HoagieTools-${opt:stage, self:provider.stage}
   apiCloudFront:
@@ -243,6 +247,45 @@ functions:
     - http:
         method: GET
         path: /api/streamersonglist/status
+        cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  setBotToken:
+    handler: bot.refreshtoken
+    events:
+      - http:
+          method: POST
+          path: /api/bot/refreshtoken
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  getBotToken:
+    handler: bot.gettoken
+    events:
+    - http:
+        method: GET
+        path: /api/bot/gettoken
+        cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  botCommand:
+    handler: bot.command
+    events:
+    - http:
+        method: GET
+        path: /api/bot/command
         cors: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}

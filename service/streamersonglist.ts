@@ -67,12 +67,12 @@ module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
 
     let tokenValidated = false;
     try {
-        const username = event.queryStringParameters?.["username"] ?? "";
-        const sslToken = await StreamerSongListToken.readToken(username);
+        const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+        const sslToken = await StreamerSongListToken.readToken(streamerName);
         if (!sslToken) {
-            throw new Error(`No ssl token found for user ${username}`);
+            throw new Error(`No ssl token found for user ${streamerName}`);
         }
-        tokenValidated = await StreamerSongListToken.validateToken(username, sslToken);
+        tokenValidated = await StreamerSongListToken.validateToken(streamerName, sslToken);
     } catch (err) {
         return {
             statusCode: 500,
@@ -89,4 +89,8 @@ module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
         },
         body: tokenValidated ? "CONNECTED" : "DISCONNECTED"
     };
+}
+
+module.exports.selectrandom = async (event: APIGatewayProxyEvent) => {
+    
 }

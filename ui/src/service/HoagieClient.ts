@@ -65,9 +65,9 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async setSSLToken(sslToken: string, username: string, accessToken: string) {
-        const response = await axios.post(`${this.BASE_URL}streamersonglist/settoken?username=${username}`, {
-            username,
+    async setSSLToken(sslToken: string, username: string, accessToken: string, streamerName: string) {
+        const response = await axios.post(`${this.BASE_URL}streamersonglist/settoken?username=${username}&streamerLogin=${streamerName}`, {
+            username: streamerName,
             streamerSongListToken: sslToken,
         }, {
             headers: {
@@ -77,8 +77,30 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async getSSLStatus(username: string, accessToken: string) {
-        const response = await axios.get(`${this.BASE_URL}streamersonglist/status?username=${username}`, {
+    async getSSLStatus(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}streamersonglist/status?username=${username}&streamername=${streamerName}`, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    }
+
+    async refreshBotToken(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.post(`${this.BASE_URL}bot/refreshtoken?username=${username}&streamername=${streamerName}`, {
+            username: streamerName,
+        }, {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    }
+
+    async getBotToken(username: string, accessToken: string, streamerName: string): Promise<{
+        botToken: string
+    }> {
+        const response = await axios.get(`${this.BASE_URL}bot/gettoken?username=${username}&streamername=${streamerName}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
@@ -142,9 +164,8 @@ export default class HoagieClient {
         }
     }
 
-    async getDonos(username: string, accessToken: string, streamerName: string, streamId?: string) {
-        console.log({streamId})
-        const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}${streamId ? `&streamId=${streamId}` : ''}`, {
+    async getDonos(username: string, accessToken: string, streamerName: string, streamIds?: string[]) {
+        const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }

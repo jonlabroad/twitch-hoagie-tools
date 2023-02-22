@@ -281,14 +281,14 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
 
         const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
         const userLogin = event.queryStringParameters?.["username"] ?? "";
-        const streamId = event.queryStringParameters?.["streamId"] ?? "";
+        const streamIds = event.multiValueQueryStringParameters?.["streamId"];
 
         const auth = await ModAuthorizer.auth(event);
         if (auth) {
             return auth;
         }
 
-        const donos = await DonoProvider.get(streamerLogin, streamId);
+        const donos = await DonoProvider.get(streamerLogin, streamIds);
 
         return {
             statusCode: 200,
