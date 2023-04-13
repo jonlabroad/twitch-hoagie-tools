@@ -75,7 +75,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
                     const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
                     const genreText = genres.join(", ");
-                    const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase() === evaluation?.user?.toLowerCase()) : undefined
+                    const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase().trim() === evaluation?.user?.toLowerCase().trim()) : undefined
                     return (
                         <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>

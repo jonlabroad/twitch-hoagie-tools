@@ -1,6 +1,6 @@
 import { Button, CircularProgress, Grid, IconButton } from "@material-ui/core";
 import { ArrowLeft, ArrowRight } from "@material-ui/icons";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import { DonoUtil } from "../../util/DonoUtil";
 import { DonoContext, StateContext } from "../MainPage";
@@ -31,6 +31,24 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     const { eligible, notEligible } = DonoUtil.getEligibleDonos(donoData, 5)
 
     useStreamerSongListEvents(stateContext);
+
+    useEffect(() => {
+        function scheduleRefresh() {
+            setTimeout(() => {
+                console.log("auto refresh")
+                refreshDonos()
+                const currentStream = currentStreams?.[0]
+                if (currentStream) {
+                    const streamStartDate = new Date(currentStream.timestamp)
+                    const now = Date.now()
+                    if (now - streamStartDate.getTime() < 8 * 60 * 60 * 1e3) {
+                        scheduleRefresh()
+                    }
+                }
+            }, 120000)
+        }
+        scheduleRefresh()
+    }, [])
 
     const isLoggedIn = state.isLoggedIn && state.accessToken && state.username;
 
