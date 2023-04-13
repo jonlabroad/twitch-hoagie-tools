@@ -21,7 +21,7 @@ export const EvaluatedSongQueueContainer = (props: EvaluatedSongQueueContainerPr
     const { state } = stateContext;
     const { donoData } = donoContext.state;
 
-    const [evaluations, evalIsLoading, config, onWhitelistWordChange] = useSongQueueEval(state);   
+    const [evaluations, evalIsLoading, config, onWhitelistWordChange, evaluationsStatus] = useSongQueueEval(state);   
 
     const { eligible } = DonoUtil.getEligibleDonos(donoData, 5)
 
@@ -32,6 +32,7 @@ export const EvaluatedSongQueueContainer = (props: EvaluatedSongQueueContainerPr
                 onWordWhitelistChange={(word: string, type: "add" | "remove") => onWhitelistWordChange(word, type)}
                 isLoading={evalIsLoading}
                 evaluations={evaluations}
+                evaluationsStatus={evaluationsStatus}
                 donoData={eligible}
             />
         }

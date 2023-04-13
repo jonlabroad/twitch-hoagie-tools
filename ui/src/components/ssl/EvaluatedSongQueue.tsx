@@ -6,7 +6,7 @@ import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
-import { Evaluations } from "../../hooks/songQueueEval";
+import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
 import { DonoData } from "../../service/HoagieClient";
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
@@ -16,6 +16,7 @@ export interface EvaluatedSongQueueProps {
     config?: SongEvalConfig;
     isLoading: boolean;
     evaluations: Evaluations;
+    evaluationsStatus: EvaluationsStatus;
     donoData?: DonoData[]
 
     onWordWhitelistChange: (word: string, type: "add" | "remove") => void
@@ -25,8 +26,12 @@ const headerStyle = {
     fontWeight: 600
 }
 
+const LoadingPlaceholder = () => {
+    return <LinearProgress />
+}
+
 const DonoIcon = (props: { donoData: DonoData }) => {
-    return <Tooltip title={`\$${props.donoData?.value}`}><div style={{ height: 30, width: 30, color: "gold" }}><MonetizationOnIcon /></div></Tooltip>
+    return <Tooltip title={`\$${props.donoData?.value}`}><div style={{ marginLeft: 8, height: 30, width: 30, color: "gold" }}><MonetizationOnIcon /></div></Tooltip>
 }
 
 export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
@@ -52,7 +57,6 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     <TableCell><Typography style={headerStyle}>Genres</Typography></TableCell>
                     <TableCell><Typography style={headerStyle}>Links</Typography></TableCell>
                 </TableRow>
-                {props.isLoading && <TableRow><TableCell colSpan={7}><LinearProgress /></TableCell></TableRow>}
             </TableHead>
             <TableBody>
                 {songQueue?.map((queueSong: any, i: number) => {
@@ -76,12 +80,14 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
                     const genreText = genres.join(", ");
                     const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase().trim() === evaluation?.user?.toLowerCase().trim()) : undefined
+                    const userName = evaluation?.user ?? queueSong.requests[0].name ?? ""
+                    const evaluationStatus = props.evaluationsStatus[songKey]
                     return (
                         <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>
                                 <Hidden smDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
                                 <TableCell>
-                                    <FlexCol>
+                                    <FlexCol style={{ minHeight: 45 }}>
                                         <Typography>{songKey}</Typography>
                                         <Typography style={{ fontSize: 14, color: "grey" }}>
                                             {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title}` : ""}
@@ -90,32 +96,36 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                 </TableCell>
                                 <Hidden smDown>
                                     <TableCell>
-                                        <FlexRow>{userDonoData ? <DonoIcon donoData={userDonoData}/> : ""}<Typography>{evaluation?.user}</Typography></FlexRow>
+                                        <FlexRow><Typography>{userName}</Typography>{userDonoData ? <DonoIcon donoData={userDonoData}/> : ""}</FlexRow>
                                     </TableCell>
                                 </Hidden>
-                                <TableCell>
-                                    <Tooltip title={badWordStatus?.statusMessage}><Typography>{evaluation?.eval ? totalBadWords : ""}</Typography></Tooltip>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography>{evaluation?.eval ? durationFormatted : ""}</Typography>
-                                </TableCell>
-                                <Hidden smDown>
+                                {evaluationStatus?.isLoading ? <TableCell colSpan={5}><LoadingPlaceholder /></TableCell> : (
+                                    <>
                                     <TableCell>
-                                        <FlexRow alignItems="center" mr={3}>
-                                            <Typography>{timeSignatureText}&nbsp;</Typography>
-                                            <Typography variant="body2" color="textSecondary">{timeSignatureConfidenceText}</Typography>
+                                        <Tooltip title={badWordStatus?.statusMessage}><Typography>{evaluation?.eval ? totalBadWords : ""}</Typography></Tooltip>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography>{evaluation?.eval ? durationFormatted : ""}</Typography>
+                                    </TableCell>
+                                    <Hidden smDown>
+                                        <TableCell>
+                                            <FlexRow alignItems="center" mr={3}>
+                                                <Typography>{timeSignatureText}&nbsp;</Typography>
+                                                <Typography variant="body2" color="textSecondary">{timeSignatureConfidenceText}</Typography>
+                                            </FlexRow>
+                                        </TableCell>
+                                    </Hidden>
+                                    <TableCell>
+                                        <Typography>{genreText}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <FlexRow>
+                                            {lyricsLink && <GeniusLink href={lyricsLink} />}
+                                            {spotifyLink && <SpotifyLink href={spotifyLink} />}
                                         </FlexRow>
                                     </TableCell>
-                                </Hidden>
-                                <TableCell>
-                                    <Typography>{genreText}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <FlexRow>
-                                        {lyricsLink && <GeniusLink href={lyricsLink} />}
-                                        {spotifyLink && <SpotifyLink href={spotifyLink} />}
-                                    </FlexRow>
-                                </TableCell>
+                                    </>
+                                )}
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
