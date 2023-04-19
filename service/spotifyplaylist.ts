@@ -3,8 +3,8 @@
 import Config from "./src/Config";
 import SpotifyCreatePlaylist from "./src/spotify/SpotifyCreatePlaylist";
 import SpotifySetToken from "./src/spotify/SpotifySetToken";
-import ModAuthorizer from "./src/twitch/ModAuthorizer";
-import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
+import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
+import { BasicAuth } from "./src/util/BasicAuth";
 import { corsHeaders } from "./streamersonglist";
 
 interface SetTokenRequestBody {
@@ -19,11 +19,6 @@ export interface CreatePlaylistRequestBody {
 module.exports.generate = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthenticator.auth(event);
-    if (authResponse) {
-        return authResponse;
-    }
-
     const username = event.queryStringParameters?.["username"] ?? "";
 
     const request = JSON.parse(event.body ?? "{}") as CreatePlaylistRequestBody;
@@ -35,12 +30,8 @@ module.exports.generate = async (event: any) => {
 module.exports.settoken = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthenticator.auth(event);
-    if (authResponse) {
-        return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
         return authenticationResponse;
     }

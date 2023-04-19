@@ -5,10 +5,9 @@ import generateApiKey from "generate-api-key";
 import BotTokenDbClient from "./src/channelDb/BotTokenDbClient";
 import { ChatCommandProcessor } from "./src/chatbot/ChatCommandProcessor";
 import Config from "./src/Config";
-import StreamerSongListToken from "./src/StreamerSongList/StreamerSongListSetToken";
 import BotTokenAuthorizer from "./src/twitch/BotTokenAuthorizer";
-import ModAuthorizer from "./src/twitch/ModAuthorizer";
-import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
+import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
+import { BasicAuth } from "./src/util/BasicAuth";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -40,8 +39,6 @@ module.exports.command = async (event: APIGatewayProxyEvent) => {
         };
     }
 
-    console.log({ query: event.queryStringParameters ?? {} })
-
     const cmdProcessor = new ChatCommandProcessor()
     const commandResult = await cmdProcessor.process(event.queryStringParameters?.command ?? "", event.queryStringParameters ?? {})
     console.log({ commandResult })
@@ -58,12 +55,8 @@ module.exports.command = async (event: APIGatewayProxyEvent) => {
 module.exports.refreshtoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthenticator.auth(event);
-    if (authResponse) {
-        return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
         return authenticationResponse;
     }
@@ -89,12 +82,8 @@ module.exports.refreshtoken = async (event: APIGatewayProxyEvent) => {
 module.exports.gettoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthenticator.auth(event);
-    if (authResponse) {
-        return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
         return authenticationResponse;
     }

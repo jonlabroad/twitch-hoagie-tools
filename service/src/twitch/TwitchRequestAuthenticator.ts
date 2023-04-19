@@ -1,11 +1,10 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { corsHeaders } from "../../twitch";
-import Config from "../Config";
 import TwitchClient from "./TwitchClient";
 
 export type AuthLevel = "admin" | "streamer";
 
-export default class TwitchAuthenticator {
+export default class TwitchRequestAuthenticator {
     public static async auth(event: APIGatewayProxyEvent) {
         const username = event.queryStringParameters?.["username"];
         const authHeader = event.headers["Authorization"];

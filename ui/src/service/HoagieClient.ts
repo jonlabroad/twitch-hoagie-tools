@@ -40,27 +40,21 @@ export default class HoagieClient {
 
     async listSubscriptions(username: string, accessToken: string) {
         const response = await axios.get(`${this.BASE_URL}listsubscriptions?username=${username}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
 
     async createSubscriptions(username: string, channelName: string, accessToken: string) {
         const response = await axios.get(`${this.BASE_URL}createsubscriptions?username=${username}&channelname=${channelName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
 
     async deleteSubscription(id: string, username: string, accessToken: string) {
         const response = await axios.post(`${this.BASE_URL}deletesubscription?username=${username}&id=${id}`, {}, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
@@ -70,18 +64,14 @@ export default class HoagieClient {
             username: streamerName,
             streamerSongListToken: sslToken,
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
 
     async getSSLStatus(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}streamersonglist/status?username=${username}&streamername=${streamerName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
@@ -90,9 +80,7 @@ export default class HoagieClient {
         const response = await axios.post(`${this.BASE_URL}bot/refreshtoken?username=${username}&streamername=${streamerName}`, {
             username: streamerName,
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
@@ -101,9 +89,7 @@ export default class HoagieClient {
         botToken: string
     }> {
         const response = await axios.get(`${this.BASE_URL}bot/gettoken?username=${username}&streamername=${streamerName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
@@ -114,9 +100,7 @@ export default class HoagieClient {
             token: spotifyToken,
             redirectUri,
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(twitchUsername, accessToken)
         })
         return response.data;
     }
@@ -126,9 +110,7 @@ export default class HoagieClient {
         const response = await axios.post(url, {
             streamerName: streamerName
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(requestorUsername, accessToken)
         })
         return response.data;
     }
@@ -136,9 +118,7 @@ export default class HoagieClient {
     async getSpotifySongs(requestorUsername: string, songs: ({ songKey: string, artist: string, title: string } | undefined)[], accessToken: string) {
         const url = `${this.BASE_URL}spotify/getsongs?username=${requestorUsername}`;
         const response = await axios.post(url, { songs }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(requestorUsername, accessToken)
         })
         return response.data;
     }
@@ -146,18 +126,14 @@ export default class HoagieClient {
     async getSpotifySong(requestorUsername: string, artist: string, title: string, accessToken: string) {
         const url = `${this.BASE_URL}spotify/getsong?username=${requestorUsername}&artist=${artist}&title=${title}`;
         const response = await axios.get(url, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(requestorUsername, accessToken)
         })
         return response.data;
     }
 
     async getRaids(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}raiddata?username=${username}&streamerLogin=${streamerName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data as {
             raids: RaidEvent[];
@@ -166,9 +142,7 @@ export default class HoagieClient {
 
     async getDonos(username: string, accessToken: string, streamerName: string, streamIds?: string[]) {
         const response = await axios.get(`${this.BASE_URL}donodata?username=${username}&streamername=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data as {
             stream: {
@@ -181,9 +155,7 @@ export default class HoagieClient {
 
     async getStreamHistory(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}streamhistory?username=${username}&streamername=${streamerName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data as {
             streamId: string,
@@ -193,9 +165,7 @@ export default class HoagieClient {
 
     async getAdminConfig(username: string, accessToken: string) {
         const response = await axios.get(`${this.BASE_URL}admin/config?username=${username}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response.data as AdminData | undefined;
     }
@@ -204,9 +174,7 @@ export default class HoagieClient {
         await axios.post(`${this.BASE_URL}admin/setstreamers?username=${username}`, {
             streamers
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
     }
 
@@ -214,45 +182,42 @@ export default class HoagieClient {
         await axios.post(`${this.BASE_URL}admin/setconfig?username=${username}`, {
             config
         }, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
     }
 
     async songEval(song: string, username: string, accessToken: string) {
         const response = await axios.get(`${this.BASE_URL}songeval/eval?username=${username}&query=${song}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response?.data;
     }
 
     async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
         const response = await axios.put(`${this.BASE_URL}songeval/whitelistwords?username=${username}&streamername=${streamerName}&word=${word}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response?.data;
     }
 
     async removeWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
         const response = await axios.put(`${this.BASE_URL}songeval/whitelistwords?username=${username}&streamername=${streamerName}&word=${word}&remove=true`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+            headers: this.getHeaders(username, accessToken)
         });
         return response?.data;
     }
 
     async readSongEvalConfig(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.BASE_URL}songeval/config?username=${username}&streamername=${streamerName}`, {
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+        const response = await axios.get(`${this.BASE_URL}songeval/config?streamername=${streamerName}`, {
+            headers: this.getHeaders(username, accessToken)
         });
         return response?.data;
+    }
+
+    getHeaders(username: string, accessToken: string) {
+        const token = btoa(`${username}:${accessToken}`)
+        return  {
+            "Authorization": `Basic ${token}`
+        }
     }
 }

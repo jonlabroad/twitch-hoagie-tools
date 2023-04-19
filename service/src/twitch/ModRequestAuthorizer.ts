@@ -2,23 +2,31 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { corsHeaders } from "../../twitch";
 import ModsDbClient from "../channelDb/ModsDbClient";
 import AdminAuthorizer from "./AdminAuthorizer";
-import TwitchRequestAuthenticator from "./TwitchRequestAuthenticator";
 
-export default class ModAuthorizer {
-    public static async auth(event: APIGatewayProxyEvent) {
-        const twitchAuth = await TwitchRequestAuthenticator.auth(event);
-        if (twitchAuth) {
-            return twitchAuth;
+export default class ModRequestAuthorizer {
+    public static async auth(username: string, event: APIGatewayProxyEvent) {
+        console.log(`ModRequestAuthorizer`);
+        console.log({username, event})
+
+        // Allow admins
+        const isAdminResponse = await AdminAuthorizer.auth(username);
+        const isAdmin = !isAdminResponse;
+        console.log({isAdminResponse})
+        if (isAdmin) {
+            return undefined;
         }
 
         // They are who they say they are, but are they a mod?
-        const username = event.queryStringParameters?.["username"]?.toLowerCase();
         const streamername = event.queryStringParameters?.["streamername"]?.toLowerCase();
+        console.log({streamername})
         if (username && streamername) {
             const modClient = new ModsDbClient(streamername);
             const mods = await modClient.readMods();
+            console.log({mods})
             const isMod = mods?.mods.map(m => m.toLowerCase()).includes(username);
-            if (isMod) {
+            const isStreamer = streamername.toLowerCase() === username
+            console.log({isMod, isStreamer})
+            if (isMod || isStreamer) {
                 return undefined;
             }
             return {

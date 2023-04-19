@@ -6,6 +6,7 @@ import Config from "./src/Config";
 import ConfigProvider from "./src/config/ConfigProvider";
 import AdminAuthorizer from "./src/twitch/AdminAuthorizer";
 import DonoProvider from "./src/twitch/DonoProvider";
+import { BasicAuth } from "./src/util/BasicAuth";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -25,7 +26,8 @@ module.exports.getconfig = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const auth = await AdminAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const auth = await AdminAuthorizer.auth(username);
         if (auth) {
             return auth;
         }
@@ -54,7 +56,8 @@ module.exports.setstreamers = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const auth = await AdminAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const auth = await AdminAuthorizer.auth(username);
         if (auth) {
             return auth;
         }
@@ -94,7 +97,8 @@ module.exports.setconfig = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const auth = await AdminAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const auth = await AdminAuthorizer.auth(username);
         if (auth) {
             return auth;
         }

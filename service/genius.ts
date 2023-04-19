@@ -3,8 +3,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import Config from "./src/Config";
 import GeniusClient from "./src/genius/GeniusClient";
-import ModAuthorizer from "./src/twitch/ModAuthorizer";
-import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
+import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
+import { BasicAuth } from "./src/util/BasicAuth";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -19,12 +19,8 @@ export const noCacheHeaders = {
 module.exports.getlyrics = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const authResponse = await TwitchAuthenticator.auth(event);
-    if (authResponse) {
-        return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
         return authenticationResponse;
     }

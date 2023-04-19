@@ -7,7 +7,7 @@ import CryptoJS from "crypto-js";
 import Config from "./src/Config";
 import ListSubscriptions from "./src/twitch/ListSubscriptions";
 import CreateSubscriptions from "./src/twitch/CreateSubscriptions";
-import TwitchAuthenticator from "./src/twitch/TwitchAuthenticator";
+import TwitchRequestAuthenticator from "./src/twitch/TwitchRequestAuthenticator";
 import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
@@ -21,6 +21,8 @@ import ModsDbClient from "./src/channelDb/ModsDbClient";
 import ModAuthorizer from "./src/twitch/ModAuthorizer";
 import ConfigProvider from "./src/config/ConfigProvider";
 import DonoDbClient from "./src/channelDb/DonoDbClient";
+import { BasicAuth } from "./src/util/BasicAuth";
+import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -107,12 +109,8 @@ module.exports.listsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthenticator.auth(event);
-        if (authResponse) {
-            return authResponse;
-        }
-
-        const authenticationResponse = await ModAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
         if (authenticationResponse) {
             return authenticationResponse;
         }
@@ -143,7 +141,7 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthenticator.auth(event);
+        const authResponse = await TwitchRequestAuthenticator.auth(event);
         if (authResponse) {
             return authResponse;
         }
@@ -177,13 +175,8 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthenticator.auth(event);
-        if (authResponse) {
-            console.log(`Unauthorized: ${authResponse.statusCode}`);
-            return authResponse;
-        }
-
-        const authenticationResponse = await ModAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
         if (authenticationResponse) {
             return authenticationResponse;
         }
@@ -211,7 +204,7 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     try {
         Config.validate();
 
-        const authResponse = await TwitchAuthenticator.auth(event);
+        const authResponse = await TwitchRequestAuthenticator.auth(event);
         if (authResponse) {
             console.log(`Unauthorized: ${authResponse.statusCode}`);
             return authResponse;
@@ -283,7 +276,8 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
         const userLogin = event.queryStringParameters?.["username"] ?? "";
         const streamIds = event.multiValueQueryStringParameters?.["streamId"];
 
-        const auth = await ModAuthorizer.auth(event);
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+        const auth = await ModRequestAuthorizer.auth(username, event);
         if (auth) {
             return auth;
         }
@@ -320,8 +314,9 @@ module.exports.streamhistory = async (event: APIGatewayProxyEvent) => {
 
         const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
         const userLogin = event.queryStringParameters?.["username"] ?? "";
+        const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
 
-        const auth = await ModAuthorizer.auth(event);
+        const auth = await ModRequestAuthorizer.auth(username, event);
         if (auth) {
             return auth;
         }
