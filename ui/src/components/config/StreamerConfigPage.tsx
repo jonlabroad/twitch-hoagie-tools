@@ -6,6 +6,7 @@ import { appStateReducer } from "../../state/AppStateReducer";
 import { PageHeader } from "../PageHeader"
 import { BotConfigModule } from "./modules/BotConfigModule";
 import { StreamerSongListConfigModule } from "./modules/StreamerSongListConfigModule"
+import { ModsModule } from "./modules/ModsModule";
 
 export interface StreamerConfigProps {
 
@@ -23,5 +24,6 @@ export const StreamerConfigPage = (props: StreamerConfigProps) => {
         <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
         <BotConfigModule appState={appState} streamerName={streamer} />
         <StreamerSongListConfigModule appState={appState} streamerName={streamer}/>
+        <ModsModule appState={appState} streamerName={streamer} />
     </>
 }

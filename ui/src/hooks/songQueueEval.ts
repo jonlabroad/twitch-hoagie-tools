@@ -74,7 +74,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                             let e: any | undefined = undefined;
                             try {
                                 setEvalLoading(songName, true, false)
-                                e = await client.songEval(songName, state.username ?? "", state.accessToken ?? "");
+                                e = await client.songEval(songName, state.username ?? "", state.accessToken ?? "", streamer.toLowerCase());
                             } catch (err) {
                                 console.error(err);
                                 setEvalLoading(songName, false, true)
@@ -93,7 +93,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                                 const doLookup = !e?.songInfo;
                                 let spotifySong: any | undefined = undefined;
                                 if (doLookup && artist && title) {
-                                    spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "");
+                                    spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "", streamer.toLowerCase());
                                 }
 
                                 setEvalLoading(songName, false, false)

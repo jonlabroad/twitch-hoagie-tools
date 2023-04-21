@@ -11,7 +11,7 @@ frameworkVersion: '2'
 custom:
   prune:
     automatic: false
-    number: 2
+    number: 0
   myStage: ${opt:stage, self:provider.stage}
   myTableName: HoagieTools-${opt:stage, self:provider.stage}
   apiCloudFront:
@@ -30,6 +30,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs14.x
+  versionFunctions: false
   httpApi:
     cors: true
     authorizers:
@@ -477,6 +478,62 @@ functions:
       - schedule:
         rate: rate(2 hours)
         enabled: false
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  getmods:
+    handler: twitch.getmods
+    events:
+      - http:
+          method: GET
+          path: /api/mods
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+          parameters:
+            querystrings:
+              streamername: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  addmod:
+    handler: twitch.addmod
+    events:
+      - http:
+          method: PUT
+          path: /api/addmod
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+          parameters:
+            querystrings:
+              streamername: true
+              username: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  removemod:
+    handler: twitch.removemod
+    events:
+      - http:
+          method: PUT
+          path: /api/removemod
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+          parameters:
+            querystrings:
+              streamername: true
+              username: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
