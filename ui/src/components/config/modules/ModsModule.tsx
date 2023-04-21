@@ -62,8 +62,8 @@ export const ModsModule = (props: BotConfigModuleProps) => {
                 ))}
                 <FlexRow alignItems="center">
                     <TextField label="Add Mod" variant="filled" style={{ maxWidth: 300, marginRight: 20 }} value={modName} onChange={(ev) => setModName(ev.target.value)} />
-                    <Button style={{ maxWidth: 160, marginRight: 30 }} variant="contained" color={"primary"} disabled={!enableButtons} onClick={() => {
-                        if (appState.username && appState.accessToken && appState.streamer && appState.streamer && modName) {
+                    <Button style={{ maxWidth: 160, marginRight: 30 }} variant="contained" color={"primary"} disabled={!enableButtons || !modName} onClick={() => {
+                        if (appState.username && appState.accessToken && appState.streamer && appState.streamer && modName.length > 0) {
                             addMod(appState.username, appState.accessToken, appState.streamer, modName);
                             setModName("");
                         }
