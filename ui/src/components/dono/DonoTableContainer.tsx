@@ -1,5 +1,5 @@
-import { Button, CircularProgress, Grid, IconButton } from "@material-ui/core";
-import { ArrowLeft, ArrowRight } from "@material-ui/icons";
+import { Button, CircularProgress, Grid, IconButton } from "@mui/material";
+import { ArrowLeft, ArrowRight } from "@mui/icons-material";
 import { useContext, useEffect } from "react";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import { DonoUtil } from "../../util/DonoUtil";
@@ -68,9 +68,12 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
         </Grid>}
         {isLoggedIn && <Grid item xs={12}>
             <FlexRow alignItems="center">
-                <IconButton disabled={!enableArrow(1)} onClick={() => {
-                    getNextStream(1)
-                }}>
+                <IconButton
+                    disabled={!enableArrow(1)}
+                    onClick={() => {
+                        getNextStream(1)
+                    }}
+                    size="large">
                     <ArrowLeft />
                 </IconButton>
                 <FlexCol>
@@ -78,9 +81,12 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
                     <FlexRow justifyContent="center" style={{minWidth: 160}}>{`${streamDate.toLocaleDateString()} ${streamDate.toLocaleTimeString()}`}</FlexRow>
                 ))}
                 </FlexCol>
-                <IconButton disabled={!enableArrow(-1)} onClick={() => {
-                    getNextStream(-1)
-                }}>
+                <IconButton
+                    disabled={!enableArrow(-1)}
+                    onClick={() => {
+                        getNextStream(-1)
+                    }}
+                    size="large">
                     <ArrowRight />
                 </IconButton>
 
@@ -96,7 +102,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
             />
         </Grid>
         }
-    </>
+    </>;
 }
 
 const LoginPrompt = () => <div>Login to view dono table</div>

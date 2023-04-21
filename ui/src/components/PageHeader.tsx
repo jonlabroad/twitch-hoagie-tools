@@ -1,4 +1,4 @@
-import { AppBar, Button, Toolbar, Typography } from "@material-ui/core"
+import { AppBar, Button, Toolbar, Typography } from "@mui/material"
 import Config from "../Config"
 import { useLogin } from "../hooks/loginHooks"
 import { AppState } from "../state/AppState"
@@ -22,7 +22,7 @@ export const PageHeader = (props: { appState: AppState, appStateDispatch: any, s
     });
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" enableColorOnDark>
             <Toolbar variant="dense">
                 <FlexRow style={{ width: "100%" }} justifyContent="space-between" alignItems="center">
                     <Typography variant="h6" style={{ marginRight: "20px" }}>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react"
-import { FormControlLabel, Switch } from "@material-ui/core"
+import { FormControlLabel, Switch } from "@mui/material"
 
 export interface DarkModeContext {
     darkMode?: boolean,
@@ -19,6 +19,7 @@ export const DarkModeSwitch = () => {
             label="Dark Mode"
             control={
                 <Switch
+                    color="default"
                     checked={darkModeContext.darkMode}
                     onChange={() => darkModeContext.setDarkMode(!darkModeContext.darkMode)}
                 />

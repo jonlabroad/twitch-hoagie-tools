@@ -1,4 +1,4 @@
-import { Collapse, Grid, Typography } from "@material-ui/core"
+import { Collapse, Grid, Typography } from "@mui/material"
 import { SpotifyEmbed } from "../spotify/SpotifyEmbed"
 import { FlexCol, FlexRow } from "../util/FlexBox"
 import { BadWordInfos, BadWordsDetails } from "./BadWordsDetails"

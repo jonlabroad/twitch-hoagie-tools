@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FlexRow } from "./FlexBox";
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 export const Expandable = (props: {
     summary: React.ReactChild | React.ReactChildren

@@ -1,4 +1,4 @@
-import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@material-ui/core"
+import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@mui/material"
 import React, { useEffect, useReducer, useState } from "react";
 import HoagieClient from "../../service/HoagieClient";
 import { TwitchSubscription } from "../../service/TwitchClientTypes";
@@ -12,8 +12,8 @@ import "../../styles/StreamerDashboard.scss";
 import TwitchClient from "../../service/TwitchClient";
 import { SongListConfig } from "./SongListConfig";
 
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 import Config from "../../Config";
 
 const chipColors: Record<string, any> = {

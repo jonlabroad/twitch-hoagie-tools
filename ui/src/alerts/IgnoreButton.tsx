@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core"
+import { Button } from "@mui/material"
 import React, { useContext } from "react"
 import { StateContext } from "../components/MainPage";
 import AlertType from "./AlertType";

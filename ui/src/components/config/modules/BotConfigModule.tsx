@@ -1,9 +1,9 @@
-import { Grid, CircularProgress, TextField, Button, Typography } from "@material-ui/core";
+import { Grid, CircularProgress, TextField, Button, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import HoagieClient from "../../../service/HoagieClient";
 import { FlexCol, FlexRow } from "../../util/FlexBox";
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 import { AppState } from "../../../state/AppState";
 
 export interface BotConfigModuleProps {

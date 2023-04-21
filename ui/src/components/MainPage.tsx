@@ -1,4 +1,4 @@
-import { AppBar, Button, Grid, Hidden, Link, Tab, Tabs, Toolbar, Typography } from "@material-ui/core"
+import { AppBar, Button, Grid, Hidden, Link, Tab, Tabs, Toolbar, Typography } from "@mui/material"
 import React, { createContext, useEffect, useReducer, useRef, useState } from "react"
 import { useParams } from "react-router";
 import AlertGenerator, { AlertContextType } from "../alerts/AlertGenerator";

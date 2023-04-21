@@ -1,10 +1,10 @@
-import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@material-ui/core"
+import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@mui/material"
 import React, { useEffect, useReducer, useState } from "react";
 
 import "../../styles/StreamerDashboard.scss";
 
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 import { AppState, defaultAppState } from "../../state/AppState";
 import { TwitchSubscription } from "../../service/TwitchClientTypes";
 import { appStateReducer } from "../../state/AppStateReducer";

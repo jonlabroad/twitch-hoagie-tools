@@ -9,7 +9,7 @@ import { useSaveLastPath } from "../../hooks/LastPathHooks";
 
 import "../../styles/Dono.scss";
 import { useParams } from "react-router";
-import { Container, Grid } from "@material-ui/core";
+import { Container, Grid } from "@mui/material";
 import Config from "../../Config";
 import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
 import { useDonoData } from "../../hooks/donoDataHooks";

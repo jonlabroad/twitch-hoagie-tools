@@ -21,8 +21,8 @@ export const StreamerListContainer = (props: StreamerListContainerProps) => {
 
     return <>
         <StreamerList streamers={props.streamers ?? []}
-            onAddStreamer={(streamer: string) => setStreamers([...props.streamers ?? [], streamer])}
+            onAddStreamer={(streamer: string) => setStreamers([...(props.streamers ?? []), streamer])}
             onRemoveStreamer={(streamer: string) => setStreamers(props.streamers.filter(s => s !== streamer) ?? [])}
         />
-    </>
+    </>;
 }

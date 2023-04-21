@@ -1,11 +1,11 @@
-import { Grid, CircularProgress, TextField, Button, Typography, IconButton } from "@material-ui/core";
+import { Grid, CircularProgress, TextField, Button, Typography, IconButton } from "@mui/material";
 import { useState, useEffect } from "react";
 import HoagieClient from "../../../service/HoagieClient";
 import { FlexCol, FlexRow } from "../../util/FlexBox";
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 import { AppState } from "../../../state/AppState";
-import BlockIcon from '@material-ui/icons/Block';
+import BlockIcon from '@mui/icons-material/Block';
 
 export interface BotConfigModuleProps {
     appState: AppState
@@ -55,9 +55,11 @@ export const ModsModule = (props: BotConfigModuleProps) => {
                 {mods?.map(mod => (
                     <FlexRow alignItems="center">
                         <Typography style={{ overflow: "ellipsis", width: 130 }}>{mod}</Typography>
-                        <IconButton onClick={() => {
-                            removeMod(appState!.username!, appState!.accessToken!, appState!.streamer!, mod)
-                        }}><BlockIcon fontSize="small" color="primary" /></IconButton>
+                        <IconButton
+                            onClick={() => {
+                                removeMod(appState!.username!, appState!.accessToken!, appState!.streamer!, mod)
+                            }}
+                            size="large"><BlockIcon fontSize="small" color="primary" /></IconButton>
                     </FlexRow>
                 ))}
                 <FlexRow alignItems="center">

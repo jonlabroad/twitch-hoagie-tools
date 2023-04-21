@@ -1,4 +1,4 @@
-import { Tooltip, Typography } from "@material-ui/core"
+import { Tooltip, Typography } from "@mui/material"
 import { FlexCol, FlexRow } from "../util/FlexBox"
 import { RaidEvent } from "./RaidEvent"
 

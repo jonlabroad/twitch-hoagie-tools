@@ -6,7 +6,7 @@ import { FlexCol, FlexRow } from "../util/FlexBox";
 import { ChatMessage } from "./SimpleChatDisplay";
 
 import "../../styles/ChatUsers.scss";
-import { Card } from "@material-ui/core";
+import { Card } from "@mui/material";
 
 export interface ChatUser {
     userData: UserData

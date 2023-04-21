@@ -1,8 +1,8 @@
-import { Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core"
+import { Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
 import { FlexCol, FlexRow } from "../util/FlexBox"
 
-import CheckIcon from '@material-ui/icons/Check';
-import BlockIcon from '@material-ui/icons/Block';
+import CheckIcon from '@mui/icons-material/Check';
+import BlockIcon from '@mui/icons-material/Block';
 import { Expandable } from "../util/Expandable";
 
 export type BadWordInfos = Record<string, BadWordInfo>
@@ -30,7 +30,7 @@ export const BadWordsDetails = (props: BadWordsDetailsProps) => {
             <Typography>{badWords.map(word => (
                 <FlexRow alignItems="center">
                     <div style={{ marginRight: 5 }}>{`${word}(${badWordCounts[word].count})`}</div>
-                    <IconButton onClick={() => props.onWordWhitelistChange(word, "add")}><CheckIcon fontSize="small" color="primary" /></IconButton>
+                    <IconButton onClick={() => props.onWordWhitelistChange(word, "add")} size="large"><CheckIcon fontSize="small" color="primary" /></IconButton>
                 </FlexRow>
             ))}
             </Typography>
@@ -47,12 +47,12 @@ export const BadWordsDetails = (props: BadWordsDetailsProps) => {
                     <Typography variant="body2">{whitelisted.map(word => (
                         <FlexRow alignItems="center">
                             <div style={{ marginRight: 5 }}>{`${word}(${badWordCounts[word].count})`}</div>
-                            <IconButton onClick={() => props.onWordWhitelistChange(word, "remove")}><BlockIcon fontSize="small" color="primary" /></IconButton>
+                            <IconButton onClick={() => props.onWordWhitelistChange(word, "remove")} size="large"><BlockIcon fontSize="small" color="primary" /></IconButton>
                         </FlexRow>
                     ))}
                     </Typography>
                 </Expandable>
             }
         </FlexCol>
-    </>
+    </>;
 }

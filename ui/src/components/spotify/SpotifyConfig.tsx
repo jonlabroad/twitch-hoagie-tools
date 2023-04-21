@@ -1,11 +1,11 @@
-import { Button, CircularProgress, Grid } from "@material-ui/core"
+import { Button, CircularProgress, Grid } from "@mui/material"
 import { defaultAppState, AppState } from "../../state/AppState";
 import { appStateReducer } from "../../state/AppStateReducer";
 import { PageHeader } from "../PageHeader"
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 import { useEffect, useReducer, useState } from "react";
 import React from "react";
 import Config from "../../Config";

@@ -1,11 +1,11 @@
-import { Button, CircularProgress, Grid, TextField } from "@material-ui/core";
+import { Button, CircularProgress, Grid, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { setTokenSourceMapRange } from "typescript";
 import HoagieClient from "../../service/HoagieClient";
 import { AppState } from "../../state/AppState";
 import { FlexCol, FlexRow } from "../util/FlexBox";
-import LinkIcon from '@material-ui/icons/Link';
-import LinkOffIcon from '@material-ui/icons/Link';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
 
 export const SongListConfig = (props: { appState: AppState }) => {
     const { appState } = props;

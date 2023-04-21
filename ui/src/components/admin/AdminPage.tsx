@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import Config from "../../Config";
 import { useSaveLastPath } from "../../hooks/LastPathHooks";

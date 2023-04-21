@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { EvaluatedMessageAlert, ShoutoutAlertType } from "../../alerts/AlertType";
 import { useAlertTrimming } from "../../hooks/alertTrimHooks";
@@ -41,7 +41,7 @@ export const AlertContainer = (props: AlertContainerProps) => {
     useEffect(() => {
         async function processMsg() {
             if (lastMessage) {
-                const alerts = await alertContext?.alertGenerator?.fromChatMessage(lastMessage, stateContext.state) ?? [];
+                const alerts = (await alertContext?.alertGenerator?.fromChatMessage(lastMessage, stateContext.state)) ?? [];
                 stateContext.dispatch({
                     type: "add_alerts",
                     alerts,

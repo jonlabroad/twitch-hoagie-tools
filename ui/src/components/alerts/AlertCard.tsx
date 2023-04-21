@@ -3,7 +3,7 @@ import AlertType from "../../alerts/AlertType"
 import { FlexCol, FlexRow } from "../util/FlexBox"
 
 import "../../styles/AlertCard.scss"
-import { Card } from "@material-ui/core"
+import { Card } from "@mui/material"
 import { CountdownTimer } from "../CountdownTimer"
 import Config from "../../Config"
 

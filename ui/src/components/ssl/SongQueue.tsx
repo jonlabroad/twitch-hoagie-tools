@@ -4,7 +4,7 @@ import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/SongQueue.scss";
-import { Card, Typography } from "@material-ui/core";
+import { Card, Typography } from "@mui/material";
 
 export interface SongQueueProps {
 }

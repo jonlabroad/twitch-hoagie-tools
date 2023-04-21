@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import React, { useContext } from "react"
 import { useChatEvaluator } from "../../hooks/chatModHooks";
 import TwitchClient from "../../service/TwitchClient";

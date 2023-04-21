@@ -1,4 +1,4 @@
-import { Card } from "@material-ui/core";
+import { Card } from "@mui/material";
 import React, { useContext } from "react"
 import { StateContext } from "../components/MainPage";
 import Config from "../Config";

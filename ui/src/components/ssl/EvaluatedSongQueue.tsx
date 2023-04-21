@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, LinearProgress, Hidden, useTheme, Tooltip } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typography, Grid, TableBody, LinearProgress, Hidden, useTheme, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
@@ -8,7 +8,7 @@ import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
 import { DonoData } from "../../service/HoagieClient";
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
 const format = require('format-duration')
 
@@ -44,48 +44,48 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
 
     const songQueue = state.songQueue?.list ?? [];
 
-    return <Grid item xs={12}><TableContainer component={Paper} className="dono-table-container">
-        <Table size="small">
-            <TableHead>
-                <TableRow >
-                    <Hidden smDown><TableCell><Typography style={headerStyle}>Queue Pos</Typography></TableCell></Hidden>
-                    <TableCell><Typography style={headerStyle}>SSL Song</Typography></TableCell>
-                    <Hidden smDown><TableCell><Typography style={headerStyle}>User</Typography></TableCell></Hidden>
-                    <TableCell><Typography style={headerStyle}># Bad Words</Typography></TableCell>
-                    <TableCell><Typography style={headerStyle}>Duration</Typography></TableCell>
-                    <Hidden smDown><TableCell><Typography style={headerStyle}>Time Signature</Typography></TableCell></Hidden>
-                    <TableCell><Typography style={headerStyle}>Genres</Typography></TableCell>
-                    <TableCell><Typography style={headerStyle}>Links</Typography></TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {songQueue?.map((queueSong: any, i: number) => {
-                    const sslListSong = queueSong?.song;
-                    const nonListSong = queueSong?.nonlistSong;
-                    const songKey = nonListSong ?? `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
-                    const evaluation = evaluations[songKey] as any | undefined;
-                    const badWordStatus = evaluation?.eval?.lyricsEval?.status
-                    const badWordCounts = getBadWordsCounts(evaluation?.eval?.lyricsEval, config?.whitelist ?? []);
-                    const totalBadWords = !badWordStatus?.isError ? Object.values(badWordCounts).filter(w => !w.isWhitelisted).reduce((prev, curr) => curr.count + prev, 0) : "X";
-                    const resolvedSong = evaluation?.eval?.song;
-                    const lyricsLink = resolvedSong?.url;
-                    const spotifyInfo = evaluation?.songInfo;
-                    const songAnalysis = spotifyInfo?.analysis;
-                    const spotifyLink = spotifyInfo?.track?.external_urls?.spotify;
-                    const durationMs = spotifyInfo?.track?.duration_ms ?? 0;
-                    const durationFormatted = format(durationMs);
-                    const genres = (evaluation?.songInfo?.artist?.genres ?? []) as string[];
-                    const timeSignature = songAnalysis?.track?.time_signature;
-                    const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
-                    const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
-                    const genreText = genres.join(", ");
-                    const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase().trim() === evaluation?.user?.toLowerCase().trim()) : undefined
-                    const userName = evaluation?.user ?? queueSong.requests[0].name ?? ""
-                    const evaluationStatus = props.evaluationsStatus[songKey]
-                    return (
-                        <>
+    return (
+        <Grid item xs={12}><TableContainer component={Paper} className="dono-table-container">
+            <Table size="small">
+                <TableHead>
+                    <TableRow >
+                        <Hidden mdDown><TableCell><Typography style={headerStyle}>Queue Pos</Typography></TableCell></Hidden>
+                        <TableCell><Typography style={headerStyle}>SSL Song</Typography></TableCell>
+                        <Hidden mdDown><TableCell><Typography style={headerStyle}>User</Typography></TableCell></Hidden>
+                        <TableCell><Typography style={headerStyle}># Bad Words</Typography></TableCell>
+                        <TableCell><Typography style={headerStyle}>Duration</Typography></TableCell>
+                        <Hidden mdDown><TableCell><Typography style={headerStyle}>Time Signature</Typography></TableCell></Hidden>
+                        <TableCell><Typography style={headerStyle}>Genres</Typography></TableCell>
+                        <TableCell><Typography style={headerStyle}>Links</Typography></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {songQueue?.map((queueSong: any, i: number) => {
+                        const sslListSong = queueSong?.song;
+                        const nonListSong = queueSong?.nonlistSong;
+                        const songKey = nonListSong ?? `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
+                        const evaluation = evaluations[songKey] as any | undefined;
+                        const badWordStatus = evaluation?.eval?.lyricsEval?.status
+                        const badWordCounts = getBadWordsCounts(evaluation?.eval?.lyricsEval, config?.whitelist ?? []);
+                        const totalBadWords = !badWordStatus?.isError ? Object.values(badWordCounts).filter(w => !w.isWhitelisted).reduce((prev, curr) => curr.count + prev, 0) : "X";
+                        const resolvedSong = evaluation?.eval?.song;
+                        const lyricsLink = resolvedSong?.url;
+                        const spotifyInfo = evaluation?.songInfo;
+                        const songAnalysis = spotifyInfo?.analysis;
+                        const spotifyLink = spotifyInfo?.track?.external_urls?.spotify;
+                        const durationMs = spotifyInfo?.track?.duration_ms ?? 0;
+                        const durationFormatted = format(durationMs);
+                        const genres = (evaluation?.songInfo?.artist?.genres ?? []) as string[];
+                        const timeSignature = songAnalysis?.track?.time_signature;
+                        const timeSignatureText = timeSignature ? `${timeSignature}/4` : "";
+                        const timeSignatureConfidenceText = timeSignature ? `(${songAnalysis?.track?.time_signature_confidence})` : "";
+                        const genreText = genres.join(", ");
+                        const userDonoData = evaluation?.user ? donoData?.find(d => d.SubKey.toLowerCase().trim() === evaluation?.user?.toLowerCase().trim()) : undefined
+                        const userName = evaluation?.user ?? queueSong.requests[0].name ?? ""
+                        const evaluationStatus = props.evaluationsStatus[songKey]
+                        return <>
                             <TableRow style={{ cursor: "pointer" }} onClick={() => setExpandedIndex(i !== expandedIndex ? i : undefined)}>
-                                <Hidden smDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
+                                <Hidden mdDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
                                 <TableCell>
                                     <FlexCol style={{ minHeight: 45 }}>
                                         <Typography>{songKey}</Typography>
@@ -94,7 +94,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                         </Typography>
                                     </FlexCol>
                                 </TableCell>
-                                <Hidden smDown>
+                                <Hidden mdDown>
                                     <TableCell>
                                         <FlexRow><Typography>{userName}</Typography>{userDonoData ? <DonoIcon donoData={userDonoData}/> : ""}</FlexRow>
                                     </TableCell>
@@ -107,7 +107,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                     <TableCell>
                                         <Typography>{evaluation?.eval ? durationFormatted : ""}</Typography>
                                     </TableCell>
-                                    <Hidden smDown>
+                                    <Hidden mdDown>
                                         <TableCell>
                                             <FlexRow alignItems="center" mr={3}>
                                                 <Typography>{timeSignatureText}&nbsp;</Typography>
@@ -141,13 +141,13 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                     />
                                 </TableCell>
                             </TableRow>
-                        </>
-                    )
-                })}
-            </TableBody>
-        </Table>
-    </TableContainer>
-    </Grid>
+                        </>;
+                    })}
+                </TableBody>
+            </Table>
+        </TableContainer>
+        </Grid>
+    );
 }
 
 function getBadWordsCounts(lyricsEval: any, whitelist: string[]): Record<string, { count: number, isWhitelisted: boolean }> {
