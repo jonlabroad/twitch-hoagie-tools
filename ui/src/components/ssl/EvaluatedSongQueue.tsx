@@ -9,6 +9,7 @@ import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
 import { DonoData } from "../../service/HoagieClient";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import { SslIcon } from "../icon/SslIcon";
 
 const format = require('format-duration')
 
@@ -63,6 +64,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                     {songQueue?.map((queueSong: any, i: number) => {
                         const sslListSong = queueSong?.song;
                         const nonListSong = queueSong?.nonlistSong;
+                        const isSslListSong = !!sslListSong;
                         const songKey = nonListSong ?? `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
                         const evaluation = evaluations[songKey] as any | undefined;
                         const badWordStatus = evaluation?.eval?.lyricsEval?.status
@@ -88,7 +90,10 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                                 <Hidden mdDown><TableCell width={1}>{i + 1}</TableCell></Hidden>
                                 <TableCell>
                                     <FlexCol style={{ minHeight: 45 }}>
-                                        <Typography>{songKey}</Typography>
+                                        <FlexRow alignItems="center">
+                                            {isSslListSong && <SslIcon />}
+                                            <Typography ml={0}>{songKey}</Typography>
+                                        </FlexRow>
                                         <Typography style={{ fontSize: 14, color: "grey" }}>
                                             {resolvedSong ? `${resolvedSong?.artist_names} - ${resolvedSong?.title}` : ""}
                                         </Typography>
