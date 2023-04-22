@@ -49,7 +49,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
             <Table size="small">
                 <TableHead>
                     <TableRow >
-                        <Hidden mdDown><TableCell><Typography style={headerStyle}>Queue Pos</Typography></TableCell></Hidden>
+                        <Hidden mdDown><TableCell><Typography style={headerStyle}>Pos</Typography></TableCell></Hidden>
                         <TableCell><Typography style={headerStyle}>SSL Song</Typography></TableCell>
                         <Hidden mdDown><TableCell><Typography style={headerStyle}>User</Typography></TableCell></Hidden>
                         <TableCell><Typography style={headerStyle}># Bad Words</Typography></TableCell>
