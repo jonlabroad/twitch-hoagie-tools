@@ -6,10 +6,11 @@ import TwitchClient from "../../service/TwitchClient";
 import { StreamData, UserData } from "../../service/TwitchClientTypes";
 import StreamSorter from "../../util/StreamSorter";
 import { CountupTimer } from "../CountdownTimer";
-import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { RaidEvent } from "./RaidEvent";
 import { RaidHistory } from "./RaidHistory";
+import { StateContext } from "../context/StateContextProvider";
+import { LoginContext } from "../context/LoginContextProvider";
 
 interface RaidData {
     raidsIn: RaidEvent[]
@@ -24,9 +25,10 @@ export interface RaidContainerProps {
 export const RaidContainer = (props: RaidContainerProps) => {
     const stateContext = useContext(StateContext);
     const { state } = stateContext;
+    const { state: loginState } = useContext(LoginContext);
 
-    const [myFollowed, theirFollowed] = useRaidTargets(state.streamer, state.username, state.accessToken);
-    const [liveStreams] = useLiveChannels(state.username, state.accessToken);
+    const [myFollowed, theirFollowed] = useRaidTargets(state.streamer, loginState.username, loginState.accessToken);
+    const [liveStreams] = useLiveChannels(loginState.username, loginState.accessToken);
 
     const [liveStreamsToDisplay, setLiveChannelsToDisplay] = useState<Record<string, StreamData>>({});
 
@@ -45,8 +47,8 @@ export const RaidContainer = (props: RaidContainerProps) => {
     const [userInfo, setUserInfo] = useState<Record<string, UserData>>({});
     useEffect(() => {
         async function get() {
-            if (state.username && state.accessToken) {
-                const client = new TwitchClient(state.accessToken);
+            if (loginState.username && loginState.accessToken) {
+                const client = new TwitchClient(loginState.accessToken);
                 const users = await client.getUsers(Object.values(liveStreamsToDisplay).map(c => c.user_name));
                 const cInfo: Record<string, UserData> = {};
                 users.forEach(s => cInfo[s.display_name] = s);
@@ -54,13 +56,13 @@ export const RaidContainer = (props: RaidContainerProps) => {
             }
         }
         get();
-    }, [liveStreamsToDisplay, state.username, state.accessToken])
+    }, [liveStreamsToDisplay, loginState.username, loginState.accessToken])
 
     useEffect(() => {
         async function getRaids() {
-            if (state.username && state.streamer && state.accessToken) {
+            if (loginState.username && state.streamer && loginState.accessToken) {
                 const client = new HoagieClient();
-                const raidData = await client.getRaids(state.username, state.accessToken, state.streamer);
+                const raidData = await client.getRaids(loginState.username, loginState.accessToken, state.streamer);
                 if (raidData) {
                     const raidByStreamer: RaidsByStreamer = {};
                     raidData.raids.forEach(raid => {
@@ -78,9 +80,9 @@ export const RaidContainer = (props: RaidContainerProps) => {
             }
         }
         getRaids();
-    }, [state.streamer, state.username, state.accessToken])
+    }, [state.streamer, loginState.username, loginState.accessToken])
 
-    if (state.username && !state.accessToken) {
+    if (loginState.username && !loginState.accessToken) {
         return <CircularProgress />
     }
 

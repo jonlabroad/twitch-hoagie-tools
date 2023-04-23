@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { StreamInfo } from "../components/dono/DonoTableContainer"
 import { AppState } from "../state/AppState"
+import { LoginContext } from "../components/context/LoginContextProvider";
+import { StateContext } from "../components/context/StateContextProvider";
 
 // Move this or something
 function getStreamGroups(streamHistory: StreamInfo[]) {
@@ -31,12 +33,14 @@ function getStreamGroups(streamHistory: StreamInfo[]) {
     return newHistory;
 }
 
-export function useStreamSelection(state: AppState, streamHistory: StreamInfo[] | undefined): [StreamInfo[], (dir: number) => any, boolean, boolean] {
+export function useStreamSelection(streamHistory: StreamInfo[] | undefined): [StreamInfo[], (dir: number) => any, boolean, boolean] {
     const [currentStreams, setCurrentStreams] = useState<StreamInfo[] | undefined>(undefined)
+    const { state } = useContext(StateContext)
+    const { state: loginState } = useContext(LoginContext)
 
     useEffect(() => {
         async function getStreamHistory() {
-            if (state.username && state.accessToken && state.streamer) {
+            if (loginState.username && loginState.accessToken && state.streamer) {
                 if (streamHistory) {
                     const groups = getStreamGroups(streamHistory ?? []) 
                     setCurrentStreams(groups[0])

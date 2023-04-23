@@ -2,8 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import { useSongQueueEval } from "../../hooks/songQueueEval";
 import { DonoData } from "../../service/HoagieClient";
 import { DonoUtil } from "../../util/DonoUtil";
-import { DonoContext, StateContext } from "../MainPage";
 import { EvaluatedSongQueue } from "./EvaluatedSongQueue"
+import { StateContext } from "../context/StateContextProvider";
+import { DonoContext } from "../dono/DonoContextProvider";
 
 const allowedStreamers = [
     "andrewcore",

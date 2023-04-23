@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import HoagieClient, { AdminData } from "../../service/HoagieClient"
-import { StateContext } from "../MainPage";
 import { StreamerList } from "./StreamerList"
+import { StateContext } from "../context/StateContextProvider"
+import { LoginContext } from "../context/LoginContextProvider"
 
 interface StreamerListContainerProps {
     streamers: string[]
@@ -9,12 +10,13 @@ interface StreamerListContainerProps {
 }
 
 export const StreamerListContainer = (props: StreamerListContainerProps) => {
-    const { state } = useContext(StateContext);
-
+    const loginContext = useContext(LoginContext);
+    const { state: loginState } = loginContext;
+    
     async function setStreamers(streamers: string[]) {
-        if (state.username && state.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            await client.adminSetStreamers(streamers, state.username, state.accessToken);
+            await client.adminSetStreamers(streamers, loginState.username, loginState.accessToken);
             setTimeout(() => props.onChange(), 1000);
         }
     }

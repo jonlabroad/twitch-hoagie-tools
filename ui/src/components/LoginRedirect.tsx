@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react"
 import { useLogin } from "../hooks/loginHooks";
 import { LoginAction } from "../state/AppStateReducer";
 import LocalStorage from "../util/LocalStorage";
-import { StateContext } from "./MainPage";
 
 export interface LoginRedirectProps {
 

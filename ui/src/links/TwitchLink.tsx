@@ -1,6 +1,6 @@
 import { Link } from "@mui/material"
 import React, { useContext } from "react"
-import { StateContext } from "../components/MainPage";
+import { StateContext } from "../components/context/StateContextProvider";
 
 export interface NightbotCommandsLinkProps {
 

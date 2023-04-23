@@ -3,9 +3,11 @@ import { ArrowLeft, ArrowRight } from "@mui/icons-material";
 import { useContext, useEffect } from "react";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import { DonoUtil } from "../../util/DonoUtil";
-import { DonoContext, StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { DonoTable } from "./DonoTable";
+import { StateContext } from "../context/StateContextProvider";
+import { DonoContext } from "./DonoContextProvider";
+import { LoginContext } from "../context/LoginContextProvider";
 
 interface DonoTableContainerProps {
     streamHistory: StreamInfo[] | undefined
@@ -24,6 +26,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     const stateContext = useContext(StateContext);
     const donoContext = useContext(DonoContext);
     const { state } = stateContext;
+    const { state: loginState } = useContext(LoginContext);
     const { state: donoState, refreshDonos } = donoContext;
     const { donoData, loading } = donoState;
     const { streamHistory, currentStreams, getNextStream, isFirstStream, isLastStream } = props;
@@ -50,7 +53,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
         scheduleRefresh()
     }, [])
 
-    const isLoggedIn = state.isLoggedIn && state.accessToken && state.username;
+    const isLoggedIn = loginState.isLoggedIn && loginState.accessToken && loginState.username;
 
     const enableArrow = (direction: number) => {
         if (direction < 0) {

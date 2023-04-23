@@ -1,6 +1,6 @@
 import React, { useContext } from "react"
 import Config from "../../Config";
-import { StateContext } from "../MainPage";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface EmbeddedChatProps {
 }

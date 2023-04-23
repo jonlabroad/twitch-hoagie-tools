@@ -1,40 +1,41 @@
-import { Grid, CircularProgress, TextField, Button, Typography } from "@mui/material";
-import { useState, useEffect } from "react";
+import { Grid, Button, Typography } from "@mui/material";
+import { useState, useEffect, useContext } from "react";
 import HoagieClient from "../../../service/HoagieClient";
 import { FlexCol, FlexRow } from "../../util/FlexBox";
-import LinkIcon from '@mui/icons-material/Link';
-import LinkOffIcon from '@mui/icons-material/Link';
-import { AppState } from "../../../state/AppState";
+import { StateContext } from "../../context/StateContextProvider";
+import { LoginContext } from "../../context/LoginContextProvider";
 
 export interface BotConfigModuleProps {
-    appState: AppState
     streamerName: string
 }
 
 export const BotConfigModule = (props: BotConfigModuleProps) => {
-    const { appState, streamerName } = props;
+    const { streamerName } = props;
+    
+    const loginContext = useContext(LoginContext);
+    const { state: loginState } = loginContext;
 
     const [token, setToken] = useState<string | undefined>(undefined);
 
     async function getToken() {
-        if (appState.username && appState.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            const response = await client.getBotToken(appState.username, appState.accessToken, streamerName);
+            const response = await client.getBotToken(loginState.username, loginState.accessToken, streamerName);
             setToken(response?.botToken)
         }
     }
 
     async function refreshToken() {
-        if (appState.username && appState.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            const response = await client.refreshBotToken(appState.username, appState.accessToken, streamerName)
+            const response = await client.refreshBotToken(loginState.username, loginState.accessToken, streamerName)
             setTimeout(() => getToken(), 500)
         }
     }
 
     useEffect(() => {
         getToken();
-    }, [appState.username, appState.accessToken])
+    }, [loginState.username, loginState.accessToken])
 
     return (
         <Grid item xs={12}>

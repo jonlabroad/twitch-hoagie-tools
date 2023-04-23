@@ -1,44 +1,47 @@
 import { Grid, CircularProgress, TextField, Button } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import HoagieClient from "../../../service/HoagieClient";
 import { FlexCol, FlexRow } from "../../util/FlexBox";
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/Link';
 import { AppState } from "../../../state/AppState";
+import { StateContext } from "../../context/StateContextProvider";
+import { LoginContext } from "../../context/LoginContextProvider";
 
 export interface StreamerSongListConfigModuleProps {
-    appState: AppState
     streamerName: string
 }
 
 export const StreamerSongListConfigModule = (props: StreamerSongListConfigModuleProps) => {
-    const { appState, streamerName } = props;
+    const { streamerName } = props;
 
+    const { state: loginState } = useContext(LoginContext);
+    
     const [sslStatus, setSSLStatus] = useState("");
     const [token, setToken] = useState<string | undefined>(undefined);
 
     const connected = sslStatus === "CONNECTED";
 
     async function retrieveConnectionStatus() {
-        if (appState.username && appState.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            const status = await client.getSSLStatus(appState.username, appState.accessToken, streamerName);
+            const status = await client.getSSLStatus(loginState.username, loginState.accessToken, streamerName);
             setSSLStatus(status);
         }
     }
 
     async function sendToken(token?: string) {
-        if (token && token.length > 0 && appState.username && appState.accessToken) {
+        if (token && token.length > 0 && loginState.username && loginState.accessToken) {
             const tokenStripped = token.replaceAll('"', "");
             const client = new HoagieClient();
-            const response = await client.setSSLToken(tokenStripped, appState.username, appState.accessToken, streamerName);
+            const response = await client.setSSLToken(tokenStripped, loginState.username, loginState.accessToken, streamerName);
             retrieveConnectionStatus();
         }
     }
 
     useEffect(() => {
         retrieveConnectionStatus();
-    }, [appState.username, appState.accessToken])
+    }, [loginState.username, loginState.accessToken])
 
     return (
         <Grid item xs={12}>

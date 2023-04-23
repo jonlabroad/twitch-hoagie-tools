@@ -1,14 +1,17 @@
-import { useEffect, useRef } from "react";
-import { ChatMessage } from "../components/chat/SimpleChatDisplay";
+import { useContext, useEffect, useRef } from "react";
 import TwitchChatClient from "../service/TwitchChatClient";
-import { AppState } from "../state/AppState";
+import { StateContext } from "../components/context/StateContextProvider";
+import { LoginContext } from "../components/context/LoginContextProvider";
 
-export const useTwitchChatClient = (state: AppState, dispatch: any) => {
+export const useTwitchChatClient = () => {
+    const { state, dispatch } = useContext(StateContext)
+    const { state: loginState } = useContext(LoginContext)
+
     const chatClient = useRef(undefined as TwitchChatClient | undefined);
 
     useEffect(() => {
-        if (state.username && state.accessToken && state.streamer) {
-            chatClient.current = new TwitchChatClient(state.username, state.streamer, state.accessToken as string,
+        if (loginState.username && loginState.accessToken && state.streamer) {
+            chatClient.current = new TwitchChatClient(loginState.username, state.streamer, loginState.accessToken as string,
                 (msg) => {
                     dispatch({
                         type: "add_chat_message",
@@ -28,7 +31,7 @@ export const useTwitchChatClient = (state: AppState, dispatch: any) => {
         return function cleanup() {
             chatClient.current?.disconnect();
         }
-    }, [state.username, state.accessToken, state.streamer]);
+    }, [loginState.username, loginState.accessToken, state.streamer]);
 
     return chatClient;
 }

@@ -33,11 +33,11 @@ export const DonoTable = (props: DonoTableProps) => {
                 <TableHead>
                     <TableRow>
                         <TableCell><Typography style={{...tableHeaderStyle, width: "20%"}}>Username</Typography></TableCell>
+                        <TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Value</Typography></TableCell>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Dono</Typography></TableCell></Hidden>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Cheer</Typography></TableCell></Hidden>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Sub</Typography></TableCell></Hidden>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Gifted Subs</Typography></TableCell></Hidden>
-                        <TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Value</Typography></TableCell>
                         <TableCell><Typography style={{...tableHeaderStyle, width: "55%"}}>Requests</Typography></TableCell>
                     </TableRow>
                 </TableHead>
@@ -72,12 +72,12 @@ const DonoTableRow = (props: DonoTableRowProps) => {
 
     return <>
         <StyledTableRow>
-            <TableCell style={{width: "20%"}}>{userdata.SubKey}</TableCell>
+            <TableCell>{userdata.SubKey}</TableCell>
+            <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.dono ? Math.round(userdata.dono * 100) / 100 : ""}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.cheer}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.sub}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subgift}</TableCell></Hidden>
-            <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <TableCell align="left" style={{...tableHeaderStyle, width: "55%"}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>

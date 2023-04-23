@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import EventGenerator from "../../events/EventGenerator";
 import { ChatMessage } from "../chat/SimpleChatDisplay";
-import { StateContext } from "../MainPage";
 import { EventCard } from "./EventCard";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface EventsContainerProps {
 

@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { SongListSong } from "../../service/StreamerSongListClient";
-import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/SongQueue.scss";
 import { Card, Typography } from "@mui/material";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface SongQueueProps {
 }

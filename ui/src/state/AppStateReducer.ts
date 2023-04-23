@@ -1,5 +1,3 @@
-import { ExecOptionsWithStringEncoding } from "node:child_process";
-import { stringify } from "qs";
 import AlertType, { AlertTypeType } from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
@@ -8,7 +6,7 @@ import { ChannelData, StreamData, UserData } from "../service/TwitchClientTypes"
 import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_streamer" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
 }
 
 export interface AddAlertAction extends AppStateAction {
@@ -44,6 +42,10 @@ export interface LoginAction extends AppStateAction {
 export interface SetChannelInfoAction extends AppStateAction {
     userData: UserData;
     streamData: StreamData;
+}
+
+export interface SetStreamerAction extends AppStateAction {
+    streamer: string;
 }
 
 export interface SetChatConnectionAction extends AppStateAction {
@@ -126,14 +128,12 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
                 }
             }
         }
-        case "login": {
-            const loginAction = action as LoginAction;
+        case "set_streamer": {
+            const setStreamerAction = action as SetStreamerAction;
             return {
                 ...state,
-                username: loginAction.username,
-                accessToken: loginAction.accessToken,
-                isLoggedIn: loginAction.isLoggedIn,
-            };
+                streamer: setStreamerAction.streamer
+            }
         }
         case "set_channel_info": {
             const setChannelInfoAction = action as SetChannelInfoAction;

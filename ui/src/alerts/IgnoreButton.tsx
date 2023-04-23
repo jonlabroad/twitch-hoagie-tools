@@ -1,7 +1,7 @@
 import { Button } from "@mui/material"
 import React, { useContext } from "react"
-import { StateContext } from "../components/MainPage";
 import AlertType from "./AlertType";
+import { StateContext } from "../components/context/StateContextProvider";
 
 export interface IgnoreButtonProps {
     alert: AlertType

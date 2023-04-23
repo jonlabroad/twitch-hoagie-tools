@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import TwitchClient from "../../service/TwitchClient";
 import { UserData, UserFollows } from "../../service/TwitchClientTypes";
-import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { ChatMessage } from "./SimpleChatDisplay";
 
 import "../../styles/ChatUsers.scss";
 import { Card } from "@mui/material";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface ChatUser {
     userData: UserData

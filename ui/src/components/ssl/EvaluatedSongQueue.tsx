@@ -2,7 +2,6 @@ import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Typograph
 import { useContext, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
-import { StateContext } from "../MainPage";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
@@ -10,6 +9,7 @@ import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
 import { DonoData } from "../../service/HoagieClient";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { SslIcon } from "../icon/SslIcon";
+import { StateContext } from "../context/StateContextProvider";
 
 const format = require('format-duration')
 

@@ -1,10 +1,10 @@
 import React, { useContext } from "react"
-import { StateContext } from "./MainPage";
 import { FlexCol, FlexRow } from "./util/FlexBox"
 import MessageIcon from '@mui/icons-material/Message';
 
 import "../styles/ChannelHeader.scss";
 import { LiveIcon } from "./LiveIcon";
+import { StateContext } from "./context/StateContextProvider";
 
 export interface ChannelHeaderProps {
 

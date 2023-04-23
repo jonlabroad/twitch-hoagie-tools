@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 // @ts-ignore
 import io from 'socket.io-client';
@@ -6,7 +6,7 @@ import StreamerSongListClient from '../service/StreamerSongListClient';
 import { AppState, StateContextType } from '../state/AppState';
 import { UpdateSongHistoryAction, UpdateSongQueueAction } from '../state/AppStateReducer';
 
-export const useStreamerSongListEvents = (stateContext: StateContextType) => {
+export const useStreamerSongListEvents = (stateContext: StateContextType) => {   
     const client = useRef<any>(undefined);
 
     const [streamerId, setStreamerId] = useState<number | undefined>(undefined);

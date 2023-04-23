@@ -1,46 +1,43 @@
 import { Grid } from "@mui/material";
-import { useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Config from "../../Config";
 import { useSaveLastPath } from "../../hooks/LastPathHooks";
 import HoagieClient, { AdminData } from "../../service/HoagieClient";
-import { AppState, defaultAppState } from "../../state/AppState";
-import { appStateReducer } from "../../state/AppStateReducer";
-import { StateContext } from "../MainPage";
 import { PageHeader } from "../PageHeader";
 import { ChatTokenContainer } from "./ChatTokenContainer";
 import { StreamerListContainer } from "./StreamerListContainer";
+import { StateContext, StateContextProvider } from "../context/StateContextProvider";
+import { useParams } from "react-router";
+import { LoginContext } from "../context/LoginContextProvider";
 
 interface AdminPageProps {
 
 }
 
 export const AdminPage = (props: AdminPageProps) => {
-    const [appState, appStateDispatch] = useReducer(appStateReducer, {
-        ...defaultAppState,
-    } as AppState);
+    const { state } = useContext(StateContext)
+    const { streamer } = state;
+
+    const loginContext = useContext(LoginContext);
+    const { state: loginState } = loginContext;
 
     useSaveLastPath();
 
     const [adminData, setAdminData] = useState<AdminData | undefined>(undefined);
 
     async function getAdminConfig() {
-        if (appState.username && appState.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            const data = await client.getAdminConfig(appState.username, appState.accessToken);
+            const data = await client.getAdminConfig(loginState.username, loginState.accessToken);
             setAdminData(data);
         }
     }
 
     useEffect(() => {
         getAdminConfig();
-    }, [appState.username, appState.accessToken]);
+    }, [loginState.username, loginState.accessToken]);
 
     return <>
-        <StateContext.Provider value={{
-            dispatch: appStateDispatch,
-            state: appState,
-        }}>
-            <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={""} clientId={Config.clientId}/>
             <Grid container spacing={3}>
                 <Grid item style={{margin: 10}} xs={12}>
                     <StreamerListContainer streamers={adminData?.streamers ?? []} onChange={() => getAdminConfig()} />
@@ -49,6 +46,5 @@ export const AdminPage = (props: AdminPageProps) => {
                     <ChatTokenContainer config={adminData} onChange={() => getAdminConfig()} />
                 </Grid>
             </Grid>
-        </StateContext.Provider>
     </>
 }

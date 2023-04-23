@@ -10,9 +10,6 @@ export interface StateContextType {
 }
 
 export const defaultAppState: AppState = {
-    username: undefined,
-    accessToken: undefined,
-    isLoggedIn: false,
     chat: {
         connected: false,
         messages: [],
@@ -29,14 +26,11 @@ export const defaultAppState: AppState = {
 };
 
 export interface AppState {
-    username?: string;
     streamer?: string;
     streamerData?: {
         userData: UserData;
         streamData: StreamData;
     },
-    accessToken?: string;
-    isLoggedIn: boolean;
     chat: ChatState;
     alert: AlertState;
     event: EventState;

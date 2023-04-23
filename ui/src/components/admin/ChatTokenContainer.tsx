@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import HoagieClient, { AdminData } from "../../service/HoagieClient";
-import { StateContext } from "../MainPage";
 import { ChatToken } from "./ChatToken"
+import { StateContext } from "../context/StateContextProvider";
+import { LoginContext } from "../context/LoginContextProvider";
 
 interface ChatTokenContainerProps {
     config?: AdminData
@@ -10,16 +11,17 @@ interface ChatTokenContainerProps {
 }
 
 export const ChatTokenContainer = (props: ChatTokenContainerProps) => {
-    const { state } = useContext(StateContext);
+    const loginContext = useContext(LoginContext);
+    const { state: loginState } = loginContext;
 
     async function setChatToken(username: string, token: string) {
-        if (props.config && state.username && state.accessToken) {
+        if (props.config && loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
             await client.adminSetConfig({
                 ...props.config,
                 chatUsername: username,
                 chatToken: token,
-            }, state.username, state.accessToken);
+            }, loginState.username, loginState.accessToken);
             setTimeout(() => props.onChange(), 1000);
         }
     }

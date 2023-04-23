@@ -1,5 +1,5 @@
 import { Button, Card, Chip, CircularProgress, Grid, TextField } from "@mui/material"
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import HoagieClient from "../../service/HoagieClient";
 import { TwitchSubscription } from "../../service/TwitchClientTypes";
 import { AppState, defaultAppState } from "../../state/AppState";
@@ -15,6 +15,7 @@ import { SongListConfig } from "./SongListConfig";
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/Link';
 import Config from "../../Config";
+import { LoginContext } from "../context/LoginContextProvider";
 
 const chipColors: Record<string, any> = {
     "enabled": "success",
@@ -29,21 +30,24 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
         streamer: streamerName,
     } as AppState);
 
+    const loginContext = useContext(LoginContext);
+    const { state: loginState } = loginContext;
+
     const [subscriptions, setSubscriptions] = useState<TwitchSubscription[] | undefined>(undefined);
     const [streamerId, setStreamerId] = useState<number | undefined>(undefined);
 
     async function createSubscriptions() {
-        if (appState.accessToken && appState.username && appState.streamer) {
+        if (loginState.accessToken && loginState.username && appState.streamer) {
             const client = new HoagieClient();
-            const response = await client.createSubscriptions(appState.username, appState.streamer, appState.accessToken);
+            const response = await client.createSubscriptions(loginState.username, appState.streamer, loginState.accessToken);
             getSubscriptions();
         }
     }
 
     async function getSubscriptions() {
-        if (appState.username && appState.accessToken) {
+        if (loginState.username && loginState.accessToken) {
             const client = new HoagieClient();
-            const subs = await client.listSubscriptions(appState.username, appState.accessToken);
+            const subs = await client.listSubscriptions(loginState.username, loginState.accessToken);
             setSubscriptions(subs);
         }
     }
@@ -55,12 +59,12 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
 
     useEffect(() => {
         getSubscriptions();
-    }, [appState.username, appState.accessToken])
+    }, [loginState.username, loginState.accessToken])
 
     useEffect(() => {
         async function getStreamerId() {
-            if (appState.accessToken) {
-                const client = new TwitchClient(appState.accessToken);
+            if (loginState.accessToken) {
+                const client = new TwitchClient(loginState.accessToken);
                 const id = await client.getUserId(props.streamerName);
                 setStreamerId(id);
             }
@@ -76,7 +80,7 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
     }
 
     return <React.Fragment>
-        <PageHeader appState={appState} appStateDispatch={appStateDispatch} scopes={scopes} clientId={Config.clientId}/>
+        <PageHeader scopes={scopes} clientId={Config.clientId}/>
         <Grid container spacing={3}>
             <SongListConfig appState={appState} />
             <Grid item xs={12}>
@@ -88,17 +92,17 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
                         {subscriptionsToDisplay && subscriptionsToDisplay.length <= 0 && <LinkOffIcon style={{ color: "red", marginRight: 10 }} />}
                         <div style={{ color: subConnectionStatus === "CONNECTED" ? "green" : "red" }}>{subConnectionStatus}</div>
                     </FlexRow>
-                    {appState.accessToken && subConnectionStatus === "DISCONNECTED" && (
+                    {loginState.accessToken && subConnectionStatus === "DISCONNECTED" && (
                         <FlexCol style={{ maxWidth: 120 }}>
                             <Button color="secondary" variant="contained" onClick={() => createSubscriptions()}>Connect</Button>
                         </FlexCol>
                     )}
-                    {appState.accessToken && subConnectionStatus === "CONNECTED" && (
+                    {loginState.accessToken && subConnectionStatus === "CONNECTED" && (
                         <FlexCol style={{ maxWidth: 120 }}>
                             <Button color="primary" variant="contained" onClick={async () => {
-                                if (appState.username && appState.accessToken) {
+                                if (loginState.username && loginState.accessToken) {
                                     const client = new HoagieClient();
-                                    await Promise.all(subscriptionsToDisplay?.map(sub => client.deleteSubscription(sub.id, appState.username!, appState.accessToken!)) ?? []);
+                                    await Promise.all(subscriptionsToDisplay?.map(sub => client.deleteSubscription(sub.id, loginState.username!, loginState.accessToken!)) ?? []);
                                     getSubscriptions();
                                 }
                             }}>Disconnect</Button>
@@ -113,9 +117,9 @@ export const StreamerDashboard = (props: { streamerName: string, scopes: string 
                                     </div>
                                     <div className="sub-delete">
                                         <Button color="primary" variant="contained" className="sub-delete-button" onClick={async () => {
-                                            if (appState.username && appState.accessToken) {
+                                            if (loginState.username && loginState.accessToken) {
                                                 const client = new HoagieClient();
-                                                await client.deleteSubscription(sub.id, appState.username, appState.accessToken);
+                                                await client.deleteSubscription(sub.id, loginState.username, loginState.accessToken);
                                                 getSubscriptions();
                                             }
                                         }}>Delete</Button>

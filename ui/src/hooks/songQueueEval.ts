@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SongEvalConfig } from "../components/ssl/SongEvalConfig";
 import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
+import { LoginContext } from "../components/context/LoginContextProvider";
+import { LoginState } from "../state/LoginState";
 
 export type Evaluations = Record<string, any>;
 export type EvaluationsStatus = Record<string, EvaluationStatus>;
@@ -10,10 +12,10 @@ export interface EvaluationStatus {
     isError: boolean
 }
 
-async function readConfig(state: AppState) {
-    if (state.username && state.accessToken && state.streamer) {
+async function readConfig(state: AppState, loginState: LoginState) {
+    if (loginState.username && loginState.accessToken && state.streamer) {
         const client = new HoagieClient();
-        const config = await client.readSongEvalConfig(state.username, state.accessToken, state.streamer);
+        const config = await client.readSongEvalConfig(loginState.username, loginState.accessToken, state.streamer);
         return config as SongEvalConfig | undefined;
     }
 }
@@ -26,25 +28,26 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
     const [evaluationsStatus, setEvaluationsStatus] = useState<EvaluationsStatus>({});
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<SongEvalConfig | undefined>(undefined);
+    const { state: loginState } = useContext(LoginContext)
 
     useEffect(() => {
         updateConfig();
-    }, [state.username, state.accessToken])
+    }, [loginState.username, loginState.accessToken])
 
     const updateConfig = async () => {
-        const config = await readConfig(state);
+        const config = await readConfig(state, loginState);
         if (config) {
             setConfig(config);
         }
     }
 
     const onWhitelistWordChange = async (word: string, type: "add" | "remove") => {
-        if (state.username && state.accessToken && state.streamer) {
+        if (loginState.username && loginState.accessToken && state.streamer) {
             const client = new HoagieClient();
             if (type === "add") {
-                await client.addWhitelistWord(word, state.username, state.accessToken, state.streamer);
+                await client.addWhitelistWord(word, loginState.username, loginState.accessToken, state.streamer);
             } else if (type === "remove") {
-                await client.removeWhitelistWord(word, state.username, state.accessToken, state.streamer);
+                await client.removeWhitelistWord(word, loginState.username, loginState.accessToken, state.streamer);
             }
             await updateConfig();
         }
@@ -63,7 +66,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
 
     useEffect(() => {
         async function evalSongs() {
-            if (state.username && state.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
+            if (loginState.username && loginState.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
                 setIsLoading(true);
                 const client = new HoagieClient();
                 await Promise.all(songQueue.list.map(async (el) => {
@@ -74,7 +77,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                             let e: any | undefined = undefined;
                             try {
                                 setEvalLoading(songName, true, false)
-                                e = await client.songEval(songName, state.username ?? "", state.accessToken ?? "", streamer.toLowerCase());
+                                e = await client.songEval(songName, loginState.username ?? "", loginState.accessToken ?? "", streamer.toLowerCase());
                             } catch (err) {
                                 console.error(err);
                                 setEvalLoading(songName, false, true)
@@ -93,7 +96,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                                 const doLookup = !e?.songInfo;
                                 let spotifySong: any | undefined = undefined;
                                 if (doLookup && artist && title) {
-                                    spotifySong = await client.getSpotifySong(state.username ?? "", artist, title, state.accessToken ?? "", streamer.toLowerCase());
+                                    spotifySong = await client.getSpotifySong(loginState.username ?? "", artist, title, loginState.accessToken ?? "", streamer.toLowerCase());
                                 }
 
                                 setEvalLoading(songName, false, false)
@@ -114,7 +117,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
             }
         }
         evalSongs();
-    }, [state.username, state.accessToken, songQueue?.list]);
+    }, [loginState.username, loginState.accessToken, songQueue?.list]);
 
     return [evaluations ?? {}, isLoading, config, onWhitelistWordChange, evaluationsStatus];
 

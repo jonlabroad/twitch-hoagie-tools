@@ -3,7 +3,7 @@ import React, { useContext } from "react"
 import { useChatEvaluator } from "../../hooks/chatModHooks";
 import TwitchClient from "../../service/TwitchClient";
 import { ChatMessage } from "../chat/SimpleChatDisplay";
-import { StateContext } from "../MainPage";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface ChatEvaluatorContainerProps {
     lastMessage?: ChatMessage

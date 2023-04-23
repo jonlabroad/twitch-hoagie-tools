@@ -1,7 +1,7 @@
 import { Card } from "@mui/material";
 import React, { useContext } from "react"
-import { StateContext } from "../components/MainPage";
 import Config from "../Config";
+import { StateContext } from "../components/context/StateContextProvider";
 
 export interface EmbeddedVideoProps {
 

@@ -1,11 +1,13 @@
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer, useContext } from "react";
 import { StreamInfo } from "../components/dono/DonoTableContainer";
 import HoagieClient, { DonoData } from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
 import { defaultDonoState, DonoState } from "../state/DonoState";
 import { donoStateReducer, SetDonoLoadingAction, SetDonosAction } from "../state/DonoStateReducer";
+import { LoginContext } from "../components/context/LoginContextProvider";
 
 export function useDonoData(state: AppState, currentStreams: StreamInfo[] | undefined): [DonoState, any, () => any] {
+    const { state: loginState } = useContext(LoginContext)
 
     const [donoState, donoStateDispatch] = useReducer(donoStateReducer, {
         ...defaultDonoState,
@@ -13,14 +15,14 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
     } as DonoState);
 
     async function getDonos() {
-        if (state.username && state.accessToken && state.streamer && currentStreams && currentStreams.length > 0) {
+        if (loginState.username && loginState.accessToken && state.streamer && currentStreams && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",
                 loading: true,
             } as SetDonoLoadingAction)
             const client = new HoagieClient();
             try {
-                const data = await client.getDonos(state.username, state.accessToken, state.streamer, currentStreams.map(s => s.streamId))
+                const data = await client.getDonos(loginState.username, loginState.accessToken, state.streamer, currentStreams.map(s => s.streamId))
                 donoStateDispatch({
                     type: "set_donos",
                     donoData: data.donos,
@@ -38,7 +40,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
 
     useEffect(() => {
         getDonos();
-    }, [state.username, state.accessToken, state.streamer, currentStreams])
+    }, [loginState.username, loginState.accessToken, state.streamer, currentStreams])
 
     return [donoState, donoStateDispatch, getDonos]
 }

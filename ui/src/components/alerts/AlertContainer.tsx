@@ -10,9 +10,10 @@ import { IgnoreShoutoutModAction } from "../../state/AppState";
 import { AddAlertAction } from "../../state/AppStateReducer";
 import { ChatMessage } from "../chat/SimpleChatDisplay";
 import { ChatEvalCard } from "../chatEval/ChatEvalCard";
-import { AlertContext, StateContext } from "../MainPage";
 import { AlertCard } from "./AlertCard";
 import { ShoutoutAlertCard } from "./ShoutoutAlertCard";
+import { AlertContext } from "../context/AlertContextProvider";
+import { StateContext } from "../context/StateContextProvider";
 
 export interface AlertContainerProps {
 }
