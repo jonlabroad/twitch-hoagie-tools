@@ -1,8 +1,7 @@
-import { AppBar, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Hidden, Toolbar, Typography } from "@mui/material";
 import Config from "../Config";
 import { useLogin } from "../hooks/loginHooks";
 import LoginUtil from "../util/LoginUtil";
-import { DarkModeSwitch } from "./DarkModeSwitch";
 import { FlexRow } from "./util/FlexBox";
 import { HeaderMenu } from "./menu/HeaderMenu";
 import { useContext } from "react";
@@ -52,14 +51,15 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
               Hoagie Tools
             </Typography>
             {state.streamerData && (
-              <FlexRow>
-                <StreamerInfo />
-              </FlexRow>
+              <Hidden smDown>
+                <FlexRow>
+                  <StreamerInfo />
+                </FlexRow>
+              </Hidden>
             )}
           </FlexRow>
           {loginState.isLoggedIn ? (
             <FlexRow alignItems="center">
-              <DarkModeSwitch />
               <div>{loginState.username}</div>
               <Button
                 style={{

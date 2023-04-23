@@ -11,7 +11,6 @@ export const LoginRedirect = (props: LoginRedirectProps) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
     const [] = useLogin((username: string | undefined, accessToken: string, isLoggedIn: boolean) => {
-        console.log({username})
         if (username) {
             setLoggedIn(isLoggedIn);
         }
@@ -20,7 +19,6 @@ export const LoginRedirect = (props: LoginRedirectProps) => {
     useEffect(() => {
         if (loggedIn) {
             const pathString = LocalStorage.get("lastPath");
-            console.log({loggedIn, pathString})
             if (pathString) {
                 const path = JSON.parse(pathString);
                 const hostname = window.location.hostname;

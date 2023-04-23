@@ -1,5 +1,5 @@
 import { DashboardV1 } from "./components/DashboardV1";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { LoginRedirect } from "./components/LoginRedirect";
 
 import { StreamerDashboard } from "./components/auth/StreamerDashboard";
@@ -32,6 +32,7 @@ import { StateContextProvider } from "./components/context/StateContextProvider"
 import { PageHeader } from "./components/PageHeader";
 import Config from "./Config";
 import { LoginContextProvider } from "./components/context/LoginContextProvider";
+import { Redirect } from "./Redirect";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -102,7 +103,7 @@ function App() {
                       path="/config/:streamer"
                       element={<StreamerConfigPage />}
                     />
-                    <Route path="/dono/:streamer" element={<DonoPage />} />
+                    <Route path="/dono/:streamer" element={<Redirect to={"/s/:streamer/dono"}/>} />
                     <Route path="/spotify/config" element={<SpotifyConfig />} />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route
