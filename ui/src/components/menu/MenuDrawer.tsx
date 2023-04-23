@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { StreamerInfo } from "./StreamerInfo";
 import { useChannelInfo } from "../../hooks/channelInfoHooks";
 import { StateContext } from "../context/StateContextProvider";
+import { useNavigate } from "react-router";
 
 export interface MenuDrawerProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
     state: { streamerData },
   } = stateContext;
 
+  const navigate = useNavigate();
+
   useChannelInfo(state.streamer, stateContext);
 
   const currentPath = window.location.pathname;
@@ -37,10 +40,10 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
         <FlexCol alignItems="center" p={3} minWidth={200}>
           <StreamerInfo />
           <List dense>
-            <ListItemButton selected={currentPath === `/dono/${state.streamer}`} component={"a"} href={`/dono/${state.streamer}`}>
+            <ListItemButton selected={currentPath === `/s/${state.streamer}/dono`} onClick={() => navigate(`/s/${state.streamer}/dono`)}>
               <ListItemText>Song and Dono List</ListItemText>
             </ListItemButton>
-            <ListItemButton selected={currentPath === `/s/${state.streamer}`} component={"a"} href={`/s/${state.streamer}`}>
+            <ListItemButton selected={currentPath === `/s/${state.streamer}/raid`} onClick={() => navigate(`/s/${state.streamer}/raid`)}>
               <ListItemText>Raid Targets</ListItemText>
             </ListItemButton>
           </List>

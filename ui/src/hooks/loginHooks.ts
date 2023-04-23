@@ -1,7 +1,6 @@
 import qs from "qs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import TwitchClient from "../service/TwitchClient";
-import { AppState } from "../state/AppState";
 import LoginUtil from "../util/LoginUtil";
 
 export function useLogin(setLogin: (username: string | undefined, accessToken: string, loggedIn: boolean) => void) {
@@ -11,9 +10,6 @@ export function useLogin(setLogin: (username: string | undefined, accessToken: s
             if (window.location.hash) {
                 // User redirected from Twitch oauth
                 const parsed = qs.parse(window.location.hash.replace('#', ''));
-                const url = window.location.href.split('#')[0];
-                /* eslint-disable-next-line */
-                history.replaceState(null, '', url);
 
                 const twitchClient = new TwitchClient(parsed.access_token as string);
                 const validatedSession = await twitchClient.validateSession();

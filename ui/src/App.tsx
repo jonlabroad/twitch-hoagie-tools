@@ -76,15 +76,13 @@ function App() {
           <div className="App">
             <LoginContextProvider>
               <StateContextProvider>
-                <PageHeader scopes={Config.scopes} clientId={Config.clientId} />
                 <Router>
+                  <PageHeader scopes={Config.scopes} clientId={Config.clientId} />
                   <Routes>
-                    <Route path="/s/:streamer" element={<DashboardV2 />} />
+                    <Route path="/s/:streamer/dono" element={<DonoPage />} />
+                    <Route path="/s/:streamer/raid" element={<RaidDashboard />} />
+
                     <Route path="/s/:streamer/v1" element={<DashboardV1 />} />
-                    <Route
-                      path="/s/:streamer/raid"
-                      element={<RaidDashboard />}
-                    />
                     <Route path="/loginRedirect" element={<LoginRedirect />} />
                     {/*
                 <Route path="/config/thesongery">
