@@ -34,7 +34,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
   );
 
   return (
-    <AppBar position="static" enableColorOnDark>
+    <AppBar style={{ marginBottom: 10 }} position="static" enableColorOnDark>
       <Toolbar variant="dense">
         <FlexRow>
           <div>
@@ -48,7 +48,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
         >
           <FlexRow>
             <Typography variant="h6" style={{ marginRight: "20px" }}>
-              Hoagie Tools
+              HoagieTools
             </Typography>
             {state.streamerData && (
               <Hidden smDown>

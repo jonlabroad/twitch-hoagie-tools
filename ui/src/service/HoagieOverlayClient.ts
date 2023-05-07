@@ -33,7 +33,7 @@ export default class HoagieClient {
     }
 
     async createSubscriptions(username: string, channelName: string, accessToken: string) {
-        const response = await axios.get(`${this.BASE_URL}createsubscriptions?username=${username}&channelname=${channelName}`, {
+        const response = await axios.get(`${this.BASE_URL}createsubscriptions?username=${username}&streamername=${channelName}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }

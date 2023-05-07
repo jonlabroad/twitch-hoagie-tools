@@ -10,14 +10,9 @@ export default class Config {
     public static GeniusClientSecret = process.env.GENIUS_CLIENT_SECRET ?? "";
     public static BadWordsSecret = process.env.BAD_WORDS_SECRET ?? "";
 
-    // TODO put in database and allow admins to add/remove other admins
+    // TODO put in database
     public static AdminUserNames = [
         "hoagieman5000",
-        "hoagiebot5000",
-    ];
-
-    public static StreamerUserNames = [
-        "thesongery"
     ];
 
     public static validate(additionalVars?: string[]) {
@@ -26,10 +21,6 @@ export default class Config {
                 throw new Error(`Missing env var ${varName}`);
             }
         })
-    }
-
-    public static isAdminOrStreamer(username: string) {
-        return Config.isAdmin(username) || Config.StreamerUserNames.includes(username);
     }
 
     public static isAdmin(username: string) {

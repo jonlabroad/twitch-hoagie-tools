@@ -6,7 +6,8 @@ export default interface TwitchWebhookEvent<T> {
         status: string
         cost: number
         condition: {
-            broadcaster_user_id: string
+            from_broadcaster_user_id: string
+            to_broadcaster_user_id: string
         },
         transport: {
             method: string

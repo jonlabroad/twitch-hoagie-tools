@@ -6,11 +6,10 @@ import {
   StateContext,
 } from "../context/StateContextProvider";
 import { useStreamerName } from "../../hooks/useStreamerName";
-import { RaidConfigModule } from "./modules/RaidConfigModule";
 
-export interface StreamerConfigProps {}
+export interface StreamerAdminPageProps {}
 
-export const StreamerConfigPage = (props: StreamerConfigProps) => {
+export const StreamerAdminPage = (props: StreamerAdminPageProps) => {
   const {
     state: { streamer },
   } = useContext(StateContext);
@@ -18,8 +17,8 @@ export const StreamerConfigPage = (props: StreamerConfigProps) => {
 
   return (
     <>
-      <ModsModule streamerName={streamer ?? ""} />
-      <RaidConfigModule streamer={streamer ?? ""}/>
+      <BotConfigModule streamerName={streamer ?? ""} />
+      <StreamerSongListConfigModule streamerName={streamer ?? ""} />
     </>
   );
 };

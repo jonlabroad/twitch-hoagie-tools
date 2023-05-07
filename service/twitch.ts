@@ -23,6 +23,7 @@ import ConfigProvider from "./src/config/ConfigProvider";
 import DonoDbClient from "./src/channelDb/DonoDbClient";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
+import AdminDbClient from "./src/channelDb/AdminDbClient";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,7 +39,7 @@ const followCacheHeaders = {
   "Cache-Control": "max-age=5",
 };
 
-const handlers = new TwitchEventhandler([TheSongeryHandlers, TestHandlers]);
+const handler = new TwitchEventhandler();
 
 module.exports.twitchwebhook = async (event: APIGatewayProxyEvent) => {
   console.log(JSON.stringify(event, null, 2));
@@ -60,8 +61,14 @@ module.exports.twitchwebhook = async (event: APIGatewayProxyEvent) => {
     };
   }
 
+  const adminClient = new AdminDbClient()
+  const adminConfig = await adminClient.read()
+  if (!adminConfig) {
+    throw new Error("Unable to read admin configuration")
+  }
+
   const body = JSON.parse(event.body ?? "{}") as TwitchWebhookEvent<any>;
-  await handlers.handle(body);
+  await handler.handle(body);
 
   return {
     statusCode: 200,
@@ -143,17 +150,13 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const authResponse = await TwitchRequestAuthenticator.auth(event);
-    if (authResponse) {
-      return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
       return authenticationResponse;
     }
 
-    const streamerLogin = event.queryStringParameters?.["channelname"] ?? "";
+    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
     console.log(`Creating subscriptions for ${streamerLogin}`);
     return {
       statusCode: 200,
@@ -213,18 +216,13 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const authResponse = await TwitchRequestAuthenticator.auth(event);
-    if (authResponse) {
-      console.log(`Unauthorized: ${authResponse.statusCode}`);
-      return authResponse;
-    }
-
-    const authenticationResponse = await ModAuthorizer.auth(event);
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
     if (authenticationResponse) {
       return authenticationResponse;
     }
 
-    const streamerLogin = event.queryStringParameters?.["streamerLogin"] ?? "";
+    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
 
     return {
       statusCode: 200,

@@ -1,21 +1,23 @@
 import RaidDbClient from "../../channelDb/RaidDbClient";
-import TwitchClient from "../../twitch/TwitchClient";
 import TwitchWebhookEvent from "../../twitch/TwitchWebhook";
 import { EventHandler } from "../EventHandler";
 import { RaidEvent } from "../events/RaidEvent";
 
-export default class RaidHandler implements EventHandler {
-    broadcasterLogin: string;
+export class RaidHandler implements EventHandler {
+  constructor() {}
 
-    constructor(broadcasterLogin: string) {
-        this.broadcasterLogin = broadcasterLogin.toLowerCase();
-    }
+  async handle(rawEvent: TwitchWebhookEvent<any>) {
+    const event = rawEvent as TwitchWebhookEvent<RaidEvent>;
+    const relevantStreamerIds = [
+      event.subscription.condition.from_broadcaster_user_id.toLowerCase(),
+      event.subscription.condition.to_broadcaster_user_id.toLowerCase(),
+    ].filter((s) => !!s);
 
-    async handle(rawEvent: TwitchWebhookEvent<any>) {
-        const event = rawEvent as TwitchWebhookEvent<RaidEvent>;
-        if (event.event.from_broadcaster_user_login.toLowerCase() === this.broadcasterLogin || event.event.to_broadcaster_user_login.toLowerCase() === this.broadcasterLogin) {
-            const client = new RaidDbClient(this.broadcasterLogin);
-            await client.writeRaid(event.event);   
-        }
-    }
+    await Promise.all(
+      relevantStreamerIds.map(async (streamerId) => {
+        const client = new RaidDbClient(streamerId);
+        await client.writeRaid(event.event);
+      })
+    );
+  }
 }

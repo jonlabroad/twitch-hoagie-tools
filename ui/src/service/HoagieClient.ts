@@ -46,7 +46,7 @@ export default class HoagieClient {
     }
 
     async createSubscriptions(username: string, channelName: string, accessToken: string) {
-        const response = await axios.get(`${this.BASE_URL}createsubscriptions?channelname=${channelName}`, {
+        const response = await axios.get(`${this.BASE_URL}createsubscriptions?streamername=${channelName}`, {
             headers: this.getHeaders(username, accessToken)
         });
         return response.data;
@@ -132,7 +132,7 @@ export default class HoagieClient {
     }
 
     async getRaids(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.BASE_URL}raiddata?streamerLogin=${streamerName}`, {
+        const response = await axios.get(`${this.BASE_URL}raiddata?streamername=${streamerName}`, {
             headers: this.getHeaders(username, accessToken)
         });
         return response.data as {
