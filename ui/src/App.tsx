@@ -111,23 +111,6 @@ function App() {
                         element={<LoginRedirect />}
                       />
                       <Route
-                        path="/config/thesongery"
-                        element={
-                          <StreamerDashboard
-                            streamerName="thesongery"
-                            scopes={"channel:read:redemptions"}
-                          />
-                        }
-                      />
-                      {/*
-                <Route path="/config/hoagieman5000">
-                  <StreamerDashboard
-                    streamerName="hoagieman5000"
-                    scopes={"channel:read:redemptions"}
-                  />
-                </Route>
-                */}
-                      <Route
                         path="/config/:streamer"
                         element={<StreamerConfigPage />}
                       />

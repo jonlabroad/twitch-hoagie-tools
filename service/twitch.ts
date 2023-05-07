@@ -10,8 +10,6 @@ import CreateSubscriptions from "./src/twitch/CreateSubscriptions";
 import TwitchRequestAuthenticator from "./src/twitch/TwitchRequestAuthenticator";
 import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
-import { TheSongeryHandlers } from "./src/eventsub/TheSongeryHandlers";
-import { TestHandlers } from "./src/eventsub/TestHandlers";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 import RaidProvider from "./src/twitch/RaidProvider";
 import TwitchProvider from "./src/twitch/TwitchProvider";
