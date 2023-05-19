@@ -148,7 +148,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                   )
                 : undefined;
               const userName =
-                evaluation?.user ?? queueSong.requests[0].name ?? "";
+                evaluation?.user ?? queueSong.requests[0]?.name ?? "";
               const evaluationStatus = props.evaluationsStatus[songKey];
               return (
                 <>

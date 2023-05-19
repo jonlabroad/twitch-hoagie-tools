@@ -66,6 +66,7 @@ export interface StreamData {
     language: string
     thumbnail_url: string
     tag_ids: string[]
+    tags: string[]
     is_mature: false
 }
 
