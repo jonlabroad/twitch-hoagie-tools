@@ -212,6 +212,29 @@ functions:
       GENIUS_CLIENT_SECRET: ${file(secrets.yml):geniusClientSecret}
       BAD_WORDS_SECRET: ${file(secrets.yml):badWordsSecret}
 
+  # songevaldotnet:
+  #   runtime: dotnet6.0
+  #   handler: SongEval::SongEvalFunction.Function::Eval
+  #   timeout: 600
+  #   events:
+  #     - http:
+  #         method: GET
+  #         path: /api/dotnet/songeval/eval
+  #         cors: true
+  #         parameters:
+  #           querystrings:
+  #             username: true
+  #             query: true
+  #         authorizer:
+  #           name: twitchAuthenticator
+  #   environment:
+  #     TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+  #     TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+  #     STAGE: ${self:custom.myStage}
+  #     TABLENAME: ${self:custom.myTableName}
+  #     GENIUS_CLIENT_SECRET: ${file(secrets.yml):geniusClientSecret}
+  #     BAD_WORDS_SECRET: ${file(secrets.yml):badWordsSecret}
+
   listsubscriptions:
     handler: twitch.listsubscriptions
     events:
