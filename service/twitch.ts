@@ -37,6 +37,10 @@ const followCacheHeaders = {
   "Cache-Control": "max-age=5",
 };
 
+const donoDataHeaders = {
+  "Cache-Control": "max-age=1",
+}
+
 const handler = new TwitchEventhandler();
 
 module.exports.twitchwebhook = async (event: APIGatewayProxyEvent) => {
@@ -310,7 +314,7 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
       ),
       headers: {
         ...corsHeaders,
-        ...followCacheHeaders,
+        ...donoDataHeaders,
       },
     };
   } catch (err) {

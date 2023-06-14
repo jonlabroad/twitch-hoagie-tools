@@ -50,6 +50,10 @@ provider:
         Fn::GetAtt:
           - HoagieToolsDatabase
           - Arn
+    - Effect: Allow
+      Action:
+        - events:PutEvents
+      Resource: arn:aws:events:*:796987500533:event-bus/default
   environment:
     PERSPECTIVE_API_KEY: ${file(secrets.yml):perspectiveApiKey}
 
@@ -632,4 +636,7 @@ resources:
           - AttributeName: SubKey
             KeyType: RANGE
         TableName: ${self:custom.myTableName}
+        TimeToLiveSpecification:
+          AttributeName: ExpirationTTL
+          Enabled: true
         BillingMode: PAY_PER_REQUEST

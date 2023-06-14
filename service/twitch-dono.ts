@@ -3,6 +3,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import Config from "./src/Config";
 import DonoProvider from "./src/twitch/DonoProvider";
+import { HoagieEventPublisher } from "./src/eventbus/HoagieEventPublisher";
+import TwitchClient from "./src/twitch/TwitchClient";
 
 export const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -34,10 +36,15 @@ module.exports.adddono = async (event: APIGatewayProxyEvent) => {
 
         const data = JSON.parse(event.body ?? "{}") as SetDonoRequest;
         console.log({ data });
+        const donoData = await DonoProvider.setDono(data);
+
+        const broadcasterId = await (new TwitchClient()).getUserId(data.streamerLogin);
+        await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, data);
+
         return {
             statusCode: 200,
             body: JSON.stringify({
-                donos: await DonoProvider.setDono(data),
+                donos: donoData,
             }, null, 2),
             headers: {
                 ...corsHeaders,

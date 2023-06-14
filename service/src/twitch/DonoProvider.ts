@@ -45,6 +45,7 @@ export default class DonoProvider {
 
     public static async setDono(request: SetDonoRequest) {
         const client = new DonoDbClient(request.streamerLogin);
-        return await client.add(request);
+        const donos = await client.add(request);
+        return donos;
     }
 }

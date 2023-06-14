@@ -1,6 +1,6 @@
-import { Button, CircularProgress, Grid, IconButton } from "@mui/material";
+import { Button, CircularProgress, Grid, Icon, IconButton, Tooltip } from "@mui/material";
 import { ArrowLeft, ArrowRight } from "@mui/icons-material";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
 import { DonoUtil } from "../../util/DonoUtil";
 import { FlexCol, FlexRow } from "../util/FlexBox";
@@ -8,6 +8,8 @@ import { DonoTable } from "./DonoTable";
 import { StateContext } from "../context/StateContextProvider";
 import { DonoContext } from "./DonoContextProvider";
 import { LoginContext } from "../context/LoginContextProvider";
+import { useHoagieSockets } from "../../hooks/hoagieSocketHooks";
+import UpdateIcon from '@mui/icons-material/Update';
 
 interface DonoTableContainerProps {
     streamHistory: StreamInfo[] | undefined
@@ -30,28 +32,20 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     const { state: donoState, refreshDonos } = donoContext;
     const { donoData, loading } = donoState;
     const { streamHistory, currentStreams, getNextStream, isFirstStream, isLastStream } = props;
+    const currentStreamsRef = useRef(currentStreams);
     
+    const [hoagieSockets, isHoagieSocketConnected] = useHoagieSockets((msg: any) => {
+        console.log({refreshDonos: msg})
+        setTimeout(() => refreshDonos(currentStreamsRef.current ?? []), 1000);
+    });
+
     const { eligible, notEligible } = DonoUtil.getEligibleDonos(donoData, 5)
 
     useStreamerSongListEvents(stateContext);
 
     useEffect(() => {
-        function scheduleRefresh() {
-            setTimeout(() => {
-                console.log("auto refresh")
-                refreshDonos()
-                const currentStream = currentStreams?.[0]
-                if (currentStream) {
-                    const streamStartDate = new Date(currentStream.timestamp)
-                    const now = Date.now()
-                    if (now - streamStartDate.getTime() < 8 * 60 * 60 * 1e3) {
-                        scheduleRefresh()
-                    }
-                }
-            }, 120000)
-        }
-        scheduleRefresh()
-    }, [])
+        currentStreamsRef.current = currentStreams;
+    }, [currentStreams])
 
     const isLoggedIn = loginState.isLoggedIn && loginState.accessToken && loginState.username;
 
@@ -94,9 +88,18 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
                 </IconButton>
 
             </FlexRow>
-            <div style={{ marginLeft: 10, marginTop: 10 }}>
-                <Button style={{ height: 40, width: 100 }} variant="contained" onClick={() => refreshDonos()} disabled={loading}>{loading ? <CircularProgress size={25} /> : "Refresh"}</Button>
-            </div>
+            <FlexRow alignItems="center" style={{ marginLeft: 10, marginTop: 10 }}>
+                <Button
+                    style={{ height: 40, width: 100, marginRight: 10 }}
+                    variant="contained"
+                    onClick={() => refreshDonos(currentStreamsRef.current ?? [])}
+                    disabled={loading}>
+                    {loading ? <CircularProgress size={25} /> : "Refresh"}
+                </Button>
+                <Tooltip title={isHoagieSocketConnected ? "Auto-updating" : "No connection :("}>
+                    <UpdateIcon color={isHoagieSocketConnected ? "primary" : "disabled"}/>
+                </Tooltip>
+            </FlexRow>
             <DonoTable
                 eligibleDonoData={eligible ?? []}
                 notEligibleDonoData={notEligible ?? []}

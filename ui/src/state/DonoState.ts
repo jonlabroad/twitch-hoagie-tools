@@ -13,7 +13,7 @@ export interface DonoStateContextType {
         getNextStream: (dir: number) => void
     },
 
-    refreshDonos: () => any
+    refreshDonos: (currentStreams: StreamInfo[]) => any
 }
 
 export interface DonoState {

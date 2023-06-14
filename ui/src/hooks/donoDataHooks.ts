@@ -6,7 +6,7 @@ import { defaultDonoState, DonoState } from "../state/DonoState";
 import { donoStateReducer, SetDonoLoadingAction, SetDonosAction } from "../state/DonoStateReducer";
 import { LoginContext } from "../components/context/LoginContextProvider";
 
-export function useDonoData(state: AppState, currentStreams: StreamInfo[] | undefined): [DonoState, any, () => any] {
+export function useDonoData(state: AppState, currentStreams: StreamInfo[] | undefined): [DonoState, any, (currentStreams: StreamInfo[]) => any] {
     const { state: loginState } = useContext(LoginContext)
 
     const [donoState, donoStateDispatch] = useReducer(donoStateReducer, {
@@ -14,8 +14,9 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
         streamer: state.streamer,
     } as DonoState);
 
-    async function getDonos() {
-        if (loginState.username && loginState.accessToken && state.streamer && currentStreams && currentStreams.length > 0) {
+    async function getDonos(currentStreams: StreamInfo[]) {
+        console.log([loginState.username, loginState.accessToken, state.streamer, currentStreams, currentStreams?.length]);
+        if (loginState.username && loginState.accessToken && state.streamer && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",
                 loading: true,
@@ -39,7 +40,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
     }
 
     useEffect(() => {
-        getDonos();
+        getDonos(currentStreams ?? []);
     }, [loginState.username, loginState.accessToken, state.streamer, currentStreams])
 
     return [donoState, donoStateDispatch, getDonos]

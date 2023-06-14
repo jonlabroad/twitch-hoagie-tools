@@ -3,6 +3,8 @@ import { stringify } from "querystring";
 import { SetDonoRequest } from "../../twitch-dono";
 import Config from "../Config";
 
+const defaultExpirySec = 60 * 24 * 60 * 60;
+
 export interface DonoData {
     SubKey: string
     dono: number;
@@ -124,8 +126,8 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #dono = if_not_exists(#dono, :start) + :amount, #data = :data",
-                ExpressionAttributeNames: { "#dono": "dono", "#data": "data" },
+                UpdateExpression: "SET #dono = if_not_exists(#dono, :start) + :amount, #data = :data, #ExpirationTTL = :expiration",
+                ExpressionAttributeNames: { "#dono": "dono", "#data": "data", "#ExpirationTTL": "ExpirationTTL" },
                 ExpressionAttributeValues: {
                     ":amount": amount,
                     ":start": 0,
@@ -134,6 +136,7 @@ export default class DonoDbClient {
                         streamId: streamId.toLowerCase(),
                         channel: this.broadcasterLogin.toLowerCase(),
                     },
+                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
                 }
             }
             await client.update(input).promise();
@@ -152,8 +155,8 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #cheer = if_not_exists(#cheer, :start) + :bits, #data = :data",
-                ExpressionAttributeNames: { "#cheer": "cheer", "#data": "data" },
+                UpdateExpression: "SET #cheer = if_not_exists(#cheer, :start) + :bits, #data = :data, #ExpirationTTL = :expiration",
+                ExpressionAttributeNames: { "#cheer": "cheer", "#data": "data", "#ExpirationTTL": "ExpirationTTL" },
                 ExpressionAttributeValues: {
                     ":bits": parseInt(bits.toString()),
                     ":start": 0,
@@ -162,6 +165,7 @@ export default class DonoDbClient {
                         streamId: streamId.toLowerCase(),
                         channel: this.broadcasterLogin.toLowerCase(),
                     },
+                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
                 }
             }
             console.log(JSON.stringify(input, null, 2));
@@ -181,8 +185,8 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #sub = :sub, #data = :data, #tier = :tier",
-                ExpressionAttributeNames: { "#sub": "sub", "#data": "data", "#tier": "tier" },
+                UpdateExpression: "SET #sub = :sub, #data = :data, #tier = :tier, #ExpirationTTL = :expiration",
+                ExpressionAttributeNames: { "#sub": "sub", "#data": "data", "#tier": "tier", "#ExpirationTTL": "ExpirationTTL" },
                 ExpressionAttributeValues: {
                     ":sub": 1,
                     ":tier": tier,
@@ -191,6 +195,7 @@ export default class DonoDbClient {
                         streamId: streamId.toLowerCase(),
                         channel: this.broadcasterLogin.toLowerCase(),
                     },
+                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
                 }
             }
             console.log({ input });
@@ -211,8 +216,8 @@ export default class DonoDbClient {
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
                 TableName: Config.tableName,
                 Key: key,
-                UpdateExpression: "SET #subgift = if_not_exists(#subgift, :start) + :subs, #data = :data, #tier = :tier",
-                ExpressionAttributeNames: { "#subgift": "subgift", "#data": "data", "#tier": "tier" },
+                UpdateExpression: "SET #subgift = if_not_exists(#subgift, :start) + :subs, #data = :data, #tier = :tier, #ExpirationTTL = :expiration",
+                ExpressionAttributeNames: { "#subgift": "subgift", "#data": "data", "#tier": "tier", "#ExpirationTTL": "ExpirationTTL" },
                 ExpressionAttributeValues: {
                     ":start": 0,
                     ":subs": subs,
@@ -222,6 +227,7 @@ export default class DonoDbClient {
                         streamId: streamId.toLowerCase(),
                         channel: this.broadcasterLogin.toLowerCase(),
                     },
+                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
                 }
             }
             await client.update(input).promise();

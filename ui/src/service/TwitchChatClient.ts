@@ -34,8 +34,6 @@ export default class TwitchChatClient {
             this.ws.onmessage = (event: ChatEvent) => {
                 this.pong(event.data);
                 const msg = event.data;
-                console.log(msg);
-
                 const parsedMessage = ChatParser.parse(msg);
                 if (parsedMessage) {
                     this.onMessage(parsedMessage);
