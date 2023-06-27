@@ -21,6 +21,7 @@ export default class DonoProvider {
             donoData.donos.forEach(dono => {
                 const existingDono = combinedDonos.find(d => d.SubKey.toLowerCase() === dono.SubKey.toLowerCase())
                 if (existingDono) {
+                    existingDono.hypechat += dono.hypechat ?? 0
                     existingDono.cheer += dono.cheer
                     existingDono.dono += dono.dono
                     existingDono.sub += dono.sub
@@ -40,7 +41,7 @@ export default class DonoProvider {
     }
 
     static getValue(dono: DonoData) {
-        return (dono.dono ?? 0) + (dono.cheer ?? 0) / 100 + (dono.sub ?? 0) * (5 * (dono.tier ?? 1)) + (dono.subgift ?? 0) * (5 * (dono.tier ?? 1));
+        return (dono.dono ?? 0) + (dono.hypechat ?? 0) + (dono.cheer ?? 0) / 100 + (dono.sub ?? 0) * (5 * (dono.tier ?? 1)) + (dono.subgift ?? 0) * (5 * (dono.tier ?? 1));
     }
 
     public static async setDono(request: SetDonoRequest) {

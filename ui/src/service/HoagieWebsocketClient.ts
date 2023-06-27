@@ -3,37 +3,24 @@ import ChatParser from "./ChatParser";
 
 const hoagieWebsocketUrl = "wss://ws-prod.hoagieman.net";
 
-interface HoagieEvent<T = any> {
+export interface HoagieEvent {
   topic: string;
   type: string;
-  data: T;
+  data: string;
 }
 
 export default class HoagieWebsocketClient {
   ws: any = undefined;
   connected: boolean = false;
-  onMessage: (msg: string) => void;
+  onMessage: (msg: HoagieEvent) => void;
   onConnectionChange: (connected: boolean) => void;
 
   constructor(
-    onMessage: (msg: string) => void,
+    onMessage: (msg: HoagieEvent) => void,
     onConnectionChange: (connected: boolean) => void
   ) {
     this.onMessage = onMessage;
     this.onConnectionChange = onConnectionChange;
-  }
-
-  subscribeDono(broadcasterId: number) {
-    this.ws.send(JSON.stringify({
-        action: "subscribe",
-        topic: `dono.${broadcasterId}`
-    }));
-  }
-
-  ping() {
-    this.ws.send(JSON.stringify({
-        action: "ping"
-    }));
   }
 
   connect() {
@@ -43,14 +30,18 @@ export default class HoagieWebsocketClient {
       this.ws.onopen = this.onConnect.bind(this);
       this.ws.onclose = this.onDisconnect.bind(this);
       this.ws.onmessage = (event: HoagieEvent) => {
-        const msg = event.data;
-        this.onMessage(msg);
+        this.onMessage(event);
       };
     }
   }
 
   disconnect() {
     this.ws.close();
+  }
+
+  send(msg: string) {
+    console.log({sending: msg});
+    this.ws.send(msg);
   }
 
   onConnect() {

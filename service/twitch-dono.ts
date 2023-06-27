@@ -23,7 +23,7 @@ const followCacheHeaders = {
 export interface SetDonoRequest {
     streamerLogin: string
     userLogin: string
-    type: "cheer" | "dono" | "sub" | "subgift"
+    type: "cheer" | "dono" | "sub" | "subgift" | "hypechat"
     amount: number
     tier: 1 | 2 | 3;
 }

@@ -9,6 +9,7 @@ export interface DonoData {
     SubKey: string
     dono: number;
     cheer: number
+    hypechat: number
     data: any
     sub: number
     subgift: number
@@ -103,6 +104,9 @@ export default class DonoDbClient {
                     case "subgift":
                         console.log("Adding subgift");
                         return await this.addGiftSubs(request.userLogin, latestStreamId, request.tier ?? 1);
+                    case "hypechat":
+                        console.log("Adding hypechat");
+                        return await this.addHypechat(request.userLogin, latestStreamId, request.amount);    
                     default:
                         console.error(`Do not understand dono type ${request.type}`);
                 }
@@ -128,6 +132,35 @@ export default class DonoDbClient {
                 Key: key,
                 UpdateExpression: "SET #dono = if_not_exists(#dono, :start) + :amount, #data = :data, #ExpirationTTL = :expiration",
                 ExpressionAttributeNames: { "#dono": "dono", "#data": "data", "#ExpirationTTL": "ExpirationTTL" },
+                ExpressionAttributeValues: {
+                    ":amount": amount,
+                    ":start": 0,
+                    ":data": {
+                        username: username.toLowerCase(),
+                        streamId: streamId.toLowerCase(),
+                        channel: this.broadcasterLogin.toLowerCase(),
+                    },
+                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
+                }
+            }
+            await client.update(input).promise();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    public async addHypechat(username: string, streamId: string, amount: number) {
+        try {
+            const client = new DynamoDB.DocumentClient();
+            const key = {
+                CategoryKey: this.getKey(this.broadcasterLogin, streamId),
+                SubKey: this.getSort(username),
+            };
+            const input: DynamoDB.DocumentClient.UpdateItemInput = {
+                TableName: Config.tableName,
+                Key: key,
+                UpdateExpression: "SET #hypechat = if_not_exists(#hypechat, :start) + :amount, #data = :data, #ExpirationTTL = :expiration",
+                ExpressionAttributeNames: { "#hypechat": "hypechat", "#data": "data", "#ExpirationTTL": "ExpirationTTL" },
                 ExpressionAttributeValues: {
                     ":amount": amount,
                     ":start": 0,

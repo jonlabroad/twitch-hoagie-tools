@@ -5,6 +5,7 @@ export interface DonoData {
     SubKey: string
     dono: number
     cheer: number
+    hypechat: number
     data: any
     sub: number
     subgift: number

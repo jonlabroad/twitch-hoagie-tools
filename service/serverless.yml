@@ -6,6 +6,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-prune-plugin
+  - serverless-plugin-log-retention
 frameworkVersion: '2'
 
 custom:
@@ -26,6 +27,7 @@ custom:
       - Access-Control-Request-Headers
       - Access-Control-Allow-Credentials
     # Unfortunately, the DefaultTTL must be set manually
+  logRetentionInDays: 30 # used to set a global value for all functions
 
 provider:
   name: aws

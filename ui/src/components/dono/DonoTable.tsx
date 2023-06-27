@@ -38,6 +38,7 @@ export const DonoTable = (props: DonoTableProps) => {
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Cheer</Typography></TableCell></Hidden>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Sub</Typography></TableCell></Hidden>
                         <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Gifted Subs</Typography></TableCell></Hidden>
+                        <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle, width: "5%"}}>Hype Chat</Typography></TableCell></Hidden>
                         <TableCell><Typography style={{...tableHeaderStyle, width: "55%"}}>Requests</Typography></TableCell>
                     </TableRow>
                 </TableHead>
@@ -45,7 +46,7 @@ export const DonoTable = (props: DonoTableProps) => {
                     {eligibleDonoData?.map(userdata => (
                         <DonoTableRow userdata={userdata} songQueue={songQueue} songHistory={songHistory} />
                     ))}
-                    <TableRow style={{ backgroundColor: theme.palette.secondary.dark}}><TableCell colSpan={7} style={{ height: 20 }}></TableCell></TableRow>
+                    <TableRow style={{ backgroundColor: theme.palette.secondary.dark}}><TableCell colSpan={8} style={{ height: 20 }}></TableCell></TableRow>
                     {notEligibleDonoData?.map(userdata => (
                         <DonoTableRow userdata={userdata} />
                     ))}
@@ -78,6 +79,7 @@ const DonoTableRow = (props: DonoTableRowProps) => {
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.cheer}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.sub}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subgift}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.hypechat}</TableCell></Hidden>
             <TableCell align="left" style={{...tableHeaderStyle, width: "55%"}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>

@@ -4,8 +4,9 @@ import { StateContext } from "../components/context/StateContextProvider";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import HoagieWebsocketClient from "../service/HoagieWebsocketClient";
 import TwitchClient from "../service/TwitchClient";
+import { HoagieSocketEventListener } from "../service/HoagieSocketEventListener";
 
-export const useHoagieSockets = (onMessage: (msg: any) => void) => {
+export const useHoagieSockets = (onDono: (msg: any) => void) => {
   const { state, dispatch } = useContext(StateContext);
   const { state: loginState } = useContext(LoginContext);
 
@@ -13,11 +14,14 @@ export const useHoagieSockets = (onMessage: (msg: any) => void) => {
   const isConnectedRef = useRef<boolean>(isConnected);
   const pingHandler = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const socketClient = useRef(undefined as HoagieWebsocketClient | undefined);
+  const socketClient = useRef(undefined as HoagieSocketEventListener | undefined);
+
+  useEffect(() => {
+    isConnectedRef.current = isConnected;
+  }, [isConnected])
 
   const ping = () => {
     try {
-      console.log("hoagie ping");
       if (socketClient.current && isConnectedRef.current) {
         socketClient.current.ping();
       }
@@ -28,19 +32,10 @@ export const useHoagieSockets = (onMessage: (msg: any) => void) => {
 
   useEffect(() => {
     if (loginState.username && loginState.accessToken && state.streamer) {
-      socketClient.current = new HoagieWebsocketClient(
-        (msg) => {
-          onMessage(JSON.parse(msg ?? ""));
-        },
-        (connected) => {
-          if (connected !== isConnected) {
-            setConnected(connected);
-            if (!connected) {
-                socketClient.current?.connect();
-            }
-          }
-        }
-      );
+      socketClient.current = new HoagieSocketEventListener();
+      socketClient.current.addListener("connect", () => setConnected(true));
+      socketClient.current.addListener("disconnect", () => setConnected(false));
+      socketClient.current.addListener("dono", onDono);
       socketClient.current.connect();
     }
 
@@ -63,7 +58,7 @@ export const useHoagieSockets = (onMessage: (msg: any) => void) => {
         if (pingHandler.current) {
           clearInterval(pingHandler.current);
         }
-        pingHandler.current = setInterval(() => ping(), 4 * 60 * 1e3);
+        pingHandler.current = setInterval(() => ping(), 3 * 60 * 1e3);
       }
     }
     subscribe();
