@@ -7,6 +7,8 @@ import { PageHeader } from "../PageHeader";
 import { ChatTokenContainer } from "./ChatTokenContainer";
 import { StreamerListContainer } from "./StreamerListContainer";
 import { LoginContext } from "../context/LoginContextProvider";
+import { Admin } from "../../admin/Admin";
+import { HoagieSocketAdminContainer } from "./HoagieSocketAdminContainer";
 
 interface AdminPageProps {}
 
@@ -33,6 +35,12 @@ export const AdminPage = (props: AdminPageProps) => {
     getAdminConfig();
   }, [loginState.username, loginState.accessToken]);
 
+  const isAdmin = Admin.isAdmin(loginState);
+
+  if (!isAdmin) {
+    return <div>Admins Only💦💦</div>
+  }
+
   return (
     <>
       <Grid container spacing={3}>
@@ -47,6 +55,9 @@ export const AdminPage = (props: AdminPageProps) => {
             config={adminData}
             onChange={() => getAdminConfig()}
           />
+        </Grid>
+        <Grid item style={{ margin: 10 }} xs={12}>
+          <HoagieSocketAdminContainer />
         </Grid>
       </Grid>
     </>

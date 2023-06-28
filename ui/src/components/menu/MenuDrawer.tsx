@@ -16,6 +16,7 @@ import { DarkModeSwitch } from "../DarkModeSwitch";
 import Config from "../../Config";
 import { ModListContext } from "../context/ModListContextProvider";
 import { LoginContext } from "../context/LoginContextProvider";
+import { Admin } from "../../admin/Admin";
 
 export interface MenuDrawerProps {
   isOpen: boolean;
@@ -42,12 +43,7 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
       .map((m) => m.toLowerCase())
       .includes(loginState.username.toLowerCase());
 
-  const isAdmin =
-    loginState.username &&
-    loginState.isLoggedIn &&
-    Config.admins
-      .map((m) => m.toLowerCase())
-      .includes(loginState.username.toLowerCase());
+  const isAdmin = Admin.isAdmin(loginState);
 
   const navigate = useNavigate();
 

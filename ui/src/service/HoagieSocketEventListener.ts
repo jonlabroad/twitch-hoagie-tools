@@ -36,6 +36,14 @@ export class HoagieSocketEventListener {
     );
   }
 
+  public getAllConnections() {
+    this.client.send(
+      JSON.stringify({
+        action: "getallconnections",
+      })
+    );
+  }
+
   public connect() {
     this.client.connect();
   }
