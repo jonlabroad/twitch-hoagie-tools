@@ -200,7 +200,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
                 </Hidden>
               </TableCell>
               <TableCell>
-                <FlexCol alignItems="center">
+                <FlexCol flexGrow={1} alignItems="center">
                   <div>{stream?.viewer_count}</div>
                   <CountupTimer startDate={new Date(stream.started_at)} />
                 </FlexCol>
