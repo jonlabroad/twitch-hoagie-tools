@@ -21,27 +21,27 @@ import { StateContext } from "../context/StateContextProvider";
 import { LoginContext } from "../context/LoginContextProvider";
 
 const filterOutTags = new Set<string>([
-    "trance",
-    "dj",
-    "vtuber",
-    "deathcore",
-    "edm",
-    "ebm",
-    "livedjmusic",
-    "electronicdancemusic",
-    "livedj",
-    "house",
-    "housemusic",
-    "videodj",
-    "vtube",
-    "techno",
-    "drumandbass",
-    "dnb",
-    "dancehall",
-    "reggae",
-    "radio",
-    "420",
-])
+  "trance",
+  "dj",
+  "vtuber",
+  "deathcore",
+  "edm",
+  "ebm",
+  "livedjmusic",
+  "electronicdancemusic",
+  "livedj",
+  "house",
+  "housemusic",
+  "videodj",
+  "vtube",
+  "techno",
+  "drumandbass",
+  "dnb",
+  "dancehall",
+  "reggae",
+  "radio",
+  "420",
+]);
 
 interface RaidData {
   raidsIn: RaidEvent[];
@@ -78,22 +78,22 @@ export const RaidContainer = (props: RaidContainerProps) => {
       liveStreams
         .filter(
           (c) =>
-            c.game_name.toLowerCase().includes("music") 
-/*
+            c.game_name.toLowerCase().includes("music") &&
+            /*
             && c.language === "en"
             && !c.user_name.toLowerCase().startsWith("dj")
             && !c.title.toLowerCase().startsWith("dj")
             && !c.title.toLowerCase().endsWith(" dj")
             && !c.title.toLowerCase().includes(" dj ")
             */
-            && (!!myFollowed[c.user_name] || !!theirFollowed[c.user_name])
-            /*
+            (!!myFollowed[c.user_name] || !!theirFollowed[c.user_name])
+          /*
            && !(c.tags ?? []).find(t => filterOutTags.has(t.toLowerCase()))
            && !(c.tags ?? []).find(tag => tag.startsWith("dj"))
            */
         )
-        .forEach((c) => (filtered[c.user_name] = c))
-        console.log({filtered})
+        .forEach((c) => (filtered[c.user_name] = c));
+      console.log({ filtered });
       setLiveChannelsToDisplay(filtered);
     }
   }, [liveStreams, myFollowed, theirFollowed]);
@@ -156,9 +156,9 @@ export const RaidContainer = (props: RaidContainerProps) => {
     return <CircularProgress />;
   }
 
-  const sortedChannels = Object.values(liveStreamsToDisplay).slice(0, 100).sort((c1, c2) =>
-    StreamSorter.sort(c1, c2)
-  );
+  const sortedChannels = Object.values(liveStreamsToDisplay)
+    .slice(0, 100)
+    .sort((c1, c2) => StreamSorter.sort(c1, c2));
   const numChannels = Object.values(liveStreamsToDisplay).length;
   return (
     <FlexCol>
@@ -169,11 +169,13 @@ export const RaidContainer = (props: RaidContainerProps) => {
         <TableBody>
           {sortedChannels.map((stream) => (
             <TableRow>
-              <TableCell width="10%">
+              <TableCell>
                 <FlexRow alignItems="center">
-                  <div style={{ marginRight: 10 }}>
-                    {StreamSorter.getSortRank(stream)}
-                  </div>
+                  <Hidden xlDown>
+                    <div style={{ marginRight: 10 }}>
+                      {StreamSorter.getSortRank(stream)}
+                    </div>
+                  </Hidden>
                   <ChannelLink username={stream.user_name}>
                     <img
                       style={{ borderRadius: 25, height: 50, width: "auto" }}
@@ -185,15 +187,17 @@ export const RaidContainer = (props: RaidContainerProps) => {
                   </Typography>
                 </FlexRow>
               </TableCell>
-              <TableCell width="10%">
-                <ChannelLink username={stream.user_name}>
-                  <img
-                    style={{ height: 90 }}
-                    src={stream?.thumbnail_url
-                      .replace("{width}", "440")
-                      .replace("{height}", "248")}
-                  />
-                </ChannelLink>
+              <TableCell>
+                <Hidden smDown>
+                  <ChannelLink username={stream.user_name}>
+                    <img
+                      style={{ height: 90 }}
+                      src={stream?.thumbnail_url
+                        .replace("{width}", "440")
+                        .replace("{height}", "248")}
+                    />
+                  </ChannelLink>
+                </Hidden>
               </TableCell>
               <TableCell>
                 <FlexCol alignItems="center">
@@ -202,7 +206,12 @@ export const RaidContainer = (props: RaidContainerProps) => {
                 </FlexCol>
               </TableCell>
               <Hidden mdDown>
-                <TableCell><FlexCol><p>{stream.title}</p><p>{(stream.tags ?? []).join(' ')}</p></FlexCol></TableCell>
+                <TableCell>
+                  <FlexCol>
+                    <p>{stream.title}</p>
+                    <p>{(stream.tags ?? []).join(" ")}</p>
+                  </FlexCol>
+                </TableCell>
               </Hidden>
               <TableCell>
                 <RaidHistory
