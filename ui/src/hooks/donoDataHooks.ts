@@ -23,7 +23,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
             } as SetDonoLoadingAction)
             const client = new HoagieClient();
             try {
-                const data = await client.getDonos(loginState.username, loginState.accessToken, state.streamer, currentStreams.map(s => s.streamId))
+                const data = await client.getDonosV2(loginState.username, loginState.accessToken, state.streamer, currentStreams.map(s => s.streamId))
                 donoStateDispatch({
                     type: "set_donos",
                     donoData: data.donos,

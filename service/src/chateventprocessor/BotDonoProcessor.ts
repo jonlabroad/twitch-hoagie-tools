@@ -22,6 +22,10 @@ const channelConfigs: Record<string, ChannelConfig> = {
     botUsername: "streamelements",
     donoMessageRegex: /(?<username>\S+).+\$(?<amount>[0-9]+\.[0-9]+)/,
   },
+  hoagieman5000: {
+    botUsername: "hoagieman5000",
+    donoMessageRegex: /DONO ARIGATO! (?<username>\S+).+\$(?<amount>[0-9]+\.[0-9]+)/,
+  }
 };
 
 export class BotDonoProcessor {
@@ -33,14 +37,13 @@ export class BotDonoProcessor {
     this.streamId = streamId;
   }
 
-  public async process(uuid: string, username: string, chatMessage: string) {
-    const config = channelConfigs[getChannelName(this.broadcasterId)];
+  public async process(uuid: string, channel: string, username: string, chatMessage: string) {
+    const config = channelConfigs[getChannelName(channel)];
     if (!config) {
-      throw new Error(
-        `Unable to find channel config for broadcasterId ${this.broadcasterId}`
-      );
+      console.log(`Unable to find channel config for channel ${channel}`);
     }
-    if (username.toLowerCase() === config.botUsername.toLowerCase()) {
+
+    if (config?.botUsername === username.toLowerCase()) {
       const match = chatMessage.match(config.donoMessageRegex);
       if (match) {
         const amountMatch = match.groups?.amount;

@@ -1,5 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import Config from "../Config";
+import { StreamData } from "../twitch/TwitchClientTypes";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 
@@ -19,76 +20,51 @@ export default class StreamsDbClient {
         this.broadcasterId = broadcasterId;
     }
 
-    public async getLatestStream(): Promise<{
-        streamId: string,
-        timestamp: string
-    }> {
+    public async setStreamHistory(stream: StreamData) {
         const client = new DynamoDB.DocumentClient();
-        const request: any = {
-            TableName: Config.tableName,
-            KeyConditionExpression: "CategoryKey = :ckey",
-            ExpressionAttributeValues: {
-                ":ckey": this.getKey(this.broadcasterId)
-            }
-        }
-        const response = await client.query(request).promise();
-        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
-        const latest = sorted?.[0];
-        return {
-            streamId: latest?.SubKey,
-            timestamp: latest?.timestamp,
-        }
-    }
-
-    public async setStreamHistory(streamId: string) {
-        const client = new DynamoDB.DocumentClient();
+        const startDate = new Date(stream.started_at);
         try {
-            const date = new Date();
             const key = {
                 CategoryKey: this.getKey(this.broadcasterId),
-                SubKey: this.getSort(streamId),
+                SubKey: this.getSort(startDate),
             };
-            const input: DynamoDB.DocumentClient.UpdateItemInput = {
+            const input: DynamoDB.DocumentClient.PutItemInput = {
                 TableName: Config.tableName,
-                Key: key,
-                UpdateExpression: "SET #timestamp = if_not_exists(#timestamp, :timestamp)",
-                ExpressionAttributeNames: { "#timestamp": "timestamp" },
-                ExpressionAttributeValues: {
-                    ":timestamp": { S: date.toISOString() },
-                }
+                Item: {
+                    ...key,
+                    streamId: stream.id,
+                    stream,
+                    startDate: startDate.toISOString(),
+                },
             }
             console.log(JSON.stringify(input, null, 2));
-            await client.update(input).promise();
+            await client.put(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-    public async getStreamHistory(): Promise<{
-        streamId: string,
-        timestamp: string,
-    }[]> {
+    public async getStreamHistory(limit = 20): Promise<StreamData[]> {
         const client = new DynamoDB.DocumentClient();
-        const request: any = {
+        const request: DynamoDB.DocumentClient.QueryInput = {
             TableName: Config.tableName,
             KeyConditionExpression: "CategoryKey = :ckey",
             ExpressionAttributeValues: {
                 ":ckey": this.getKey(this.broadcasterId)
-            }
+            },
+            ScanIndexForward: false, // descending order?
+            Limit: limit,
         }
+        console.log(JSON.stringify(request, null, 2));
         const response = await client.query(request).promise();
-        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
-        return sorted?.map(s => ({
-            streamId: s?.SubKey,
-            timestamp: s?.timestamp,
-        })) ?? []
+        return response.Items?.map(s => s.stream) ?? []
     }
 
     getKey(broadcasterId: string) {
         return `${StreamsDbClient.CATEGORY}_${broadcasterId}`;
     }
 
-    getSort(streamId: string) {
-        return streamId;
+    getSort(date: Date) {
+        return date.toISOString();
     }
 }

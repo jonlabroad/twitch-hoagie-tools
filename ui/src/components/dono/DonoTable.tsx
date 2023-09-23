@@ -73,7 +73,7 @@ const DonoTableRow = (props: DonoTableRowProps) => {
 
     return <>
         <StyledTableRow>
-            <TableCell>{userdata.SubKey}</TableCell>
+            <TableCell>{userdata.username}</TableCell>
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.dono ? Math.round(userdata.dono * 100) / 100 : ""}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.cheer}</TableCell></Hidden>

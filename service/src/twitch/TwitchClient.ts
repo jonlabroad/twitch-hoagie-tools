@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import Config from "../Config";
-import { UserData } from "./TwitchClientTypes";
+import { StreamData, UserData } from "./TwitchClientTypes";
 import TwitchProvider from "./TwitchProvider";
 import { TwitchSubscription } from "./TwitchSubscription";
 
@@ -134,7 +134,7 @@ export default class TwitchClient {
         return data.data.data;
     }
 
-    async getBroadcasterIdLiveStream(userId: string): Promise<{id: string, type: string}> {
+    async getBroadcasterIdLiveStream(userId: string): Promise<StreamData> {
         const url = `https://api.twitch.tv/helix/streams?user_id=${userId}&type=live`;
         console.log({ url });
         const authToken = await this.getAuthToken();
@@ -145,11 +145,11 @@ export default class TwitchClient {
                 "Client-ID": Config.twitchClientId,
             }
         });
-        console.log({ data: response.data })
+        console.log(JSON.stringify(response.data, null, 2));
         return response.data.data[0];
     }
 
-    async getBroadcasterLoginLiveStream(userLogin: string): Promise<{id: string, type: string}> {
+    async getBroadcasterLoginLiveStream(userLogin: string): Promise<StreamData> {
         const url = `https://api.twitch.tv/helix/streams?user_login=${userLogin}&type=live`;
         console.log({ url });
         const authToken = await this.getAuthToken();

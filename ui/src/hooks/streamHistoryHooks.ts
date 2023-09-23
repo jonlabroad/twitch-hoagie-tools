@@ -4,7 +4,7 @@ import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
 import { LoginContext } from "../components/context/LoginContextProvider";
 
-export function useStreamHistory(state: AppState) {
+export function useStreamHistory(state: AppState): [StreamInfo[] | undefined] {
     const { state: loginState } = useContext(LoginContext)
     const [streamHistory, setStreamHistory] = useState<StreamInfo[] | undefined>(undefined)
 
@@ -12,10 +12,12 @@ export function useStreamHistory(state: AppState) {
         async function getStreamHistory() {
             if (loginState.username && loginState.accessToken && state.streamer) {
                 const client = new HoagieClient();
-                const data = await client.getStreamHistory(loginState.username, loginState.accessToken, state.streamer)
+                const data = await client.getStreamHistoryV2(loginState.username, loginState.accessToken, state.streamer)
                 if (data) {
-                    const historyArray = Object.values(data)
-                    setStreamHistory(historyArray)
+                    setStreamHistory(data.streams.map(stream => ({
+                        streamId: stream.id,
+                        timestamp: stream.started_at,
+                    })));
                 }
             }
         }

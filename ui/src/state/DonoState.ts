@@ -1,5 +1,5 @@
 import { StreamInfo } from "../components/dono/DonoTableContainer";
-import { DonoData } from "../service/HoagieClient"
+import { DonoData, DonoDataV2 } from "../service/HoagieClient"
 
 export interface DonoStateContextType {
     dispatch: any,
@@ -17,7 +17,7 @@ export interface DonoStateContextType {
 }
 
 export interface DonoState {
-    donoData: DonoData[]
+    donoData: DonoDataV2[]
     loading: boolean
 }
 

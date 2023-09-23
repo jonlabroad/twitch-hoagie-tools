@@ -460,12 +460,51 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  donodataV2:
+    handler: twitch.donodataV2
+    events:
+      - http:
+          method: GET
+          path: /api/v2/donodata
+          parameters:
+            querystrings:
+              username: true
+              channelname: true
+              streamId: false
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
   streamhistory:
     handler: twitch.streamhistory
     events:
       - http:
           method: GET
           path: /api/streamhistory
+          parameters:
+            querystrings:
+              username: true
+              channelname: true
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  streamhistoryV2:
+    handler: twitch.streamhistoryV2
+    events:
+      - http:
+          method: GET
+          path: /api/v2/streamhistory
           parameters:
             querystrings:
               username: true

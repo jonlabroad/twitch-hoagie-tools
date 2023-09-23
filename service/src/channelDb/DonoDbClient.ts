@@ -17,12 +17,34 @@ export interface DonoData {
     tier: number | undefined
 }
 
+export interface DonoDataV2 {
+    CategoryKey: string;
+    SubKey: string
+    type: string;
+    dono: number;
+    cheer: number
+    hypechat: number
+    data: any
+    sub: number
+    subgift: number
+    value: number
+    tier: string | undefined
+}
+
 export interface DonoResponse {
     stream: {
         streamId: string,
         timestamp?: string
     },
     donos: DonoData[]
+}
+
+export interface DonoResponseV2 {
+    stream: {
+        streamId: string,
+        timestamp?: string
+    },
+    donos: DonoDataV2[]
 }
 
 export default class DonoDbClient {

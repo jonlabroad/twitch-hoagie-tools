@@ -3,6 +3,7 @@ import { stringify } from "querystring";
 import { SetDonoRequest } from "../../twitch-dono";
 import Config from "../Config";
 import * as tmi from "tmi.js";
+import { DonoDataV2, DonoResponseV2 } from "./DonoDbClient";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 
@@ -35,23 +36,24 @@ export default class DonoDbClientV2 {
         this.broadcasterId = broadcasterId;
     }
 
-    public async readDonos(streamId: string): Promise<DonoResponse> {
+    public async readDonos(streamId: string): Promise<DonoResponseV2> {
         const client = new DynamoDB.DocumentClient();
 
-        // Get latest stream id
-        const request: any = {
+        const request: DynamoDB.DocumentClient.QueryInput = {
             TableName: Config.tableName,
             KeyConditionExpression: "CategoryKey = :ckey",
             ExpressionAttributeValues: {
                 ":ckey": this.getKey(this.broadcasterId, streamId)
             }
         }
+        console.log({ request })
         const response = await client.query(request).promise();
+        console.log({ items: response?.Items })
         return {
             stream: {
                 streamId: streamId,
             },
-            donos: (response?.Items ?? []) as DonoData[]
+            donos: (response?.Items ?? []) as DonoDataV2[]
         };
     }
 
@@ -66,7 +68,7 @@ export default class DonoDbClientV2 {
                 TableName: Config.tableName,
                 Item: {
                     ...key,
-                    amount: amount,
+                    dono: amount,
                     username: username.toLowerCase(),
                     streamId: streamId.toLowerCase(),
                     broadcasterId: this.broadcasterId,
@@ -195,47 +197,6 @@ export default class DonoDbClientV2 {
         } catch (err) {
             console.error(err);
         }
-    }
-
-    public async getLatestStream(): Promise<{
-        streamId: string,
-        timestamp: string
-    }> {
-        const client = new DynamoDB.DocumentClient();
-        const request: any = {
-            TableName: Config.tableName,
-            KeyConditionExpression: "CategoryKey = :ckey",
-            ExpressionAttributeValues: {
-                ":ckey": `DonoWatch_${this.broadcasterId.toLowerCase()}_streamhistory`
-            }
-        }
-        const response = await client.query(request).promise();
-        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
-        const latest = sorted?.[0];
-        return {
-            streamId: latest?.SubKey,
-            timestamp: latest?.timestamp,
-        }
-    }
-
-    public async getStreamHistory(): Promise<{
-        streamId: string,
-        timestamp: string,
-    }[]> {
-        const client = new DynamoDB.DocumentClient();
-        const request: any = {
-            TableName: Config.tableName,
-            KeyConditionExpression: "CategoryKey = :ckey",
-            ExpressionAttributeValues: {
-                ":ckey": `DonoWatch_${this.broadcasterId.toLowerCase()}_streamhistory`
-            }
-        }
-        const response = await client.query(request).promise();
-        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
-        return sorted?.map(s => ({
-            streamId: s?.SubKey,
-            timestamp: s?.timestamp,
-        })) ?? []
     }
 
     getKey(broadcasterId: string, streamId: string) {

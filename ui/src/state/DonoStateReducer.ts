@@ -1,4 +1,4 @@
-import { DonoData } from "../service/HoagieClient";
+import { DonoData, DonoDataV2 } from "../service/HoagieClient";
 import { DonoState } from "./DonoState";
 
 export interface DonoStateAction {
@@ -6,7 +6,7 @@ export interface DonoStateAction {
 }
 
 export interface SetDonosAction extends DonoStateAction {
-    donoData: DonoData[];
+    donoData: DonoDataV2[];
 }
 
 export interface SetDonoLoadingAction extends DonoStateAction {

@@ -18,7 +18,7 @@ module.exports.twitchchatsource = async (ev: EventBridgeEvent<any, any>) => {
         const writer = new EventDbClient();
         await writer.writeEvent(stream.id, broadcasterId, ev);
     } else {
-        console.error(`Could not find stream or channel name for ${ev.detail.channel}`);
+        console.error(`Could not find stream or channel name for ${broadcasterName}: ${stream?.id}, ${broadcasterId}`);
     }
   } catch (err) {
     console.error(err);
@@ -36,12 +36,12 @@ module.exports.detectstreams = async (ev: EventBridgeEvent<any, any>) => {
     const broadcasterId = ev.detail.subscription.condition.broadcaster_user_id;
     console.log({ broadcasterId });
 
-    const liveStreamId = await client.getBroadcasterIdLiveStream(broadcasterId);
-    console.log({ liveStreamId });
+    const liveStream = await client.getBroadcasterIdLiveStream(broadcasterId);
+    console.log({ liveStream });
 
-    if (liveStreamId) {
+    if (liveStream) {
       const streamClient = new StreamsDbClient(broadcasterId);
-      await streamClient.setStreamHistory(liveStreamId.id);
+      await streamClient.setStreamHistory(liveStream);
     }
   } else {
     console.log("Not a stream.online event");

@@ -10,6 +10,21 @@ export interface DonoData {
     sub: number
     subgift: number
     value: number
+    username: string
+}
+
+export interface DonoDataV2 {
+    CategoryKey: string;
+    SubKey: string
+    type: string;
+    dono: number;
+    cheer: number
+    hypechat: number
+    data: any
+    sub: number
+    subgift: number
+    value: number
+    tier: string | undefined
 }
 
 export interface AdminData {
@@ -154,6 +169,19 @@ export default class HoagieClient {
         }
     }
 
+    async getDonosV2(username: string, accessToken: string, streamerName: string, streamIds?: string[]) {
+        const response = await axios.get(`${this.BASE_URL}v2/donodata?streamername=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
+            headers: this.getHeaders(username, accessToken)
+        });
+        return response.data as {
+            stream: {
+                streamId: string
+                timestamp: string
+            },
+            donos: DonoDataV2[]
+        }
+    }
+
     async getStreamHistory(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.BASE_URL}streamhistory?streamername=${streamerName}`, {
             headers: this.getHeaders(username, accessToken)
@@ -162,6 +190,19 @@ export default class HoagieClient {
             streamId: string,
             timestamp: string,
         }[]
+    }
+
+    async getStreamHistoryV2(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}v2/streamhistory?streamername=${streamerName}`, {
+            headers: this.getHeaders(username, accessToken)
+        });
+        console.log({ history: response.data });
+        return response.data as {
+            streams: {
+                id: string
+                started_at: string
+            }[],
+        }
     }
 
     async getAdminConfig(username: string, accessToken: string) {

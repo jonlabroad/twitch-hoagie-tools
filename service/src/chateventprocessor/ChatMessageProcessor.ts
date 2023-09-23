@@ -17,9 +17,12 @@ export class ChatMessageProcessor {
             const liveStream = await twitchClient.getBroadcasterIdLiveStream(broadcasterId);
             if (liveStream) {
                 const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id);
-                await donoProcessor.process(username, message, channel);
+                await donoProcessor.process(detail.userstate.id, channel, username, message);
             } else {
-                console.error(`Could not find live stream for ${broadcasterId}`)
+                console.error(`Could not find live stream for ${broadcasterId}`);
+                console.warn("Testing parsing of dono messages in offline stream");
+                const donoProcessor = new BotDonoProcessor(broadcasterId, "test");
+                await donoProcessor.process(detail.userstate.id, channel, username, message);
             }
         } else {
             console.error(`Could not find broadcaster id for ${channel}`);

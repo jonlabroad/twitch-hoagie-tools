@@ -23,6 +23,10 @@ import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import AdminDbClient from "./src/channelDb/AdminDbClient";
 import { EventPublisher } from "./src/eventbus/EventPublisher";
+import DonoDbClientV2 from "./src/channelDb/DonoDbClientV2";
+import StreamsDbClient from "./src/channelDb/StreamsDbClient";
+import DonoProviderV2 from "./src/twitch/DonoProviderV2";
+import TwitchClient from "./src/twitch/TwitchClient";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -336,6 +340,50 @@ module.exports.donodata = async (event: APIGatewayProxyEvent) => {
   }
 };
 
+module.exports.donodataV2 = async (event: APIGatewayProxyEvent) => {
+  try {
+    Config.validate();
+
+    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+    const userLogin = event.queryStringParameters?.["username"] ?? "";
+    const streamIds = event.multiValueQueryStringParameters?.["streamId"] ?? [];
+
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const auth = await ModRequestAuthorizer.auth(username, event);
+    if (auth) {
+      return auth;
+    }
+
+    const donos = await DonoProviderV2.get(streamerLogin, streamIds);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        {
+          userLogin,
+          streamerLogin,
+          ...donos,
+        },
+        null,
+        2
+      ),
+      headers: {
+        ...corsHeaders,
+        ...donoDataHeaders,
+      },
+    };
+  } catch (err) {
+    console.error(err.message, err);
+    return {
+      statusCode: 500,
+      headers: {
+        ...corsHeaders,
+      },
+      body: `${err.message}`,
+    };
+  }
+};
+
 module.exports.streamhistory = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
@@ -359,6 +407,53 @@ module.exports.streamhistory = async (event: APIGatewayProxyEvent) => {
           userLogin,
           streamerLogin,
           ...streams,
+        },
+        null,
+        2
+      ),
+      headers: {
+        ...corsHeaders,
+        ...followCacheHeaders,
+      },
+    };
+  } catch (err) {
+    console.error(err.message, err);
+    return {
+      statusCode: 500,
+      headers: {
+        ...corsHeaders,
+      },
+      body: `${err.message}`,
+    };
+  }
+};
+
+module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
+  try {
+    Config.validate();
+
+    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+    const userLogin = event.queryStringParameters?.["username"] ?? "";
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+
+    const auth = await ModRequestAuthorizer.auth(username, event);
+    if (auth) {
+      return auth;
+    }
+
+    const broadcasterId = await (new TwitchClient()).getUserId(streamerLogin);
+    if (!broadcasterId) {
+      throw new Error(`Unable to find broadcaster id for ${streamerLogin}`)
+    }
+    const client = new StreamsDbClient(broadcasterId);
+    const streams = await client.getStreamHistory();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        {
+          streamerLogin,
+          streams: streams,
         },
         null,
         2
