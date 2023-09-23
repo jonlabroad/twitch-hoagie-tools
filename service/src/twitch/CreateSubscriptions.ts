@@ -8,8 +8,14 @@ export default class CreateSubscriptions {
             const response = await client.createSubscription(broadcasterLogin, "channel.raid", {
                 "to_broadcaster_user_id": broadcasterId
             });
-            const response2 = await client.createSubscription(broadcasterLogin, "channel.raid", {
+            await client.createSubscription(broadcasterLogin, "channel.raid", {
                 "from_broadcaster_user_id": broadcasterId
+            });
+            await client.createSubscription(broadcasterLogin, "stream.online", {
+                "broadcaster_user_id": broadcasterId
+            });
+            await client.createSubscription(broadcasterLogin, "stream.offline", {
+                "broadcaster_user_id": broadcasterId
             });
 
             return response ?? {};

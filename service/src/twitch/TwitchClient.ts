@@ -134,6 +134,36 @@ export default class TwitchClient {
         return data.data.data;
     }
 
+    async getBroadcasterIdLiveStream(userId: string): Promise<{id: string, type: string}> {
+        const url = `https://api.twitch.tv/helix/streams?user_id=${userId}&type=live`;
+        console.log({ url });
+        const authToken = await this.getAuthToken();
+
+        const response = await axios.get<any>(url, {
+            headers: {
+                "Authorization": `Bearer ${authToken?.access_token}`,
+                "Client-ID": Config.twitchClientId,
+            }
+        });
+        console.log({ data: response.data })
+        return response.data.data[0];
+    }
+
+    async getBroadcasterLoginLiveStream(userLogin: string): Promise<{id: string, type: string}> {
+        const url = `https://api.twitch.tv/helix/streams?user_login=${userLogin}&type=live`;
+        console.log({ url });
+        const authToken = await this.getAuthToken();
+
+        const response = await axios.get<any>(url, {
+            headers: {
+                "Authorization": `Bearer ${authToken?.access_token}`,
+                "Client-ID": Config.twitchClientId,
+            }
+        });
+        console.log({ data: response.data })
+        return response.data.data[0];
+    }
+
     // Confirm that this Twitch user is who they say they are
     async validateUserIdAndToken(userName: string, userToken: string) {
         try {

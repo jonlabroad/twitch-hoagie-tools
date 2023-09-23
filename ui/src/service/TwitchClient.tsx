@@ -44,6 +44,11 @@ export default class TwitchClient {
         return data.data;
     }
 
+    async getBroadcasterIdStream(userId: string): Promise<any[]> {
+        const data = await this.getRequest(`https://api.twitch.tv/helix/streams?user_id=${userId}`, false);
+        return data.data;
+    }
+
     async getUserSubscriptions(broadcasterId: string, userId: string): Promise<UserSubscriptions[]> {
         const data = await this.getRequest(`https://api.twitch.tv/helix/subscriptions/user?broadcaster_id=${broadcasterId}&user_id=${userId}`, true);
         return data.data;

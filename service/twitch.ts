@@ -22,6 +22,7 @@ import DonoDbClient from "./src/channelDb/DonoDbClient";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import AdminDbClient from "./src/channelDb/AdminDbClient";
+import { EventPublisher } from "./src/eventbus/EventPublisher";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -71,6 +72,12 @@ module.exports.twitchwebhook = async (event: APIGatewayProxyEvent) => {
 
   const body = JSON.parse(event.body ?? "{}") as TwitchWebhookEvent<any>;
   await handler.handle(body);
+  try {
+    const eventPublisher = new EventPublisher();
+    await eventPublisher.send(body);
+  } catch (err) {
+    console.error(err);
+  }
 
   return {
     statusCode: 200,
@@ -90,9 +97,9 @@ function handleVerificationRequest(event: APIGatewayProxyEvent) {
 }
 
 function verifySignature(event: APIGatewayProxyEvent) {
-  const id = event.headers["Twitch-Eventsub-Message-Id"] ?? "";
-  const timestamp = event.headers["Twitch-Eventsub-Message-Timestamp"] ?? "";
-  const msgSignature = event.headers["Twitch-Eventsub-Message-Signature"] ?? "";
+  const id = event.headers["Twitch-Eventsub-Message-Id"] ?? event.headers["Twitch-Eventsub-Message-Id".toLowerCase()] ?? "";
+  const timestamp = event.headers["Twitch-Eventsub-Message-Timestamp"] ?? event.headers["Twitch-Eventsub-Message-Timestamp".toLowerCase()] ?? "";
+  const msgSignature = event.headers["Twitch-Eventsub-Message-Signature"] ?? event.headers["Twitch-Eventsub-Message-Signature".toLowerCase()] ?? "";
   const body = event.body;
   if (!msgSignature) {
     return false;

@@ -31,7 +31,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   versionFunctions: false
   httpApi:
     cors: true
@@ -56,6 +56,7 @@ provider:
       Action:
         - events:PutEvents
       Resource: arn:aws:events:*:796987500533:event-bus/default
+
   environment:
     PERSPECTIVE_API_KEY: ${file(secrets.yml):perspectiveApiKey}
 
@@ -72,6 +73,39 @@ functions:
           cors: true
           authorizer:
             name: twitchAuthenticator
+
+  twitchchatevents:
+    handler: events.twitchchatsource
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - 'hoagie.twitch-chat'
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+
+  detectstreams:
+    handler: events.detectstreams
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - 'hoagie.twitch-eventsub'
+            detail-type:
+              - 'Event'
+            detail:
+              subscription:
+                type:
+                  - 'stream.online'
+
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
 
   chatevalget:
     handler: chatevalHandler.eval
