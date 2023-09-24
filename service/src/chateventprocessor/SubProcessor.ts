@@ -1,4 +1,5 @@
 import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
+import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
 import TwitchClient from "../twitch/TwitchClient";
 import { ResubEvent, SubEvent, getChannelName } from "./ChatEventProcessor";
 
@@ -21,6 +22,7 @@ export class SubProcessor {
           stream.id,
           detail.methods.plan!
         );
+        await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, {});
       }
     }
   }

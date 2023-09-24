@@ -1,4 +1,5 @@
 import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
+import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
 import TwitchClient from "../twitch/TwitchClient";
 import { CheerEvent, getChannelName } from "./ChatEventProcessor";
 
@@ -21,6 +22,7 @@ export class CheerProcessor {
           stream.id,
           parseInt(detail.userstate.bits ?? "0")
         );
+        await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, {});
       }
     }
   }

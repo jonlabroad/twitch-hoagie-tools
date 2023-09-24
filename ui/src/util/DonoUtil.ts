@@ -5,10 +5,11 @@ export class DonoUtil {
     donos: UserDonoSummaries,
     valueThreshold: number
   ): { eligible: UserDonoSummary[]; notEligible: UserDonoSummary[] } {
+    const allDonos = Object.values(donos).sort((a, b) => a.username.localeCompare(b.username));
     const eligible =
-      Object.values(donos)?.filter((dono) => dono.value >= valueThreshold) ?? [];
+    allDonos?.filter((dono) => dono.value >= valueThreshold) ?? [];
     const notEligible =
-      Object.values(donos)?.filter((dono) => dono.value < valueThreshold) ?? [];
+    allDonos?.filter((dono) => dono.value < valueThreshold) ?? [];
     return { eligible, notEligible };
   }
 }

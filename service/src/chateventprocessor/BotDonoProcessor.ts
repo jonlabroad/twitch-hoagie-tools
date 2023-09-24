@@ -1,4 +1,5 @@
 import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
+import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
 import { getChannelName } from "./ChatEventProcessor";
 
 interface ChannelConfig {
@@ -52,6 +53,7 @@ export class BotDonoProcessor {
         const dbWriter = new DonoDbClientV2(this.broadcasterId);
         console.log({ uuid, username, streamId: this.streamId, amount });
         await dbWriter.addDono(uuid, donator.toLowerCase(), this.streamId, amount);
+        await HoagieEventPublisher.publishToTopic(`dono.${this.broadcasterId}`, {});
       }
     }
   }
