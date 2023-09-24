@@ -4,6 +4,10 @@ import { GetHistoryResponse, GetQueueResponse } from "../../service/StreamerSong
 
 import "../../styles/Dono.scss";
 import { FlexRow } from "../util/FlexBox";
+import { TwitchBitIcon } from "../icon/TwitchBitIcon";
+import { TwitchSubIcon } from "../icon/TwitchSubIcon";
+import { TwitchGiftSubIcon } from "../icon/TwitchGiftSubIcon";
+import { TwitchPrimeSubIcon } from "../icon/TwitchPrimeSubIcon";
 
 const tableHeaderStyle = {
     fontWeight: 600
@@ -75,11 +79,21 @@ const DonoTableRow = (props: DonoTableRowProps) => {
         <StyledTableRow>
             <TableCell>{userdata.username}</TableCell>
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.dono ? Math.round(userdata.dono * 100) / 100 : ""}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.bits}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subs}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subgifts}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.hypechat}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.dono ? `$${Math.round(userdata.dono * 100) / 100}` : ""}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>
+                {!!userdata.bits && <FlexRow alignItems="center">
+                    <TwitchBitIcon />{userdata.bits}
+                </FlexRow>}
+            </TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>
+                {!!userdata.subs && (<><TwitchSubIcon tier={userdata.subtier}/><TwitchPrimeSubIcon tier={userdata.subtier}/></>)}
+            </TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{!!userdata.subgifts && (
+                <FlexRow alignItems="center">
+                    <TwitchGiftSubIcon />{userdata.subgifts}
+                </FlexRow>
+            )}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{!!userdata.hypechat && userdata.hypechat}</TableCell></Hidden>
             <TableCell align="left" style={{...tableHeaderStyle, width: "55%"}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>

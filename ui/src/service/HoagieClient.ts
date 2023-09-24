@@ -33,6 +33,7 @@ export interface UserDonoSummary {
     username: string;
     value: number;
     subs: number;
+    subtier: string;
     subgifts: number;
     bits: number;
     dono: number;
