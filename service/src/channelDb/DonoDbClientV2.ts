@@ -3,28 +3,21 @@ import { stringify } from "querystring";
 import { SetDonoRequest } from "../../twitch-dono";
 import Config from "../Config";
 import * as tmi from "tmi.js";
-import { DonoDataV2, DonoResponseV2 } from "./DonoDbClient";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 
-export interface DonoData {
+export interface DonoDataV2 {
+    CategoryKey: string
     SubKey: string
-    dono: number;
-    cheer: number
-    hypechat: number
-    data: any
-    sub: number
-    subgift: number
-    value: number
-    tier: number | undefined
-}
-
-export interface DonoResponse {
-    stream: {
-        streamId: string,
-        timestamp?: string
-    },
-    donos: DonoData[]
+    username: string
+    streamId: string
+    broadcasterId: string
+    amount: number
+    subTier?: string
+    subRecipient?: string
+    type: string
+    timestamp: string
+    ExpirationTTL: number
 }
 
 export default class DonoDbClientV2 {
@@ -36,7 +29,7 @@ export default class DonoDbClientV2 {
         this.broadcasterId = broadcasterId;
     }
 
-    public async readDonos(streamId: string): Promise<DonoResponseV2> {
+    public async readDonos(streamId: string): Promise<DonoDataV2[]> {
         const client = new DynamoDB.DocumentClient();
 
         const request: DynamoDB.DocumentClient.QueryInput = {
@@ -48,155 +41,60 @@ export default class DonoDbClientV2 {
         }
         console.log({ request })
         const response = await client.query(request).promise();
-        console.log({ items: response?.Items })
-        return {
-            stream: {
-                streamId: streamId,
-            },
-            donos: (response?.Items ?? []) as DonoDataV2[]
-        };
+        return (response?.Items ?? []) as DonoDataV2[];
     }
 
     public async addDono(uuid: string, username: string, streamId: string, amount: number) {
-        try {
-            const client = new DynamoDB.DocumentClient();
-            const key = {
-                CategoryKey: this.getKey(this.broadcasterId, streamId),
-                SubKey: this.getSort(uuid),
-            };
-            const input: DynamoDB.DocumentClient.PutItemInput = {
-                TableName: Config.tableName,
-                Item: {
-                    ...key,
-                    dono: amount,
-                    username: username.toLowerCase(),
-                    streamId: streamId.toLowerCase(),
-                    broadcasterId: this.broadcasterId,
-                    type: "dono",
-                    timestamp: new Date().toISOString(),
-                    ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
-                },
-            }
-            console.log(JSON.stringify(input, null, 2));
-            await client.put(input).promise();
-        } catch (err) {
-            console.error(err);
-        }
+        await this.writeItem(this.createItem(uuid, username, streamId, "dono", amount));
     }
 
     public async addHypechat(username: string, streamId: string, amount: number) {
-        try {
-            const client = new DynamoDB.DocumentClient();
-            const key = {
-                CategoryKey: this.getKey(this.broadcasterId, streamId),
-                SubKey: this.getSort(username),
-            };
-            const input: DynamoDB.DocumentClient.UpdateItemInput = {
-                TableName: Config.tableName,
-                Key: key,
-                UpdateExpression: "SET #hypechat = if_not_exists(#hypechat, :start) + :amount, #data = :data, #ExpirationTTL = :expiration",
-                ExpressionAttributeNames: { "#hypechat": "hypechat", "#data": "data", "#ExpirationTTL": "ExpirationTTL" },
-                ExpressionAttributeValues: {
-                    ":amount": amount,
-                    ":start": 0,
-                    ":data": {
-                        username: username.toLowerCase(),
-                        streamId: streamId.toLowerCase(),
-                        channel: this.broadcasterId,
-                        type: "hypechat",
-                        timestamp: new Date().toISOString(),
-                    },
-                    ":expiration": Math.floor(Date.now() / 1e3 + defaultExpirySec)
-                }
-            }
-            console.log(JSON.stringify(input, null, 2));
-            await client.update(input).promise();
-        } catch (err) {
-            console.error(err);
-        }
+        console.log("TODO");
     }
 
     public async addCheer(uuid: string, username: string, streamId: string, bits: number | string) {
-        try {
-            const client = new DynamoDB.DocumentClient();
-            const key = {
-                CategoryKey: this.getKey(this.broadcasterId, streamId),
-                SubKey: this.getSort(uuid),
-            };
-            const input: DynamoDB.DocumentClient.PutItemInput = {
-                TableName: Config.tableName,
-                Item: {
-                    ...key,
-                    cheer: parseInt(bits.toString()),
-                    username: username.toLowerCase(),
-                    streamId: streamId.toLowerCase(),
-                    broadcasterId: this.broadcasterId,
-                    type: "cheer",
-                    timestamp: new Date().toISOString(),
-                    ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
-                },
-            }
-            //console.log(JSON.stringify(input, null, 2));
-            await client.put(input).promise();
-        } catch (err) {
-            console.error(err);
-        }
+        await this.writeItem(this.createItem(uuid, username, streamId, "cheer", parseInt(bits.toString())));
     }
 
     public async addSub(uuid: string, username: string, streamId: string, tier: string) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "subscription", 1, tier));
+    }
+
+    public async addGiftSubs(uuid: string, username: string, streamId: string, tier: string, recipient: string) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "subgift", 1, tier, recipient));
+    }
+
+    async writeItem(item: any) {
         try {
             const client = new DynamoDB.DocumentClient();
-            const key = {
-                CategoryKey: this.getKey(this.broadcasterId, streamId),
-                SubKey: this.getSort(uuid),
-            };
             const input: DynamoDB.DocumentClient.PutItemInput = {
                 TableName: Config.tableName,
-                Item: {
-                    ...key,
-                    sub: 1,
-                    username: username.toLowerCase(),
-                    streamId: streamId.toLowerCase(),
-                    broadcasterId: this.broadcasterId,
-                    tier,
-                    type: "subscription",
-                    timestamp: new Date().toISOString(),
-                    ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
-                },
+                Item: item,
             }
-            //console.log(JSON.stringify(input, null, 2));
+            console.log(JSON.stringify(input, null, 2));
             await client.put(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-    public async addGiftSubs(uuid: string, username: string, streamId: string, tier: string, recipient: string) {
-        try {
-            const client = new DynamoDB.DocumentClient();
-            const key = {
-                CategoryKey: this.getKey(this.broadcasterId, streamId),
-                SubKey: this.getSort(uuid),
-            };
-            const input: DynamoDB.DocumentClient.PutItemInput = {
-                TableName: Config.tableName,
-                Item: {
-                    ...key,
-                    username: username.toLowerCase(),
-                    streamId: streamId.toLowerCase(),
-                    broadcasterId: this.broadcasterId,
-                    tier,
-                    recipient,
-                    type: "subgift",
-                    timestamp: new Date().toISOString(),
-                    ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
-                },
-            }
-            //console.log(JSON.stringify(input, null, 2));
-            await client.put(input).promise();
-        } catch (err) {
-            console.error(err);
-        }
+    createItem(uuid: string, username: string, streamId: string, type: string, amount: number, subTier?: string, subRecipient?: string) {
+        const key = {
+            CategoryKey: this.getKey(this.broadcasterId, streamId),
+            SubKey: this.getSort(uuid),
+        };
+        return {
+            ...key,
+            username: username.toLowerCase(),
+            streamId: streamId.toLowerCase(),
+            broadcasterId: this.broadcasterId,
+            amount,
+            subTier,
+            subRecipient,
+            type,
+            timestamp: new Date().toISOString(),
+            ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
+        };
     }
 
     getKey(broadcasterId: string, streamId: string) {

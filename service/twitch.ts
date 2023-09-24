@@ -362,7 +362,7 @@ module.exports.donodataV2 = async (event: APIGatewayProxyEvent) => {
         {
           userLogin,
           streamerLogin,
-          ...donos,
+          data: donos,
         },
         null,
         2

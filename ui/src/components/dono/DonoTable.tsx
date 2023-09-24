@@ -1,5 +1,5 @@
 import { Table, TableHead, TableRow, TableCell, TableBody, Card, TableContainer, Paper, Typography, styled, Chip, Tooltip, useTheme, Hidden } from "@mui/material"
-import { DonoData } from "../../service/HoagieClient";
+import { UserDonoSummary } from "../../service/HoagieClient";
 import { GetHistoryResponse, GetQueueResponse } from "../../service/StreamerSongListClient";
 
 import "../../styles/Dono.scss";
@@ -16,8 +16,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 interface DonoTableProps {
-    eligibleDonoData: DonoData[];
-    notEligibleDonoData: DonoData[];
+    eligibleDonoData: UserDonoSummary[];
+    notEligibleDonoData: UserDonoSummary[];
     songQueue?: GetQueueResponse
     songHistory?: GetHistoryResponse
 }
@@ -57,7 +57,7 @@ export const DonoTable = (props: DonoTableProps) => {
 }
 
 interface DonoTableRowProps {
-    userdata: DonoData
+    userdata: UserDonoSummary
     songQueue?: GetQueueResponse
     songHistory?: GetHistoryResponse
 }
@@ -65,8 +65,8 @@ interface DonoTableRowProps {
 const DonoTableRow = (props: DonoTableRowProps) => {
     const { userdata, songQueue, songHistory } = props;
 
-    const queueSongs = songQueue?.list.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.SubKey.toLowerCase()).length > 0);
-    const historySongs = songHistory?.items.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.SubKey.toLowerCase()).length > 0);
+    const queueSongs = songQueue?.list.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.username.toLowerCase()).length > 0);
+    const historySongs = songHistory?.items.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.username.toLowerCase()).length > 0);
 
     const queueSongTitles = queueSongs?.map(s => s?.song ? `${s?.song?.title} - ${s?.song?.artist}` : `${s?.nonlistSong ?? ""}`)
     const historySongTitles = historySongs?.map(s => s?.song ? `${s?.song?.title} - ${s?.song?.artist}` : `${s?.nonlistSong ?? ""}`)
@@ -76,9 +76,9 @@ const DonoTableRow = (props: DonoTableRowProps) => {
             <TableCell>{userdata.username}</TableCell>
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.dono ? Math.round(userdata.dono * 100) / 100 : ""}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.cheer}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.sub}</TableCell></Hidden>
-            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subgift}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.bits}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subs}</TableCell></Hidden>
+            <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.subgifts}</TableCell></Hidden>
             <Hidden mdDown><TableCell align="right" style={{width: "5%"}}>{userdata.hypechat}</TableCell></Hidden>
             <TableCell align="left" style={{...tableHeaderStyle, width: "55%"}}>
                 <FlexRow>

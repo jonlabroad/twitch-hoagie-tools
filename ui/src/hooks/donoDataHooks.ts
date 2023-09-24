@@ -26,7 +26,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
                 const data = await client.getDonosV2(loginState.username, loginState.accessToken, state.streamer, currentStreams.map(s => s.streamId))
                 donoStateDispatch({
                     type: "set_donos",
-                    donoData: data.donos,
+                    donoData: data.data,
                 } as SetDonosAction)
             } catch (err) {
                 console.error(err)

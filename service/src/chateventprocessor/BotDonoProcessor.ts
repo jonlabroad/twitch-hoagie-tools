@@ -47,10 +47,11 @@ export class BotDonoProcessor {
       const match = chatMessage.match(config.donoMessageRegex);
       if (match) {
         const amountMatch = match.groups?.amount;
+        const donator = match.groups?.username ?? "ERROR";
         const amount = parseFloat(amountMatch ?? "0");
         const dbWriter = new DonoDbClientV2(this.broadcasterId);
         console.log({ uuid, username, streamId: this.streamId, amount });
-        await dbWriter.addDono(uuid, username.toLowerCase(), this.streamId, amount);
+        await dbWriter.addDono(uuid, donator.toLowerCase(), this.streamId, amount);
       }
     }
   }

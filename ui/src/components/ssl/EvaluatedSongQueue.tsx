@@ -19,7 +19,7 @@ import { FlexCol, FlexRow } from "../util/FlexBox";
 import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
-import { DonoData } from "../../service/HoagieClient";
+import { UserDonoSummaries, UserDonoSummary } from "../../service/HoagieClient";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { SslIcon } from "../icon/SslIcon";
 import { StateContext } from "../context/StateContextProvider";
@@ -31,7 +31,7 @@ export interface EvaluatedSongQueueProps {
   isLoading: boolean;
   evaluations: Evaluations;
   evaluationsStatus: EvaluationsStatus;
-  donoData?: DonoData[];
+  donoData?: UserDonoSummaries;
 
   onWordWhitelistChange: (word: string, type: "add" | "remove") => void;
 }
@@ -44,7 +44,7 @@ const LoadingPlaceholder = (props: { width: number }) => {
   return <Skeleton variant="rectangular" width={props.width} />;
 };
 
-const DonoIcon = (props: { donoData: DonoData }) => {
+const DonoIcon = (props: { donoData: UserDonoSummary }) => {
   return (
     <Tooltip title={`\$${props.donoData?.value}`}>
       <div style={{ marginLeft: 8, height: 30, width: 30, color: "gold" }}>
@@ -141,11 +141,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                 : "";
               const genreText = genres.join(", ");
               const userDonoData = evaluation?.user
-                ? donoData?.find(
-                    (d) =>
-                      d.SubKey.toLowerCase().trim() ===
-                      evaluation?.user?.toLowerCase().trim()
-                  )
+                ? donoData?.[evaluation?.user?.toLowerCase().trim()]
                 : undefined;
               const userName =
                 evaluation?.user ?? queueSong.requests[0]?.name ?? "";

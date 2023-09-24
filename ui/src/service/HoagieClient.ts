@@ -14,18 +14,30 @@ export interface DonoData {
 }
 
 export interface DonoDataV2 {
-    CategoryKey: string;
+    CategoryKey: string
     SubKey: string
-    type: string;
-    dono: number;
-    cheer: number
-    hypechat: number
-    data: any
-    sub: number
-    subgift: number
-    value: number
-    tier: string | undefined
+    username: string
+    streamId: string
+    broadcasterId: string
+    amount: number
+    subTier?: string
+    subRecipient?: string
+    type: string
+    timestamp: string
+    ExpirationTTL: number
 }
+
+export type UserDonoSummaries = Record<string, UserDonoSummary>;
+
+export interface UserDonoSummary {
+    username: string;
+    value: number;
+    subs: number;
+    subgifts: number;
+    bits: number;
+    dono: number;
+    hypechat: number;
+  }
 
 export interface AdminData {
     CategoryKey: string
@@ -169,17 +181,11 @@ export default class HoagieClient {
         }
     }
 
-    async getDonosV2(username: string, accessToken: string, streamerName: string, streamIds?: string[]) {
+    async getDonosV2(username: string, accessToken: string, streamerName: string, streamIds?: string[]): Promise<{data: UserDonoSummaries}> {
         const response = await axios.get(`${this.BASE_URL}v2/donodata?streamername=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
             headers: this.getHeaders(username, accessToken)
         });
-        return response.data as {
-            stream: {
-                streamId: string
-                timestamp: string
-            },
-            donos: DonoDataV2[]
-        }
+        return response.data as { data: UserDonoSummaries };
     }
 
     async getStreamHistory(username: string, accessToken: string, streamerName: string) {

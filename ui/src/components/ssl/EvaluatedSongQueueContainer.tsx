@@ -33,7 +33,7 @@ export const EvaluatedSongQueueContainer = (props: EvaluatedSongQueueContainerPr
                 isLoading={evalIsLoading}
                 evaluations={evaluations}
                 evaluationsStatus={evaluationsStatus}
-                donoData={eligible}
+                donoData={eligible.reduce((acc, cur) => ({...acc, [cur.username.toLowerCase()]: cur}), {})}
             />
         }
     </>

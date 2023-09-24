@@ -1,66 +1,73 @@
 import { SetDonoRequest } from "../../twitch-dono";
-import DonoDbClient, {
-  DonoDataV2,
-  DonoResponseV2,
-} from "../channelDb/DonoDbClient";
-import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
+import DonoDbClientV2, { DonoDataV2 } from "../channelDb/DonoDbClientV2";
 import TwitchClient from "./TwitchClient";
 
+export interface UserDonoSummary {
+  username: string;
+  value: number;
+  subs: number;
+  subgifts: number;
+  bits: number;
+  dono: number;
+  hypechat: number;
+}
+
 export default class DonoProviderV2 {
-  public static async get(streamerLogin: string, streamIds: string[]) {
+  public static async get(
+    streamerLogin: string,
+    streamIds: string[]
+  ): Promise<Record<string, UserDonoSummary>> {
+    const summaries: Record<string, UserDonoSummary> = {};
     const broadcasterId = await new TwitchClient().getUserId(streamerLogin);
     if (broadcasterId) {
       const client = new DonoDbClientV2(broadcasterId);
-      let donoDatas: DonoResponseV2[] = [];
-      donoDatas = await Promise.all(
-        streamIds.map((streamId) => client.readDonos(streamId))
-      );
-      donoDatas.forEach((donoData) =>
-        donoData.donos.forEach((dono) => {
-          dono.value = this.getValue(dono);
-        })
-      );
-      const donoData = donoDatas[0];
-      donoDatas
-        .slice(1)
-        .forEach((otherData) => donoData.donos.push(...otherData.donos));
-
-      const combinedDonos: DonoDataV2[] = [];
+      let donoDatas: DonoDataV2[] = [];
+      donoDatas = (
+        await Promise.all(
+          streamIds.map((streamId) => client.readDonos(streamId))
+        )
+      ).flat();
       donoDatas.forEach((donoData) => {
-        donoData.donos.forEach((dono) => {
-          const existingDono = combinedDonos.find(
-            (d) => d.SubKey.toLowerCase() === dono.SubKey.toLowerCase()
-          );
-          if (existingDono) {
-            existingDono.hypechat += dono.hypechat ?? 0;
-            existingDono.cheer += dono.cheer;
-            existingDono.dono += dono.dono;
-            existingDono.sub += dono.sub;
-            existingDono.subgift +=
-              dono.subgift ?? (dono.type === "subgift" ? 1 : 0);
-            existingDono.value += dono.value;
-          } else {
-            combinedDonos.push(dono);
-          }
-        });
+        const username = donoData.username.toLowerCase();
+        let summary = summaries[donoData.username.toLowerCase()];
+        if (!summary) {
+          summary = {
+            username,
+            value: 0,
+            subs: 0,
+            subgifts: 0,
+            bits: 0,
+            dono: 0,
+            hypechat: 0,
+          };
+          summaries[username] = summary;
+        }
+        summary.value += this.getValue(donoData);
+        summary.subs += donoData.type === "subscription" ? 1 : 0;
+        summary.subgifts += donoData.type === "subgift" ? 1 : 0;
+        summary.bits += donoData.type === "cheer" ? donoData.amount : 0;
+        summary.dono += donoData.type === "dono" ? donoData.amount : 0;
+        summary.hypechat += donoData.type === "hypechat" ? donoData.amount : 0;
       });
-      const combinedDonoData: DonoResponseV2 = {
-        donos: combinedDonos.sort((a, b) => a.SubKey.localeCompare(b.SubKey)),
-        stream: donoData.stream,
-      };
-
-      return combinedDonoData;
     }
+    return summaries;
   }
 
   static getValue(dono: DonoDataV2) {
-    return (
-      (dono.dono ?? 0) +
-      (dono.hypechat ?? 0) +
-      (dono.cheer ?? 0) / 100 +
-      (dono.sub ?? 0) * this.getTierValue(dono.tier) +
-      (dono.subgift ?? 0) * this.getTierValue(dono.tier)
-    );
+    switch (dono.type) {
+      case "subscription":
+        return this.getTierValue(dono.subTier);
+      case "subgift":
+        return this.getTierValue(dono.subTier);
+      case "cheer":
+        return dono.amount / 100;
+      case "dono":
+        return dono.amount;
+      case "hypechat":
+        return dono.amount;
+      default:
+        return 0;
+    }
   }
 
   static getTierValue(tier?: string) {
@@ -76,11 +83,5 @@ export default class DonoProviderV2 {
       default:
         return 5;
     }
-  }
-
-  public static async setDono(request: SetDonoRequest) {
-    const client = new DonoDbClient(request.streamerLogin);
-    const donos = await client.add(request);
-    return donos;
   }
 }
