@@ -44,9 +44,13 @@ export default class DonoProviderV2 {
           };
           summaries[username] = summary;
         }
+
+        if (donoData.type === "subscription") {
+          summary.subtier = donoData.subTier ?? "";
+        }
+
         summary.value += this.getValue(donoData);
         summary.subs += donoData.type === "subscription" ? 1 : 0;
-        summary.subtier = summary.subtier ? summary.subtier : (donoData.subTier ?? "");
         summary.subgifts += donoData.type === "subgift" ? 1 : 0;
         summary.bits += donoData.type === "cheer" ? donoData.amount : 0;
         summary.dono += donoData.type === "dono" ? donoData.amount : 0;

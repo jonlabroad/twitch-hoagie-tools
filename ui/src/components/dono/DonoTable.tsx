@@ -45,11 +45,11 @@ export const DonoTable = (props: DonoTableProps) => {
                 </TableHead>
                 <TableBody>
                     {eligibleDonoData?.map(userdata => (
-                        <DonoTableRow userdata={userdata} songQueue={songQueue} songHistory={songHistory} />
+                        <DonoTableRow key={userdata.username} userdata={userdata} songQueue={songQueue} songHistory={songHistory} />
                     ))}
                     <TableRow style={{ backgroundColor: theme.palette.secondary.dark}}><TableCell colSpan={8} style={{ height: 20 }}></TableCell></TableRow>
                     {notEligibleDonoData?.map(userdata => (
-                        <DonoTableRow userdata={userdata} />
+                        <DonoTableRow key={userdata.username} userdata={userdata} />
                     ))}
                 </TableBody>
             </Table>
@@ -78,26 +78,26 @@ const DonoTableRow = (props: DonoTableRowProps) => {
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <Hidden xsDown><TableCell align="right" style={{width: "15%"}}>
                 <FlexRow alignItems="center">
-                    {!!userdata.dono && <FlexRow alignItems="center" marginRight={1}><MoneyIcon />{`${userdata.dono}`}</FlexRow>}
+                    {!!userdata.subs && (<FlexRow marginRight={1}><TwitchSubIcon tier={userdata.subtier}/><TwitchPrimeSubIcon tier={userdata.subtier}/></FlexRow>)}
                     {!!userdata.bits && <FlexRow alignItems="center" marginRight={1}>
                         <TwitchBitIcon />{userdata.bits}
                     </FlexRow>}
-                    {!!userdata.subs && (<FlexRow marginRight={1}><TwitchSubIcon tier={userdata.subtier}/><TwitchPrimeSubIcon tier={userdata.subtier}/></FlexRow>)}
                     {!!userdata.subgifts && (
                     <FlexRow alignItems="center" marginRight={1}>
                         <TwitchGiftSubIcon />{userdata.subgifts}
                     </FlexRow>
                     )}
+                    {!!userdata.dono && <FlexRow alignItems="center" marginRight={1}><MoneyIcon />{`${userdata.dono}`}</FlexRow>}
                 </FlexRow>
             {!!userdata.hypechat && `Hypechat ${userdata.hypechat}`}
             </TableCell></Hidden>
             <Hidden mdDown><TableCell align="left" style={{...tableHeaderStyle}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>
-                        <Chip style={{marginRight: 5}} label={"In Queue"} color="secondary" />
+                        <Chip key={s} style={{marginRight: 5}} label={"In Queue"} color="secondary" />
                     </Tooltip>)}
                     {historySongTitles?.map(s => <Tooltip title={s}>
-                        <Chip label={"Completed"} color="primary" />
+                        <Chip key={s} label={"Completed"} color="primary" />
                     </Tooltip>)}
                 </FlexRow>
             </TableCell>

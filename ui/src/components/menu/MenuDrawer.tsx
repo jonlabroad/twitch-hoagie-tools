@@ -73,6 +73,7 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
                 });
                 return (
                   <ListItemButton
+                    key={key}
                     selected={currentPath === resolvedPath}
                     onClick={() => {
                       navigate(resolvedPath);

@@ -75,7 +75,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
                 </IconButton>
                 <FlexCol>
                 {streamDates && streamDates.map(streamDate => (
-                    <FlexRow justifyContent="center" style={{minWidth: 160}}>{`${streamDate.toLocaleDateString()} ${streamDate.toLocaleTimeString()}`}</FlexRow>
+                    <FlexRow key={streamDate.toISOString()} justifyContent="center" style={{minWidth: 160}}>{`${streamDate.toLocaleDateString()} ${streamDate.toLocaleTimeString()}`}</FlexRow>
                 ))}
                 </FlexCol>
                 <IconButton
