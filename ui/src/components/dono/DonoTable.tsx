@@ -94,10 +94,10 @@ const DonoTableRow = (props: DonoTableRowProps) => {
             <Hidden xsDown><TableCell align="left" style={{...tableHeaderStyle}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>
-                        <Chip key={s} style={{marginRight: 5}} label={"In Queue"} color="secondary" />
+                        <Chip key={s} style={{marginRight: 5}} label={"Queued"} color="secondary" size="small" />
                     </Tooltip>)}
                     {historySongTitles?.map(s => <Tooltip title={s}>
-                        <Chip key={s} label={"Completed"} color="primary" />
+                        <Chip key={s} label={"Complete"} color="primary" size="small" />
                     </Tooltip>)}
                 </FlexRow>
             </TableCell>
