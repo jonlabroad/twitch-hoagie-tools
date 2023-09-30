@@ -98,8 +98,9 @@ export interface TwitchSubscription {
     version: string
     cost: string
     condition: {
-        to_broadcaster_user_id: string
-        from_broadcaster_user_id: string
+        to_broadcaster_user_id?: string
+        from_broadcaster_user_id?: string
+        broadcaster_user_id?: string
     },
     created_at: string
     transport: {

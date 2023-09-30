@@ -75,7 +75,10 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
       getStreamerId();
     });
   
-    const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId && (sub.condition.to_broadcaster_user_id === `${streamerId}` || sub.condition.from_broadcaster_user_id === `${streamerId}`));
+    const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId && 
+      (sub.condition.to_broadcaster_user_id === `${streamerId}` ||
+       sub.condition.from_broadcaster_user_id === `${streamerId}` ||
+       sub.condition.broadcaster_user_id === `${streamerId}`));
   
     let subConnectionStatus = "";
     if (subscriptionsToDisplay) {
