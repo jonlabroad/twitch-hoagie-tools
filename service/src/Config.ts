@@ -9,6 +9,10 @@ export default class Config {
     public static GeniusClientId = "2vmZ-eHDI3UGd_QIiS_rMjVz37mwmRAOLbQIzbO6PhDtN0QHfuN11NyJ99XTHiqV";
     public static GeniusClientSecret = process.env.GENIUS_CLIENT_SECRET ?? "";
     public static BadWordsSecret = process.env.BAD_WORDS_SECRET ?? "";
+    public static ChatEventSource = {
+        clusterName: "TwitchChatEventSource",
+        serviceName: "TwitchChatEventSource",        
+    };
 
     // TODO put in database
     public static AdminUserNames = [

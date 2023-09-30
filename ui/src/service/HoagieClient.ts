@@ -284,6 +284,13 @@ export default class HoagieClient {
         return response?.data;
     }
 
+    async getSystemStatus(username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.BASE_URL}admin/system/status?streamername=${streamerName}`, {
+            headers: this.getHeaders(username, accessToken)
+        });
+        return response?.data;
+    }
+
     getHeaders(username: string, accessToken: string) {
         const token = btoa(`${username}:${accessToken}`)
         return  {

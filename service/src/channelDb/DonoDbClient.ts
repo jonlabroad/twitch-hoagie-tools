@@ -303,7 +303,8 @@ export default class DonoDbClient {
             }
         }
         const response = await client.query(request).promise();
-        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime());
+        const sorted = response?.Items?.sort((i1, i2) => new Date(i2.timestamp).getTime() - new Date(i1.timestamp).getTime())
+            .filter(item => !!item.startDate);
         return sorted?.map(s => ({
             streamId: s?.SubKey,
             timestamp: s?.timestamp,

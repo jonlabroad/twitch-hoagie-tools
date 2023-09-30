@@ -56,6 +56,10 @@ provider:
       Action:
         - events:PutEvents
       Resource: arn:aws:events:*:796987500533:event-bus/default
+    - Effect: Allow
+      Action:
+        - 'ecs:DescribeServices'
+      Resource: '*'
 
   environment:
     PERSPECTIVE_API_KEY: ${file(secrets.yml):perspectiveApiKey}
@@ -100,7 +104,6 @@ functions:
               subscription:
                 type:
                   - 'stream.online'
-
     environment:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
@@ -683,6 +686,21 @@ functions:
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
+
+  getsystemstatus:
+    handler: systemstatus.getstatus
+    events:
+      - http:
+          method: GET
+          path: /api/admin/system/status
+          parameters:
+            querystrings:
+              streamerName: true
+          cors: true
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
 
 resources:
   Resources:

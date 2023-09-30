@@ -1,4 +1,4 @@
-import { useContext, useReducer } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import { AppState, defaultAppState } from "../../state/AppState";
 import { appStateReducer } from "../../state/AppStateReducer";
 import { PageHeader } from "../PageHeader";
@@ -9,10 +9,9 @@ import { useSaveLastPath } from "../../hooks/LastPathHooks";
 import "../../styles/Dono.scss";
 import { Container, Grid } from "@mui/material";
 import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
-import {
-  StateContext,
-} from "../context/StateContextProvider";
-import { DonoContext, DonoContextProvider } from "./DonoContextProvider";
+import { DonoContext } from "./DonoContextProvider";
+import { SystemStatusContext } from "../context/SystemStatusContextProvider";
+import { ChannelInfoProvider } from "../data/ChannelInfoProvider";
 
 export interface DonoPageContainerProps {}
 
@@ -21,10 +20,13 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
 
   useSaveLastPath();
 
+  const { status, refresh } = useContext(SystemStatusContext);
+
   return (
     <>
-      <Container maxWidth={false}>
+      <Container maxWidth={"xl"}>
         <Grid container spacing={3}>
+          <ChannelInfoProvider />
           <EvaluatedSongQueueContainer />
           <DonoTableContainer
             streamHistory={donoContext.selection.streamHistory}

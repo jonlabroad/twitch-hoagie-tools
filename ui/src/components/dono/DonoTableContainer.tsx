@@ -10,6 +10,8 @@ import { DonoContext } from "./DonoContextProvider";
 import { LoginContext } from "../context/LoginContextProvider";
 import { useHoagieSockets } from "../../hooks/hoagieSocketHooks";
 import UpdateIcon from '@mui/icons-material/Update';
+import { ServerStatus } from "../status/ServerStatus";
+import { StreamLiveIcon } from "../icon/StreamLive";
 
 interface DonoTableContainerProps {
     streamHistory: StreamInfo[] | undefined
@@ -58,6 +60,8 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     }
 
     const streamDates = currentStreams ? currentStreams.map(s => new Date(s.timestamp)) : undefined
+    const liveStreamId = state.streamerData?.streamData?.id ?? "";
+    const isLive = (currentStreams ?? []).map(s => s.streamId).includes(liveStreamId) && state.streamerData?.streamData?.type === "live";
 
     return <>
         {!isLoggedIn && <Grid item xs={12}>
@@ -86,7 +90,8 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
                     size="large">
                     <ArrowRight />
                 </IconButton>
-
+                <StreamLiveIcon isLive={isLive} />
+                <ServerStatus />
             </FlexRow>
             <FlexRow alignItems="center" style={{ marginLeft: 10, marginTop: 10 }}>
                 <Button

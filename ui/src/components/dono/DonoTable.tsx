@@ -40,7 +40,7 @@ export const DonoTable = (props: DonoTableProps) => {
                         <TableCell><Typography style={{...tableHeaderStyle, width: "10%"}}>Username</Typography></TableCell>
                         <TableCell align="right"><Typography style={{...tableHeaderStyle, width: "5%"}}>Value</Typography></TableCell>
                         <TableCell><Typography style={{...tableHeaderStyle, width: "15%"}}>Support</Typography></TableCell>
-                        <Hidden mdDown><TableCell><Typography style={{...tableHeaderStyle}}>Requests</Typography></TableCell></Hidden>
+                        <Hidden xsDown><TableCell><Typography style={{...tableHeaderStyle}}>Requests</Typography></TableCell></Hidden>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -91,7 +91,7 @@ const DonoTableRow = (props: DonoTableRowProps) => {
                 </FlexRow>
             {!!userdata.hypechat && `Hypechat ${userdata.hypechat}`}
             </TableCell></Hidden>
-            <Hidden mdDown><TableCell align="left" style={{...tableHeaderStyle}}>
+            <Hidden xsDown><TableCell align="left" style={{...tableHeaderStyle}}>
                 <FlexRow>
                     {queueSongTitles?.map(s => <Tooltip title={s}>
                         <Chip key={s} style={{marginRight: 5}} label={"In Queue"} color="secondary" />
