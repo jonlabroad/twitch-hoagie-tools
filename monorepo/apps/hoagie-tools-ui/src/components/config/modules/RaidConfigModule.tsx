@@ -30,7 +30,7 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     const [subscriptions, setSubscriptions] = useState<
       TwitchSubscription[] | undefined
     >(undefined);
-    const [streamerId, setStreamerId] = useState<number | undefined>(undefined);
+    const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
   
     async function createSubscriptions() {
       if (loginState.accessToken && loginState.username && appState.streamer) {

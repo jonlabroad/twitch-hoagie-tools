@@ -1,4 +1,3 @@
-import { AlertTypeType } from "./alerts/AlertType";
 import { ModActionType } from "./state/AppState";
 
 export interface PageConfig {
@@ -19,20 +18,6 @@ export default class Config {
 
     //const scopes = "chat:read chat:edit"
     public static scopes = "user:read:follows"
-
-
-    public static defaultAlertExpirySec = 10 * 60;
-    public static alertExpirySec: Record<AlertTypeType, number> = {
-        "shoutout": 3 * 60,
-        "chat_eval": 3 * 60,
-        "generic": Config.defaultAlertExpirySec,
-    }
-
-    public static defaultAlertIgnoreList = [
-        "nightbot",
-        "songlistbot",
-        "streamlabs",
-    ]
 
     public static modActionExpirySec: Record<ModActionType, number> = {
         "ignore_shoutout": 60 * 60,

@@ -1,4 +1,3 @@
-import AlertType, { AlertTypeType } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
@@ -13,9 +12,6 @@ export const defaultAppState: AppState = {
     chat: {
         connected: false,
         messages: [],
-    },
-    alert: {
-        alerts: []
     },
     event: {
         events: []
@@ -32,7 +28,6 @@ export interface AppState {
         streamData: StreamData;
     },
     chat: ChatState;
-    alert: AlertState;
     event: EventState;
     modActions: ModActionState;
     songQueue?: GetQueueResponse;
@@ -42,10 +37,6 @@ export interface AppState {
 export interface ChatState {
     connected: boolean;
     messages: ChatMessage[];
-}
-
-export interface AlertState {
-    alerts: AlertType[];
 }
 
 export interface EventState {
@@ -75,7 +66,6 @@ export const createIgnoreShoutoutModAction = (alertKey: string): IgnoreShoutoutM
 }
 
 export interface IgnoreShoutoutModAction extends ModAction {
-    alertType: AlertTypeType
     alertKey: string
 }
 

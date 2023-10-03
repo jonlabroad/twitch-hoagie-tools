@@ -19,7 +19,7 @@ export class HoagieSocketEventListener {
     this.listeners[messageTypeLower].push(callback);
   }
 
-  public subscribeDono(broadcasterId: number) {
+  public subscribeDono(broadcasterId: string) {
     this.client.send(
       JSON.stringify({
         action: "subscribe",

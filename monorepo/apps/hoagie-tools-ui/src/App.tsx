@@ -1,4 +1,3 @@
-import { DashboardV1 } from "./components/DashboardV1";
 import {
   BrowserRouter as Router,
   Route,
@@ -108,11 +107,6 @@ function App() {
                         <Route
                           path="/s/:streamer/admin"
                           element={<StreamerAdminPage />}
-                        />
-
-                        <Route
-                          path="/s/:streamer/v1"
-                          element={<DashboardV1 />}
                         />
                         <Route
                           path="/loginRedirect"

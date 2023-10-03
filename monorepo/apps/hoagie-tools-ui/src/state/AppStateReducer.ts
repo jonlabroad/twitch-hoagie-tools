@@ -1,4 +1,3 @@
-import AlertType, { AlertTypeType } from "../alerts/AlertType"
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
@@ -7,14 +6,6 @@ import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAc
 
 export interface AppStateAction {
     type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_streamer" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
-}
-
-export interface AddAlertAction extends AppStateAction {
-    alerts: AlertType[];
-}
-
-export interface RemoveAlertAction extends AppStateAction {
-    alerts: AlertType[];
 }
 
 export interface AddEventAction extends AppStateAction {
@@ -62,34 +53,6 @@ export interface UpdateSongHistoryAction extends AppStateAction {
 
 export const appStateReducer = (state: AppState, action: AppStateAction): AppState => {
     switch (action.type) {
-        case "add_alerts": {
-            const addAlertAction = action as AddAlertAction;
-            let newAlerts = [...state.alert.alerts];
-            addAlertAction.alerts.forEach(newAlert => {
-                const existingAlertIndex = newAlerts.findIndex(a => a.key === newAlert.key);
-                if (existingAlertIndex >= 0) {
-                    newAlerts = [...newAlerts.slice(0, existingAlertIndex), newAlert, ...newAlerts.slice(existingAlertIndex + 1)];
-                } else {
-                    newAlerts.push(newAlert);
-                }
-            })
-            return {
-                ...state,
-                alert: {
-                    alerts: newAlerts
-                }
-            }
-        }
-        case "remove_alerts": {
-            const removeAlertAction = action as RemoveAlertAction;
-            const newAlerts = state.alert.alerts.filter(a => !removeAlertAction.alerts.find(o => a.key === o.key));
-            return {
-                ...state,
-                alert: {
-                    alerts: newAlerts,
-                }
-            }
-        }
         case "add_event": {
             const addEventAction = action as AddEventAction;
             return {
