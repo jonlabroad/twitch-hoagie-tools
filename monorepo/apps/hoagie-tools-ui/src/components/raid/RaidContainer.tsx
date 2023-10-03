@@ -56,7 +56,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
   const { state } = stateContext;
   const { state: loginState } = useContext(LoginContext);
 
-  const [myFollowed, theirFollowed] = useRaidTargets(
+  const [myFollowed] = useRaidTargets(
     state.streamer,
     loginState.username,
     loginState.accessToken
@@ -73,7 +73,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
   const [raids, setRaids] = useState<RaidsByStreamer>({});
 
   useEffect(() => {
-    if (myFollowed && theirFollowed && liveStreams.length > 0) {
+    if (myFollowed && liveStreams.length > 0) {
       const filtered: Record<string, StreamData> = {};
       liveStreams
         .filter(
@@ -86,17 +86,16 @@ export const RaidContainer = (props: RaidContainerProps) => {
             && !c.title.toLowerCase().endsWith(" dj")
             && !c.title.toLowerCase().includes(" dj ")
             */
-            (!!myFollowed[c.user_name] || !!theirFollowed[c.user_name])
+            (!!myFollowed[c.user_login])
           /*
            && !(c.tags ?? []).find(t => filterOutTags.has(t.toLowerCase()))
            && !(c.tags ?? []).find(tag => tag.startsWith("dj"))
            */
         )
-        .forEach((c) => (filtered[c.user_name] = c));
-      console.log({ filtered });
+        .forEach((c) => (filtered[c.user_login] = c));
       setLiveChannelsToDisplay(filtered);
     }
-  }, [liveStreams, myFollowed, theirFollowed]);
+  }, [liveStreams, myFollowed]);
 
   const [userInfo, setUserInfo] = useState<Record<string, UserData>>({});
   useEffect(() => {

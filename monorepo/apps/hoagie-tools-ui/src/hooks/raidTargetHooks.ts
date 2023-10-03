@@ -1,33 +1,30 @@
 import { useEffect, useRef, useState } from "react"
 import TwitchClient from "../service/TwitchClient";
-import { LiveChannelData, StreamData, UserFollows } from "../service/TwitchClientTypes";
+import { StreamData, UserFollows } from "../service/TwitchClientTypes";
 import CacheManager from "../util/CacheManager";
 
 export const useRaidTargets = (broadcasterName?: string, username?: string, accessToken?: string) => {
     const caches = useRef(new CacheManager());
 
-    const [myFollowedChannels, setMyFollowedChannels] = useState<Record<string, UserFollows> | undefined>(undefined);
-    const [theirFollowedChannels, setTheirFollowedChannels] = useState<Record<string, UserFollows> | undefined>(undefined);
+    const [myFollowedChannels, setMyFollowedChannels] = useState<Record<string, UserFollows>>({});
 
     useEffect(() => {
         async function get() {
             if (broadcasterName && username && accessToken) {
                 const client = new TwitchClient(accessToken, caches.current);
-                const mine = await client.getAllUsersFollowedChannels(username);
-                const mineParsed: Record<string, UserFollows> = {};
-                mine.forEach(f => mineParsed[f.to_name] = f)
-                setMyFollowedChannels(mineParsed);
-
-                const theirs = await client.getAllUsersFollowedChannels(broadcasterName);
-                const theirsParsed: Record<string, UserFollows> = {};
-                theirs.forEach(f => theirsParsed[f.to_name] = f)
-                setTheirFollowedChannels(theirsParsed);
+                const userId = await client.getUserId(username);
+                if (userId) {
+                    const mine = await client.getUserFollows(userId);
+                    const mineParsed: Record<string, UserFollows> = {};
+                    mine.forEach(f => mineParsed[f.broadcaster_login] = f)
+                    setMyFollowedChannels(mineParsed);
+                }
             }
         }
         get();
     }, [broadcasterName, username, accessToken]);
 
-    return [myFollowedChannels, theirFollowedChannels];
+    return [myFollowedChannels];
 }
 
 export const useLiveChannels = (username?: string, accessToken?: string) => {
