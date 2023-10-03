@@ -17,7 +17,6 @@ import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/StreamerDashboard.scss";
 import TwitchClient from "../../service/TwitchClient";
-import { SongListConfig } from "./SongListConfig";
 
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/Link";

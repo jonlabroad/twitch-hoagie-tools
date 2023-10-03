@@ -24,7 +24,8 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { SslIcon } from "../icon/SslIcon";
 import { StateContext } from "../context/StateContextProvider";
 
-const format = require("format-duration");
+import format from "format-duration";
+//const format = require("format-duration");
 
 export interface EvaluatedSongQueueProps {
   config?: SongEvalConfig;

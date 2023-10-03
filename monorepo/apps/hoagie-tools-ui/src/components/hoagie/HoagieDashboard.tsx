@@ -18,7 +18,6 @@ import { appStateReducer } from "../../state/AppStateReducer";
 import HoagieOverlayClient from "../../service/HoagieOverlayClient";
 import LocalStorage from "../../util/LocalStorage";
 import TwitchClient from "../../service/TwitchClient";
-import { SongListConfig } from "../auth/SongListConfig";
 import { PageHeader } from "../PageHeader";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import HoagieClient from "../../service/HoagieClient";

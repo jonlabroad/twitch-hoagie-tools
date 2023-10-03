@@ -1,7 +1,7 @@
 {
-  "name": "hoagie-tools",
+  "name": "hoagie-tools-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/hoagie-tools/src",
+  "sourceRoot": "apps/hoagie-tools-ui/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/hoagie-tools"
+        "outputPath": "dist/apps/hoagie-tools-ui"
       },
       "configurations": {
         "development": {
@@ -24,15 +24,15 @@
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "hoagie-tools:build"
+        "buildTarget": "hoagie-tools-ui:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "hoagie-tools:build:development",
+          "buildTarget": "hoagie-tools-ui:build:development",
           "hmr": true
         },
         "production": {
-          "buildTarget": "hoagie-tools:build:production",
+          "buildTarget": "hoagie-tools-ui:build:production",
           "hmr": false
         }
       }
@@ -41,14 +41,14 @@
       "executor": "@nx/vite:preview-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "hoagie-tools:build"
+        "buildTarget": "hoagie-tools-ui:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "hoagie-tools:build:development"
+          "buildTarget": "hoagie-tools-ui:build:development"
         },
         "production": {
-          "buildTarget": "hoagie-tools:build:production"
+          "buildTarget": "hoagie-tools-ui:build:production"
         }
       }
     },
@@ -57,14 +57,14 @@
       "outputs": ["{options.reportsDirectory}"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/hoagie-tools"
+        "reportsDirectory": "../../coverage/apps/hoagie-tools-ui"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/hoagie-tools/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/hoagie-tools-ui/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },

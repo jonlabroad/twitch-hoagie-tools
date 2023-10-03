@@ -1,5 +1,6 @@
-import Box, { BoxProps } from "@mui/material/Box"
 import React from "react"
+import CssBaseline from "@mui/material/CssBaseline"
+import { Box, BoxProps } from "@mui/material"
 
 export interface FlexBoxProps extends BoxProps {
     inline?: boolean

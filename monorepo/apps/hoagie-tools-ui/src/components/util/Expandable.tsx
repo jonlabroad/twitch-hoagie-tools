@@ -4,8 +4,8 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 export const Expandable = (props: {
-    summary: React.ReactChild | React.ReactChildren
-    children: React.ReactChild | React.ReactChildren
+    summary: React.ReactNode
+    children: React.ReactNode
     showExpand: boolean
     style?: Record<string, any>
 }) => {

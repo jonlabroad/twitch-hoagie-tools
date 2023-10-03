@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react"
 import { createEvaluatedMessageAlert } from "../alerts/AlertType";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay"
 import Config from "../Config";
-import Perspective from "../secrets/Perspective";
 import HoagieClient from "../service/HoagieClient";
 import PerspectiveClient from "../service/PerspectiveClient";
 import TwitchClient from "../service/TwitchClient";
