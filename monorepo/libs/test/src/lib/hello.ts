@@ -1,0 +1,1 @@
+export const helloWorldMessage = 'Hello, World 2!!!';

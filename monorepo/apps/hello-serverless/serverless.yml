@@ -1,0 +1,13 @@
+service: my-hello-world-service
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+
+functions:
+  helloWorld:
+    handler: handler.helloWorld

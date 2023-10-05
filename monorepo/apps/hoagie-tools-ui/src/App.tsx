@@ -40,6 +40,7 @@ import { Redirect } from "./Redirect";
 import { StreamerAdminPage } from "./components/config/StreamerAdminPage";
 import { ModListContextProvider } from "./components/context/ModListContextProvider";
 import { SystemStatusContextProvider } from "./components/context/SystemStatusContextProvider";
+import { helloWorldMessage } from "@hoagie/test";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
