@@ -5,11 +5,11 @@ import { FlexCol, FlexRow } from "../../util/FlexBox";
 import { StateContext } from "../../context/StateContextProvider";
 import { LoginContext } from "../../context/LoginContextProvider";
 import React from "react";
-import { TwitchSubscription } from "../../../service/TwitchClientTypes";
+import { createTwitchClient } from "../../../util/CreateTwitchClient";
 import LocalStorage from "../../../util/LocalStorage";
-import TwitchClient from "../../../service/TwitchClientOld";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/Link";
+import { TwitchSubscription } from "@hoagie/service-clients";
 
 const chipColors: Record<string, any> = {
     enabled: "success",
@@ -67,7 +67,7 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     useEffect(() => {
       async function getStreamerId() {
         if (loginState.accessToken) {
-          const client = new TwitchClient(loginState.accessToken);
+          const client = createTwitchClient(loginState.accessToken);
           const id = await client.getUserId(streamer);
           setStreamerId(id);
         }

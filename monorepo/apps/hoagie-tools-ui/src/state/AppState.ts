@@ -1,7 +1,7 @@
+import { StreamData, UserData } from "@hoagie/service-clients";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
-import { StreamData, UserData } from "../service/TwitchClientTypes";
 
 export interface StateContextType {
     dispatch: any,

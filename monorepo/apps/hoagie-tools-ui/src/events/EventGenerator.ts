@@ -1,5 +1,4 @@
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
-import TwitchClient from "../service/TwitchClientOld";
 import StreamEvent, { ShoutoutStreamEvent } from "./StreamEvent";
 
 export default class EventGenerator {

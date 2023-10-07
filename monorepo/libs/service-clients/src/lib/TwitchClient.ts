@@ -1,9 +1,13 @@
 import axios from 'axios';
 import {
+    Game,
+    Paginated,
   StreamData,
   TwitchSubscription,
   UserData,
   UserFollows,
+  UsersFollows,
+  ValidatedSession,
 } from './TwitchClientTypes';
 
 // const subscriptionCallbackHost = process.env.STAGE === "prod" ? "https://hoagietools-svc-prod.hoagieman.net" : "https://hoagietools-svc-development.hoagieman.net";
@@ -108,11 +112,36 @@ export class TwitchClient {
     return response.data;
   }
 
-  async getUserFollows(broadcasterId: string, userId: string) {
-    const url = `https://api.twitch.tv/helix/users/follows?to_id=${broadcasterId}&from_id=${userId}`;
-    const data = await this.get<{ data: UserFollows[] }>(url);
-    return data?.data;
-  }
+  async getGame(name: string): Promise<Game | undefined> {
+    const data = await this.get<{ data: Game[]}>(`https://api.twitch.tv/helix/games?name=${name}`);
+    return data?.data?.[0];
+}
+
+async getStreamsByGame(gameId: string): Promise<StreamData[]> {
+    let after = undefined;
+    const channels: StreamData[] = [];
+    do {
+        const page = await this.get(`https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100${after ? `&after=${after}` : ``}`) as Paginated<StreamData[]>;
+        channels.push(...page.data);
+        after = page.pagination?.cursor;
+    } while (after);
+    return channels;
+}
+
+  async getUserFollows(userId: string): Promise<UserFollows[]> {
+    let after = undefined;
+    const follows: UserFollows[] = [];
+    do {
+        const followData: Paginated<UserFollows[]> | undefined | null = await this.get<Paginated<UserFollows[]>>(`https://api.twitch.tv/helix/channels/followed?user_id=${userId}&first=100${after ? `&after=${after}` : ``}`);
+        if (followData) {
+            follows.push(...followData.data);
+            after = followData.pagination?.cursor;
+        } else {
+            after = null;
+        }
+    } while (after);
+    return follows;
+}
 
   async getBroadcasterIdLiveStream(userId: string) {
     const url = `https://api.twitch.tv/helix/streams?user_id=${userId}&type=live`;
@@ -132,12 +161,19 @@ export class TwitchClient {
   }
 
   async getStreamsByUsernames(usernames: string[]): Promise<StreamData[]> {
-    const data = await this.get<StreamData[]>(`https://api.twitch.tv/helix/streams?${usernames.map(u => `user_login=${u}`).join("&")}`);
+    const data = await this.get<StreamData[]>(
+      `https://api.twitch.tv/helix/streams?${usernames
+        .map((u) => `user_login=${u}`)
+        .join('&')}`
+    );
     return data ?? [];
-}
+  }
 
   // Confirm that this Twitch user is who they say they are
-  async validateUserIdAndToken(userName: string, userToken: string) {
+  public static async validateUserIdAndToken(
+    userName: string,
+    userToken: string
+  ) {
     try {
       console.log('https://id.twitch.tv/oauth2/validate');
       const response = await axios.get<any>(
@@ -161,10 +197,33 @@ export class TwitchClient {
     }
   }
 
-  async getUserData(userLogin: string) {
-    const url = `https://api.twitch.tv/helix/users?login=${userLogin}`;
+  // Validate a session given only a token
+  public static async validateSession(token: string): Promise<{
+    validatedSession: ValidatedSession | undefined;
+    validated: boolean;
+  }> {
+    const response = await axios.get('https://id.twitch.tv/oauth2/validate', {
+      headers: {
+        Authorization: `OAuth ${token}`,
+      },
+    });
+    return {
+      validated: response.status === 200,
+      validatedSession: response.data,
+    };
+  }
+
+  async getUsersData(userLogins: string[]) {
+    const url = `https://api.twitch.tv/helix/users?${userLogins
+      .map((u) => `login=${u}`)
+      .join('&')}`;
     const response = await this.get<{ data: UserData[] }>(url);
-    return response?.data?.[0];
+    return response?.data ?? [];
+  }
+
+  async getUserData(userLogin: string) {
+    const datas = await this.getUsersData([userLogin]);
+    return datas[0];
   }
 
   private async getServiceAuthToken() {

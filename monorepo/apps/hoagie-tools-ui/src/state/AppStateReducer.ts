@@ -1,7 +1,7 @@
+import { StreamData, UserData } from "@hoagie/service-clients";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
-import { ChannelData, StreamData, UserData } from "../service/TwitchClientTypes";
 import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {

@@ -1,4 +1,4 @@
-import { StreamData } from "../service/TwitchClientTypes";
+import { StreamData } from "@hoagie/service-clients";
 
 export default class StreamSorter {
     private static viewerRange = [10, 500];

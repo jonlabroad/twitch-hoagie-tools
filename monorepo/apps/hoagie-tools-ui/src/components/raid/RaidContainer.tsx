@@ -10,8 +10,6 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { useLiveChannels, useRaidTargets } from "../../hooks/raidTargetHooks";
 import HoagieClient from "../../service/HoagieClient";
-import TwitchClient from "../../service/TwitchClientOld";
-import { StreamData, UserData } from "../../service/TwitchClientTypes";
 import StreamSorter from "../../util/StreamSorter";
 import { CountupTimer } from "../CountdownTimer";
 import { FlexCol, FlexRow } from "../util/FlexBox";
@@ -19,6 +17,8 @@ import { RaidEvent } from "./RaidEvent";
 import { RaidHistory } from "./RaidHistory";
 import { StateContext } from "../context/StateContextProvider";
 import { LoginContext } from "../context/LoginContextProvider";
+import { createTwitchClient } from "../../util/CreateTwitchClient";
+import { StreamData, UserData } from "@hoagie/service-clients";
 
 const filterOutTags = new Set<string>([
   "trance",
@@ -101,8 +101,8 @@ export const RaidContainer = (props: RaidContainerProps) => {
   useEffect(() => {
     async function get() {
       if (loginState.username && loginState.accessToken) {
-        const client = new TwitchClient(loginState.accessToken);
-        const users = await client.getUsers(
+        const client = createTwitchClient(loginState.accessToken);
+        const users = await client.getUsersData(
           Object.values(liveStreamsToDisplay).map((c) => c.user_name)
         );
         const cInfo: Record<string, UserData> = {};

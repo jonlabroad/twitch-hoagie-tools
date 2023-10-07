@@ -8,21 +8,17 @@ import {
 } from "@mui/material";
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import HoagieClient from "../../service/HoagieClient";
-import { TwitchSubscription } from "../../service/TwitchClientTypes";
-import { AppState, defaultAppState } from "../../state/AppState";
-import { appStateReducer } from "../../state/AppStateReducer";
 import LocalStorage from "../../util/LocalStorage";
-import { PageHeader } from "../PageHeader";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/StreamerDashboard.scss";
-import TwitchClient from "../../service/TwitchClientOld";
 
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/Link";
-import Config from "../../Config";
 import { LoginContext } from "../context/LoginContextProvider";
 import { StateContext } from "../context/StateContextProvider";
+import { createTwitchClient } from "../../util/CreateTwitchClient";
+import { TwitchSubscription } from "@hoagie/service-clients";
 
 const chipColors: Record<string, any> = {
   enabled: "success",
@@ -79,9 +75,11 @@ export const StreamerDashboard = (props: {
   useEffect(() => {
     async function getStreamerId() {
       if (loginState.accessToken) {
-        const client = new TwitchClient(loginState.accessToken);
+        const client = createTwitchClient(loginState.accessToken);
         const id = await client.getUserId(props.streamerName);
-        setStreamerId(id);
+        if (id) {
+          setStreamerId(id);
+        }
       }
     }
     getStreamerId();
