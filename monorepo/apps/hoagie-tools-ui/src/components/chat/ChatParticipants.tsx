@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import TwitchClient from "../../service/TwitchClient";
+import TwitchClient from "../../service/TwitchClientOld";
 import { UserData, UserFollows } from "../../service/TwitchClientTypes";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import { ChatMessage } from "./SimpleChatDisplay";

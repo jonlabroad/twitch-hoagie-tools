@@ -7,7 +7,7 @@ import { LoginContext } from "../../context/LoginContextProvider";
 import React from "react";
 import { TwitchSubscription } from "../../../service/TwitchClientTypes";
 import LocalStorage from "../../../util/LocalStorage";
-import TwitchClient from "../../../service/TwitchClient";
+import TwitchClient from "../../../service/TwitchClientOld";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/Link";
 

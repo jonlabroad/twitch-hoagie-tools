@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import TwitchClient from "../service/TwitchClient";
+import TwitchClient from "../service/TwitchClientOld";
 import { StreamData, UserFollows } from "../service/TwitchClientTypes";
 import CacheManager from "../util/CacheManager";
 

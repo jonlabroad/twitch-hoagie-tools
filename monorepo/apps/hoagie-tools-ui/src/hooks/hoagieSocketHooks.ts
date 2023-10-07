@@ -1,8 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { StateContext } from "../components/context/StateContextProvider";
-import { LoginContext } from "../components/context/LoginContextProvider";
-import TwitchClient from "../service/TwitchClient";
-import { HoagieSocketEventListener } from "../service/HoagieSocketEventListener";
+import { useContext, useEffect, useRef, useState } from 'react';
+import { StateContext } from '../components/context/StateContextProvider';
+import { LoginContext } from '../components/context/LoginContextProvider';
+import { HoagieSocketEventListener } from '../service/HoagieSocketEventListener';
+import { createTwitchClient } from '../util/CreateTwitchClient';
 
 const defaultOptions = {
   doSubscribe: true,
@@ -42,9 +42,9 @@ export const useHoagieSockets = (
   useEffect(() => {
     if (loginState.username && loginState.accessToken) {
       socketClient.current = new HoagieSocketEventListener();
-      socketClient.current.addListener("connect", () => setConnected(true));
-      socketClient.current.addListener("disconnect", () => setConnected(false));
-      socketClient.current.addListener("dono", onDono);
+      socketClient.current.addListener('connect', () => setConnected(true));
+      socketClient.current.addListener('disconnect', () => setConnected(false));
+      socketClient.current.addListener('dono', onDono);
       socketClient.current.connect();
     }
 
@@ -55,11 +55,9 @@ export const useHoagieSockets = (
 
   useEffect(() => {
     async function subscribe() {
-      if (options.doSubscribe && isConnected) {
-        console.log("Subscribing");
-        const broadcasterId = await new TwitchClient(
-          loginState.accessToken!
-        ).getUserId(state.streamer!);
+      if (options.doSubscribe && isConnected && state.streamer && loginState.accessToken) {
+        const twitchClient = createTwitchClient(loginState.accessToken!);
+        const broadcasterId = await twitchClient.getUserId(state.streamer!);
         if (broadcasterId) {
           socketClient.current?.subscribeDono(broadcasterId);
         }

@@ -17,7 +17,7 @@ import { TwitchSubscription } from "../../service/TwitchClientTypes";
 import { appStateReducer } from "../../state/AppStateReducer";
 import HoagieOverlayClient from "../../service/HoagieOverlayClient";
 import LocalStorage from "../../util/LocalStorage";
-import TwitchClient from "../../service/TwitchClient";
+import TwitchClient from "../../service/TwitchClientOld";
 import { PageHeader } from "../PageHeader";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 import HoagieClient from "../../service/HoagieClient";

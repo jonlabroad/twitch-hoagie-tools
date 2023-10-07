@@ -10,7 +10,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { useLiveChannels, useRaidTargets } from "../../hooks/raidTargetHooks";
 import HoagieClient from "../../service/HoagieClient";
-import TwitchClient from "../../service/TwitchClient";
+import TwitchClient from "../../service/TwitchClientOld";
 import { StreamData, UserData } from "../../service/TwitchClientTypes";
 import StreamSorter from "../../util/StreamSorter";
 import { CountupTimer } from "../CountdownTimer";

@@ -10,7 +10,7 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import React from "react";
 import Config from "../../Config";
 import qs from "qs";
-import TwitchClient from "../../service/TwitchClient";
+import TwitchClient from "../../service/TwitchClientOld";
 import HoagieClient from "../../service/HoagieClient";
 import SpotifyClient from "../../service/SpotifyClient";
 import {

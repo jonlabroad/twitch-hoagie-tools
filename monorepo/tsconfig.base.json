@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@hoagie/service-clients": ["libs/service-clients/src/index.ts"],
       "@hoagie/test": ["libs/test/src/index.ts"]
     }
   },

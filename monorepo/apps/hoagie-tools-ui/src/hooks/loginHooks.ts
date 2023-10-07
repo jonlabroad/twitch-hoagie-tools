@@ -1,6 +1,6 @@
 import qs from "qs";
 import { useEffect } from "react";
-import TwitchClient from "../service/TwitchClient";
+import TwitchClient from "../service/TwitchClientOld";
 import LoginUtil from "../util/LoginUtil";
 
 export function useLogin(setLogin: (username: string | undefined, accessToken: string, loggedIn: boolean) => void) {

@@ -16,7 +16,7 @@ import { PageHeader } from "../PageHeader";
 import { FlexCol, FlexRow } from "../util/FlexBox";
 
 import "../../styles/StreamerDashboard.scss";
-import TwitchClient from "../../service/TwitchClient";
+import TwitchClient from "../../service/TwitchClientOld";
 
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/Link";
