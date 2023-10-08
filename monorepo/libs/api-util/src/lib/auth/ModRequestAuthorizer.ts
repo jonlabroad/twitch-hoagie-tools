@@ -1,0 +1,52 @@
+import { APIGatewayProxyEvent } from "aws-lambda";
+import { corsHeaders } from "@hoagie/api-util";
+import ModsDbClient from "../db/ModsDbClient";
+
+export default class ModRequestAuthorizer {
+    public static async auth(username: string, event: APIGatewayProxyEvent) {
+        console.log(`ModRequestAuthorizer`);
+        console.log({username, event})
+
+        const tableName = process.env['TABLENAME'];
+        if (!tableName) {
+            console.error("TABLENAME not set");
+            return {
+                statusCode: 500,
+                body: "TABLENAME not set",
+                headers: corsHeaders,
+            };
+        }
+
+        // Allow admins
+        const isAdminResponse = await AdminAuthorizer.auth(username);
+        const isAdmin = !isAdminResponse;
+        console.log({isAdminResponse})
+        if (isAdmin) {
+            return undefined;
+        }
+
+        // They are who they say they are, but are they a mod?
+        const streamername = event.queryStringParameters?.["streamername"]?.toLowerCase();
+        if (username && streamername) {
+            const modClient = new ModsDbClient(streamername);
+            const mods = await modClient.readMods();
+            const isMod = mods?.mods.map(m => m.toLowerCase()).includes(username);
+            const isStreamer = streamername.toLowerCase() === username
+            if (isMod || isStreamer) {
+                return undefined;
+            }
+            return {
+                statusCode: 403,
+                body: `Unauthorized, ${username} not a mod`,
+                headers: corsHeaders,
+            };
+        }
+
+        console.log(`Unauthorized ${username} at ${streamername}`);
+        return {
+            statusCode: 403,
+            body: `Unauthorized ${username} ${streamername}`,
+            headers: corsHeaders,
+        };;
+    }
+}
