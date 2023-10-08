@@ -1,5 +1,6 @@
 service: dono-service
 
+useDotenv: true
 plugins:
   - serverless-esbuild
   - serverless-offline
@@ -16,6 +17,16 @@ provider:
       twitchAuthenticator:
         type: request
         functionArn: arn:aws:lambda:us-east-1:796987500533:function:hoagietools-service-prod-twitchAuthenticator
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:Query'
+        - 'dynamodb:Scan'
+        - 'dynamodb:GetItem'
+        - 'dynamodb:PutItem'
+        - 'dynamodb:UpdateItem'
+        - 'dynamodb:DeleteItem'
+      Resource: "*"
 
 custom:
   prune:
@@ -36,8 +47,6 @@ functions:
           path: /api/v2/dono
           authorizer: twitchAuthenticator
     environment:
-      TWITCH_CLIENT_ID: ${file(../../shared/secrets/secrets.yml):twitchClientId_${self:custom.myStage}}
-      TWITCH_CLIENT_SECRET: ${file(../../shared/secrets/secrets.yml):twitchClientSecret_${self:custom.myStage}}
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
@@ -76,7 +85,48 @@ resources:
                 - "HttpApi"
                 - "ApiId"
             ForwardedValues:
-              QueryString: "false"
+              QueryString: true
               Cookies:
                 Forward: none
+              Headers:
+                - Origin
+                - Authorization
+                - Access-Control-Request-Method
+                - Access-Control-Allow-Origin
+                - Access-Control-Request-Headers
+                - Access-Control-Allow-Credentials
             ViewerProtocolPolicy: "allow-all"
+            DefaultTTL: 0
+            MinTTL: 0
+            MaxTTL: 0
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+
+    ApiGatewayAuthorizerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: 'Allow'
+              Principal:
+                Service:
+                  - 'apigateway.amazonaws.com'
+              Action:
+                - sts:AssumeRole
+        Policies:
+          - PolicyName: InvokeTwitchAuthorizerFunction
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: 'Allow'
+                  Action:
+                    - lambda:InvokeAsync
+                    - lambda:InvokeFunction
+                  Resource: arn:aws:lambda:us-east-1:796987500533:function:hoagietools-service-prod-twitchAuthenticator

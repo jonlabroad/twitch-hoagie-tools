@@ -1,12 +1,12 @@
 {
-    "root": "dono-service",
+    "root": "dono-service-app",
     "projectType": "application",
-    "sourceRoot": "apps/dono-service/src",
+    "sourceRoot": "apps/dono-service-app/src",
     "targets": {
       "build": {
         "executor": "nx:run-commands",
         "options": {
-          "cwd": "apps/dono-service",
+          "cwd": "apps/dono-service-app",
           "color": true,
           "command": "sls package --stage=development --verbose"
         }
@@ -14,7 +14,7 @@
       "offline": {
         "executor": "nx:run-commands",
         "options": {
-          "cwd": "apps/dono-service",
+          "cwd": "apps/dono-service-app",
           "color": true,
           "command": "sls offline --noAuth --stage=development --verbose"
         }
@@ -22,9 +22,9 @@
       "deploy": {
         "executor": "nx:run-commands",
         "options": {
-          "cwd": "apps/dono-service",
+          "cwd": "apps/dono-service-app",
           "color": true,
-          "command": "sls deploy --stage=prod --verbose"
+          "command": "sls deploy --stage=prod --verbose --force"
         },
         "dependsOn": [
           {

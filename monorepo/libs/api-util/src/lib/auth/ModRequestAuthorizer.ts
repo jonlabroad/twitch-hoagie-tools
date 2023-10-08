@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { corsHeaders } from "@hoagie/api-util";
 import ModsDbClient from "../db/ModsDbClient";
+import AdminAuthorizer from "./AdminAuthorizer";
 
-export default class ModRequestAuthorizer {
+export class ModRequestAuthorizer {
     public static async auth(username: string, event: APIGatewayProxyEvent) {
         console.log(`ModRequestAuthorizer`);
         console.log({username, event})
@@ -28,7 +29,7 @@ export default class ModRequestAuthorizer {
         // They are who they say they are, but are they a mod?
         const streamername = event.queryStringParameters?.["streamername"]?.toLowerCase();
         if (username && streamername) {
-            const modClient = new ModsDbClient(streamername);
+            const modClient = new ModsDbClient(tableName, streamername);
             const mods = await modClient.readMods();
             const isMod = mods?.mods.map(m => m.toLowerCase()).includes(username);
             const isStreamer = streamername.toLowerCase() === username

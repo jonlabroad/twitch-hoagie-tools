@@ -7,9 +7,9 @@
     "build:ui": "nx run hoagie-tools-ui:build",
     "serve:ui": "nx run hoagie-tools-ui:serve",
     "deploy:ui": "npm run build:ui && aws s3 sync ./dist/apps/hoagie-tools-ui s3://hoagietools --acl public-read",
-    "dono:offline": "nx run dono-service:offline",
-    "dono:build": "nx run dono-service:build",
-    "dono:deploy": "nx run dono-service:deploy"
+    "dono:offline": "nx run dono-service-app:offline",
+    "dono:build": "nx run dono-service-app:build",
+    "dono:deploy": "nx run dono-service-app:deploy"
   },
   "private": true,
   "dependencies": {

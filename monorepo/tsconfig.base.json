@@ -16,6 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@hoagie/api-util": ["libs/api-util/src/index.ts"],
+      "@hoagie/dono-service": ["libs/dono-service/src/index.ts"],
+      "@hoagie/secrets-provider": ["libs/secrets-provider/src/index.ts"],
       "@hoagie/service-clients": ["libs/service-clients/src/index.ts"],
       "@hoagie/test": ["libs/test/src/index.ts"]
     }

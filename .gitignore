@@ -4,4 +4,6 @@
 /service/.serverless
 /service/.build
 **/secrets.yml
-
+**/.serverless
+**/.build
+**/.esbuild
