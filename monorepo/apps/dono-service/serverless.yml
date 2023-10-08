@@ -1,0 +1,82 @@
+service: dono-service
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+  - serverless-prune-plugin
+  - serverless-plugin-log-retention
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  httpApi:
+    cors: true
+    authorizers:
+      twitchAuthenticator:
+        type: request
+        functionArn: arn:aws:lambda:us-east-1:796987500533:function:hoagietools-service-prod-twitchAuthenticator
+
+custom:
+  prune:
+    automatic: false
+    number: 1
+  myStage: ${opt:stage, 'dev'}
+  myTableName: HoagieTools-${opt:stage, self:provider.stage}
+  domainName:
+    development: dono-dev.hoagieman.net
+    prod: dono.hoagieman.net
+
+functions:
+  getdono:
+    handler: handlers.getdono
+    events:
+      - httpApi:
+          method: GET
+          path: /api/v2/dono
+          authorizer: twitchAuthenticator
+    environment:
+      TWITCH_CLIENT_ID: ${file(../../shared/secrets/secrets.yml):twitchClientId_${self:custom.myStage}}
+      TWITCH_CLIENT_SECRET: ${file(../../shared/secrets/secrets.yml):twitchClientSecret_${self:custom.myStage}}
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+resources:
+  Resources:
+    ApiCloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName:
+                Fn::Sub:
+                  - "${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+                  - "HttpApi": { "Ref": "HttpApi" }
+              Id:
+                Fn::GetAtt:
+                  - "HttpApi"
+                  - "ApiId"
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: https-only
+          Enabled: true
+          HttpVersion: http2
+          DefaultRootObject: index.html
+          PriceClass: PriceClass_100
+          Aliases:
+            - "${self:custom.domainName.${self:custom.myStage}}"
+          ViewerCertificate:
+            AcmCertificateArn: "arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2"
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2018
+          DefaultCacheBehavior:
+            TargetOriginId:
+              Fn::GetAtt:
+                - "HttpApi"
+                - "ApiId"
+            ForwardedValues:
+              QueryString: "false"
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: "allow-all"
