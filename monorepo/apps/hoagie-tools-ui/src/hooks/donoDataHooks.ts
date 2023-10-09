@@ -1,6 +1,6 @@
-import { useState, useEffect, useReducer, useContext } from "react";
+import { useEffect, useReducer, useContext } from "react";
 import { StreamInfo } from "../components/dono/DonoTableContainer";
-import HoagieClient, { DonoData } from "../service/HoagieClient";
+import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
 import { defaultDonoState, DonoState } from "../state/DonoState";
 import { donoStateReducer, SetDonoLoadingAction, SetDonosAction } from "../state/DonoStateReducer";
@@ -15,7 +15,6 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
     } as DonoState);
 
     async function getDonos(currentStreams: StreamInfo[]) {
-        console.log([loginState.username, loginState.accessToken, state.streamer, currentStreams, currentStreams?.length]);
         if (loginState.username && loginState.accessToken && state.streamer && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",

@@ -1,8 +1,5 @@
 import { DynamoDB } from "aws-sdk";
-import { stringify } from "querystring";
-import { SetDonoRequest } from "../../twitch-dono";
 import Config from "../Config";
-import * as tmi from "tmi.js";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 

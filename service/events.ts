@@ -1,6 +1,6 @@
 "use strict";
 
-import { APIGatewayProxyEvent, EventBridgeEvent } from "aws-lambda";
+import { EventBridgeEvent } from "aws-lambda";
 import { EventDbClient } from "./src/eventbus/EventDbClient";
 import TwitchClient from "./src/twitch/TwitchClient";
 import StreamsDbClient from "./src/channelDb/StreamsDbClient";

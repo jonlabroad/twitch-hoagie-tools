@@ -7,25 +7,19 @@ import CryptoJS from "crypto-js";
 import Config from "./src/Config";
 import ListSubscriptions from "./src/twitch/ListSubscriptions";
 import CreateSubscriptions from "./src/twitch/CreateSubscriptions";
-import TwitchRequestAuthenticator from "./src/twitch/TwitchRequestAuthenticator";
 import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 import RaidProvider from "./src/twitch/RaidProvider";
 import TwitchProvider from "./src/twitch/TwitchProvider";
-import DonoProvider from "./src/twitch/DonoProvider";
 import * as tmi from "tmi.js";
 import ModsDbClient from "./src/channelDb/ModsDbClient";
-import ModAuthorizer from "./src/twitch/ModAuthorizer";
 import ConfigProvider from "./src/config/ConfigProvider";
-import DonoDbClient from "./src/channelDb/DonoDbClient";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import AdminDbClient from "./src/channelDb/AdminDbClient";
 import { EventPublisher } from "./src/eventbus/EventPublisher";
-import DonoDbClientV2 from "./src/channelDb/DonoDbClientV2";
 import StreamsDbClient from "./src/channelDb/StreamsDbClient";
-import DonoProviderV2 from "./src/twitch/DonoProviderV2";
 import TwitchClient from "./src/twitch/TwitchClient";
 
 export const corsHeaders = {
@@ -275,138 +269,6 @@ module.exports.getuserinfo = async (event: APIGatewayProxyEvent) => {
           userLogin,
           streamerLogin,
           ...(await TwitchProvider.getUserData(streamerLogin, userLogin)),
-        },
-        null,
-        2
-      ),
-      headers: {
-        ...corsHeaders,
-        ...followCacheHeaders,
-      },
-    };
-  } catch (err) {
-    console.error(err.message, err);
-    return {
-      statusCode: 500,
-      headers: {
-        ...corsHeaders,
-      },
-      body: `${err.message}`,
-    };
-  }
-};
-
-module.exports.donodata = async (event: APIGatewayProxyEvent) => {
-  try {
-    Config.validate();
-
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const userLogin = event.queryStringParameters?.["username"] ?? "";
-    const streamIds = event.multiValueQueryStringParameters?.["streamId"];
-
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const auth = await ModRequestAuthorizer.auth(username, event);
-    if (auth) {
-      return auth;
-    }
-
-    const donos = await DonoProvider.get(streamerLogin, streamIds);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          userLogin,
-          streamerLogin,
-          ...donos,
-        },
-        null,
-        2
-      ),
-      headers: {
-        ...corsHeaders,
-        ...donoDataHeaders,
-      },
-    };
-  } catch (err) {
-    console.error(err.message, err);
-    return {
-      statusCode: 500,
-      headers: {
-        ...corsHeaders,
-      },
-      body: `${err.message}`,
-    };
-  }
-};
-
-module.exports.donodataV2 = async (event: APIGatewayProxyEvent) => {
-  try {
-    Config.validate();
-
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const userLogin = event.queryStringParameters?.["username"] ?? "";
-    const streamIds = event.multiValueQueryStringParameters?.["streamId"] ?? [];
-
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const auth = await ModRequestAuthorizer.auth(username, event);
-    if (auth) {
-      return auth;
-    }
-
-    const donos = await DonoProviderV2.get(streamerLogin, streamIds);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          userLogin,
-          streamerLogin,
-          data: donos,
-        },
-        null,
-        2
-      ),
-      headers: {
-        ...corsHeaders,
-        ...donoDataHeaders,
-      },
-    };
-  } catch (err) {
-    console.error(err.message, err);
-    return {
-      statusCode: 500,
-      headers: {
-        ...corsHeaders,
-      },
-      body: `${err.message}`,
-    };
-  }
-};
-
-module.exports.streamhistory = async (event: APIGatewayProxyEvent) => {
-  try {
-    Config.validate();
-
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const userLogin = event.queryStringParameters?.["username"] ?? "";
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-
-    const auth = await ModRequestAuthorizer.auth(username, event);
-    if (auth) {
-      return auth;
-    }
-
-    const client = new DonoDbClient(streamerLogin);
-    const streams = await client.getStreamHistory();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          userLogin,
-          streamerLogin,
-          ...streams,
         },
         null,
         2

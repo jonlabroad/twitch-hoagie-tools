@@ -1,5 +1,5 @@
+import { UserDonoSummaries } from "@hoagie/dono-service";
 import { StreamInfo } from "../components/dono/DonoTableContainer";
-import { DonoData, DonoDataV2, UserDonoSummaries } from "../service/HoagieClient"
 
 export interface DonoStateContextType {
     dispatch: any,

@@ -5,7 +5,6 @@ import { AdminData } from "./src/channelDb/AdminDbClient";
 import Config from "./src/Config";
 import ConfigProvider from "./src/config/ConfigProvider";
 import AdminAuthorizer from "./src/twitch/AdminAuthorizer";
-import DonoProvider from "./src/twitch/DonoProvider";
 import { BasicAuth } from "./src/util/BasicAuth";
 
 export const corsHeaders = {

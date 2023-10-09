@@ -2,45 +2,6 @@ import axios from "axios";
 import { RaidEvent } from "../components/raid/RaidEvent";
 import { DonoDataResponse } from "@hoagie/dono-service"
 
-export interface DonoData {
-    SubKey: string
-    dono: number
-    cheer: number
-    hypechat: number
-    data: any
-    sub: number
-    subgift: number
-    value: number
-    username: string
-}
-
-export interface DonoDataV2 {
-    CategoryKey: string
-    SubKey: string
-    username: string
-    streamId: string
-    broadcasterId: string
-    amount: number
-    subTier?: string
-    subRecipient?: string
-    type: string
-    timestamp: string
-    ExpirationTTL: number
-}
-
-export type UserDonoSummaries = Record<string, UserDonoSummary>;
-
-export interface UserDonoSummary {
-    username: string;
-    value: number;
-    subs: number;
-    subtier: string;
-    subgifts: number;
-    bits: number;
-    dono: number;
-    hypechat: number;
-  }
-
 export interface AdminData {
     CategoryKey: string
     SubKey: string
@@ -171,19 +132,6 @@ export default class HoagieClient {
         }
     }
 
-    async getDonos(username: string, accessToken: string, streamerName: string, streamIds?: string[]) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}donodata?streamername=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
-            headers: this.getHeaders(username, accessToken)
-        });
-        return response.data as {
-            stream: {
-                streamId: string
-                timestamp: string
-            },
-            donos: DonoData[]
-        }
-    }
-
     async getDonosV2(username: string, accessToken: string, streamerName: string, streamIds?: string[]): Promise<DonoDataResponse> {
         const response = await axios.get(`${this.DONO_BASE_URL}dono?streamerLogin=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
             headers: this.getHeaders(username, accessToken)
@@ -205,7 +153,6 @@ export default class HoagieClient {
         const response = await axios.get(`${this.LEGACY_BASE_URL}v2/streamhistory?streamername=${streamerName}`, {
             headers: this.getHeaders(username, accessToken)
         });
-        console.log({ history: response.data });
         return response.data as {
             streams: {
                 id: string

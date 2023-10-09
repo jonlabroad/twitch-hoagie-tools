@@ -8,7 +8,7 @@ import Config from "./src/Config";
 import GeniusClient from "./src/genius/GeniusClient";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import { BasicAuth } from "./src/util/BasicAuth";
-import { noCacheHeaders } from "./twitch-dono";
+import { noCacheHeaders } from "./admin";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

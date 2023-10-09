@@ -1,5 +1,4 @@
 import { Table, TableHead, TableRow, TableCell, TableBody, Card, TableContainer, Paper, Typography, styled, Chip, Tooltip, useTheme, Hidden } from "@mui/material"
-import { UserDonoSummary } from "../../service/HoagieClient";
 import { GetHistoryResponse, GetQueueResponse } from "../../service/StreamerSongListClient";
 
 import "../../styles/Dono.scss";
@@ -9,6 +8,7 @@ import { TwitchSubIcon } from "../icon/TwitchSubIcon";
 import { TwitchGiftSubIcon } from "../icon/TwitchGiftSubIcon";
 import { TwitchPrimeSubIcon } from "../icon/TwitchPrimeSubIcon";
 import { MoneyIcon } from "../icon/MoneyIcon";
+import { UserDonoSummary } from "@hoagie/dono-service";
 
 const tableHeaderStyle = {
     fontWeight: 600

@@ -1,4 +1,4 @@
-import { UserDonoSummaries, UserDonoSummary } from "../service/HoagieClient";
+import { UserDonoSummaries, UserDonoSummary } from "@hoagie/dono-service";
 
 export class DonoUtil {
   public static getEligibleDonos(

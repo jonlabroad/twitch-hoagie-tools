@@ -1,9 +1,6 @@
 'use strict';
 
 import { APIGatewayProxyEvent } from "aws-lambda";
-import Config from "./src/Config";
-import DonoProvider from "./src/twitch/DonoProvider";
-import { HoagieEventPublisher } from "./src/eventbus/HoagieEventPublisher";
 import TwitchClient from "./src/twitch/TwitchClient";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";

@@ -1,5 +1,5 @@
-import { UserDonoSummaries } from "../service/HoagieClient";
 import { DonoState } from "./DonoState";
+import { UserDonoSummaries } from "@hoagie/dono-service";
 
 export interface DonoStateAction {
     type: "set_donos" | "set_loading"

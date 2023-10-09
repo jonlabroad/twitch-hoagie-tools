@@ -23,6 +23,8 @@ export interface DonoData {
     ExpirationTTL: number
 }
 
+export type UserDonoSummaries = Record<string, UserDonoSummary>
+
 export interface DonoDataResponse {
-    data: Record<string, UserDonoSummary>
+    data: UserDonoSummaries
 }
