@@ -1,0 +1,80 @@
+resources:
+  Resources:
+    ApiCloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName:
+                Fn::Sub:
+                  - "${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+                  - "HttpApi": { "Ref": "HttpApi" }
+              Id:
+                Fn::GetAtt:
+                  - "HttpApi"
+                  - "ApiId"
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: https-only
+          Enabled: true
+          HttpVersion: http2
+          DefaultRootObject: index.html
+          PriceClass: PriceClass_100
+          Aliases:
+            - "${self:custom.domainName.${self:custom.myStage}}"
+          ViewerCertificate:
+            AcmCertificateArn: "arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2"
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2018
+          DefaultCacheBehavior:
+            TargetOriginId:
+              Fn::GetAtt:
+                - "HttpApi"
+                - "ApiId"
+            ForwardedValues:
+              QueryString: true
+              Cookies:
+                Forward: none
+              Headers:
+                - Origin
+                - Authorization
+                - Access-Control-Request-Method
+                - Access-Control-Allow-Origin
+                - Access-Control-Request-Headers
+                - Access-Control-Allow-Credentials
+            ViewerProtocolPolicy: "allow-all"
+            DefaultTTL: 0
+            MinTTL: 0
+            MaxTTL: 0
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+
+    ApiGatewayAuthorizerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: 'Allow'
+              Principal:
+                Service:
+                  - 'apigateway.amazonaws.com'
+              Action:
+                - sts:AssumeRole
+        Policies:
+          - PolicyName: InvokeTwitchAuthorizerFunction
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: 'Allow'
+                  Action:
+                    - lambda:InvokeAsync
+                    - lambda:InvokeFunction
+                  Resource: arn:aws:lambda:us-east-1:796987500533:function:hoagietools-service-prod-twitchAuthenticator
