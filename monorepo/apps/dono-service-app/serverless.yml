@@ -33,7 +33,8 @@ custom:
     automatic: false
     number: 1
   myStage: ${opt:stage, 'dev'}
-  myTableName: HoagieTools-${opt:stage, self:provider.stage}
+  #myTableName: HoagieTools-${opt:stage, self:provider.stage}
+  myTableName: HoagieTools-prod
   domainName:
     development: dono-dev.hoagieman.net
     prod: dono.hoagieman.net

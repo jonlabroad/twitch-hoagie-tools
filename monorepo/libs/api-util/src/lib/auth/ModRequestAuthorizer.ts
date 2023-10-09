@@ -5,9 +5,6 @@ import AdminAuthorizer from "./AdminAuthorizer";
 
 export class ModRequestAuthorizer {
     public static async auth(username: string, event: APIGatewayProxyEvent) {
-        console.log(`ModRequestAuthorizer`);
-        console.log({username, event})
-
         const tableName = process.env['TABLENAME'];
         if (!tableName) {
             console.error("TABLENAME not set");
@@ -21,7 +18,6 @@ export class ModRequestAuthorizer {
         // Allow admins
         const isAdminResponse = await AdminAuthorizer.auth(username);
         const isAdmin = !isAdminResponse;
-        console.log({isAdminResponse})
         if (isAdmin) {
             return undefined;
         }
