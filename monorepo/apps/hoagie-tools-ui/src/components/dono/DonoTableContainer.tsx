@@ -62,8 +62,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     const streamDates = currentStreams ? currentStreams.map(s => new Date(s.timestamp)) : undefined
     const liveStreamId = state.streamerData?.streamData?.id ?? "";
     const isLive = (currentStreams ?? []).map(s => s.streamId).includes(liveStreamId) && state.streamerData?.streamData?.type === "live";
-    console.log(state.streamerData);
-    console.log({isLive, liveStreamId, currentStreams});
+
     return <>
         {!isLoggedIn && <Grid item xs={12}>
             <LoginPrompt />
