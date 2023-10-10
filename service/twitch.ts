@@ -124,9 +124,10 @@ module.exports.listsubscriptions = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
     const authenticationResponse = await ModRequestAuthorizer.auth(
       username,
-      event
+      streamerName
     );
     if (authenticationResponse) {
       return authenticationResponse;
@@ -158,7 +159,8 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
       return authenticationResponse;
     }
@@ -192,10 +194,8 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const authenticationResponse = await ModRequestAuthorizer.auth(
-      username,
-      event
-    );
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
       return authenticationResponse;
     }
@@ -224,7 +224,8 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
       return authenticationResponse;
     }
@@ -295,10 +296,10 @@ module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const userLogin = event.queryStringParameters?.["username"] ?? "";
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
 
-    const auth = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const auth = await ModRequestAuthorizer.auth(username, streamerName);
     if (auth) {
       return auth;
     }
@@ -420,15 +421,12 @@ module.exports.addmod = async (event: any) => {
   Config.validate();
 
   const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    username,
-    event
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
+  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+  const auth = await ModRequestAuthorizer.auth(username, streamerName);
+  if (auth) {
+    return auth;
   }
 
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
   const modUsername = event.queryStringParameters?.["username"] ?? "";
   if (!streamerName) {
     throw new Error("streamername not defined");
@@ -453,15 +451,12 @@ module.exports.removemod = async (event: any) => {
   Config.validate();
 
   const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    username,
-    event
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
+  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+  const auth = await ModRequestAuthorizer.auth(username, streamerName);
+  if (auth) {
+    return auth;
   }
 
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
   const modUsername = event.queryStringParameters?.["username"] ?? "";
   if (!streamerName) {
     throw new Error("streamername not defined");

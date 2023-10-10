@@ -23,7 +23,8 @@ export class ModRequestAuthorizer {
         }
 
         // They are who they say they are, but are they a mod?
-        const streamername = event.queryStringParameters?.["streamername"]?.toLowerCase();
+        const streamername = event.queryStringParameters?.["streamerName"]?.toLowerCase() ?? event.queryStringParameters?.["streamername"]?.toLowerCase() ??
+            event.queryStringParameters?.["streamerLogin"]?.toLowerCase() ?? event.queryStringParameters?.["streamerlogin"]?.toLowerCase();
         if (username && streamername) {
             const modClient = new ModsDbClient(tableName, streamername);
             const mods = await modClient.readMods();

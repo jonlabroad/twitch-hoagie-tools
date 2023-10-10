@@ -24,9 +24,10 @@ module.exports.eval = async (event: APIGatewayProxyEvent) => {
   Config.validate(["TABLENAME"]);
 
   const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
   const authenticationResponse = await ModRequestAuthorizer.auth(
     username,
-    event
+    streamerName
   );
   if (authenticationResponse) {
     return authenticationResponse;
@@ -86,9 +87,10 @@ module.exports.readconfig = async (event: APIGatewayProxyEvent) => {
   Config.validate(["TABLENAME"]);
 
   const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
   const authenticationResponse = await ModRequestAuthorizer.auth(
     username,
-    event
+    streamerName
   );
   if (authenticationResponse) {
     return authenticationResponse;

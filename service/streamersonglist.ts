@@ -25,7 +25,8 @@ module.exports.settoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
         return authenticationResponse;
     }
@@ -52,14 +53,14 @@ module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
         return authenticationResponse;
     }
 
     let tokenValidated = false;
     try {
-        const streamerName = event.queryStringParameters?.["streamername"] ?? "";
         const sslToken = await StreamerSongListToken.readToken(streamerName);
         if (!sslToken) {
             throw new Error(`No ssl token found for user ${streamerName}`);

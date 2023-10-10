@@ -23,14 +23,11 @@ const cacheHeaders = {
 module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     try {
         const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-        const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+
+        const streamerName = event.queryStringParameters?.streamername ?? event.queryStringParameters?.streamerlogin ?? event.queryStringParameters?.streamerLogin ?? "";
+        const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
         if (authenticationResponse) {
           return authenticationResponse;
-        }
-
-        const streamerName = event.queryStringParameters?.streamername ?? "";
-        if (!streamerName) {
-            throw new Error("Streamer name is required");
         }
 
         const broadcasterId = await (new TwitchClient()).getUserId(streamerName);

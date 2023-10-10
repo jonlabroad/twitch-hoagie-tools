@@ -31,7 +31,8 @@ module.exports.settoken = async (event: any) => {
     Config.validate(["TABLENAME"]);
 
     const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, event);
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
     if (authenticationResponse) {
         return authenticationResponse;
     }
