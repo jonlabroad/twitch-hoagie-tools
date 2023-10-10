@@ -1,5 +1,4 @@
 import { useContext, useEffect } from 'react';
-import { TwitchClient } from '@hoagie/service-clients';
 import { StateContextType } from '../state/AppState';
 import { SetChannelInfoAction } from '../state/AppStateReducer';
 import { LoginContext } from '../components/context/LoginContextProvider';

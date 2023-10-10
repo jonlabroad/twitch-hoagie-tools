@@ -9,7 +9,10 @@
     "deploy:ui": "npm run build:ui && aws s3 sync ./dist/apps/hoagie-tools-ui s3://hoagietools --acl public-read",
     "dono:offline": "nx run dono-service-app:offline",
     "dono:build": "nx run dono-service-app:build",
-    "dono:deploy": "nx run dono-service-app:deploy"
+    "dono:deploy": "nx run dono-service-app:deploy",
+    "songeval:offline": "nx run song-eval-service-app:offline",
+    "songeval:build": "nx run song-eval-service-app:build",
+    "songeval:deploy": "nx run song-eval-service-app:deploy"
   },
   "private": true,
   "dependencies": {

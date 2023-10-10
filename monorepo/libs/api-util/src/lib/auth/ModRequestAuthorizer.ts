@@ -1,10 +1,9 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import { corsHeaders } from "@hoagie/api-util";
 import ModsDbClient from "../db/ModsDbClient";
 import AdminAuthorizer from "./AdminAuthorizer";
 
 export class ModRequestAuthorizer {
-    public static async auth(username: string, event: APIGatewayProxyEvent) {
+    public static async auth(username: string, streamerName: string) {
         const tableName = process.env['TABLENAME'];
         if (!tableName) {
             console.error("TABLENAME not set");
@@ -23,13 +22,11 @@ export class ModRequestAuthorizer {
         }
 
         // They are who they say they are, but are they a mod?
-        const streamername = event.queryStringParameters?.["streamerName"]?.toLowerCase() ?? event.queryStringParameters?.["streamername"]?.toLowerCase() ??
-            event.queryStringParameters?.["streamerLogin"]?.toLowerCase() ?? event.queryStringParameters?.["streamerlogin"]?.toLowerCase();
-        if (username && streamername) {
-            const modClient = new ModsDbClient(tableName, streamername);
+        if (username && streamerName) {
+            const modClient = new ModsDbClient(tableName, streamerName);
             const mods = await modClient.readMods();
             const isMod = mods?.mods.map(m => m.toLowerCase()).includes(username);
-            const isStreamer = streamername.toLowerCase() === username
+            const isStreamer = streamerName.toLowerCase() === username
             if (isMod || isStreamer) {
                 return undefined;
             }
@@ -40,10 +37,10 @@ export class ModRequestAuthorizer {
             };
         }
 
-        console.log(`Unauthorized ${username} at ${streamername}`);
+        console.log(`Unauthorized ${username} at ${streamerName}`);
         return {
             statusCode: 403,
-            body: `Unauthorized ${username} ${streamername}`,
+            body: `Unauthorized ${username} ${streamerName}`,
             headers: corsHeaders,
         };;
     }

@@ -161,12 +161,12 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   }
 
   async getStreamsByUsernames(usernames: string[]): Promise<StreamData[]> {
-    const data = await this.get<StreamData[]>(
+    const data = await this.get<Paginated<StreamData[]>>(
       `https://api.twitch.tv/helix/streams?${usernames
         .map((u) => `user_login=${u}`)
         .join('&')}`
     );
-    return data ?? [];
+    return data?.data ?? [];
   }
 
   // Confirm that this Twitch user is who they say they are

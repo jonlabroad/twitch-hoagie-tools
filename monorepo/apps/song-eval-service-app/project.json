@@ -1,0 +1,39 @@
+{
+    "root": "song-eval-service-app",
+    "projectType": "application",
+    "sourceRoot": "apps/song-eval-service-app/src",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/song-eval-service-app",
+          "color": true,
+          "command": "sls package --stage=development --verbose"
+        }
+      },
+      "offline": {
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/song-eval-service-app",
+          "color": true,
+          "command": "sls offline --noAuth --stage=development --verbose"
+        }
+      },
+      "deploy": {
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/song-eval-service-app",
+          "color": true,
+          "command": "sls deploy --stage=prod --verbose --force"
+        },
+        "dependsOn": [
+          {
+            "target": "deploy",
+            "projects": "dependencies"
+          }
+        ]
+      }
+    },
+    "tags": ["service"],
+    "implicitDependencies": []
+  }

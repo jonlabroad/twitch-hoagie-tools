@@ -1,6 +1,5 @@
 import axios from "axios";
 import { RaidEvent } from "../components/raid/RaidEvent";
-import { DonoDataResponse } from "@hoagie/dono-service"
 
 export interface AdminData {
     CategoryKey: string
@@ -14,7 +13,6 @@ export interface AdminData {
 export default class HoagieClient {
     //readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
     readonly LEGACY_BASE_URL = 'https://hoagietools-svc-prod.hoagieman.net/api/';
-    readonly DONO_BASE_URL = 'https://dono.hoagieman.net/api/v2/';
 
     async analyze(text: string): Promise<Record<string, number> | undefined> {
         let result = undefined;
@@ -130,13 +128,6 @@ export default class HoagieClient {
         return response.data as {
             raids: RaidEvent[];
         }
-    }
-
-    async getDonosV2(username: string, accessToken: string, streamerName: string, streamIds?: string[]): Promise<DonoDataResponse> {
-        const response = await axios.get(`${this.DONO_BASE_URL}dono?streamerLogin=${streamerName}${streamIds ? streamIds.map(streamId => `&streamId=${streamId}`).join('') : ''}`, {
-            headers: this.getHeaders(username, accessToken)
-        });
-        return response.data as DonoDataResponse;
     }
 
     async getStreamHistory(username: string, accessToken: string, streamerName: string) {

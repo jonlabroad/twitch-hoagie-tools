@@ -12,9 +12,9 @@ import { Config } from './Config';
 import { createTwitchClient } from './createTwitchClient';
 
 export class GetDonos {
-  public static async run(event: APIGatewayEvent) {
-    const { streamerLogin, streamId } = event.queryStringParameters ?? {};
-    if (!streamerLogin || !streamId) {
+  public static async run(streamerName: string, event: APIGatewayEvent) {
+    const { streamId } = event.queryStringParameters ?? {};
+    if (!streamId) {
       return {
         statusCode: 400,
         body: 'Missing streamerLogin or streamid',
@@ -23,7 +23,7 @@ export class GetDonos {
 
     const { username } = BasicAuth.decode(event.headers.authorization ?? '');
     if (!isOfflineMode()) {
-      const auth = await ModRequestAuthorizer.auth(username, event);
+      const auth = await ModRequestAuthorizer.auth(username, streamerName);
       if (auth) {
         return auth;
       }
@@ -35,7 +35,7 @@ export class GetDonos {
       createTwitchClient(),
       Config.tableName
     );
-    const donos = await donoProvider.get(streamerLogin, streamIds);
+    const donos = await donoProvider.get(streamerName, streamIds);
     const responseData: DonoDataResponse = {
       data: donos,
     };

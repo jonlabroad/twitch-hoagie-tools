@@ -1,4 +1,4 @@
-service: dono-service
+service: song-eval-service
 
 useDotenv: true
 plugins:
@@ -36,16 +36,16 @@ custom:
   #myTableName: HoagieTools-${opt:stage, self:provider.stage}
   myTableName: HoagieTools-prod
   domainName:
-    development: dono-dev.hoagieman.net
-    prod: dono.hoagieman.net
+    development: songeval-dev.hoagieman.net
+    prod: songeval.hoagieman.net
 
 functions:
-  getdono:
-    handler: handlers.getdono
+  test:
+    handler: handlers.test
     events:
       - httpApi:
           method: GET
-          path: /api/v1/{streamerName}
+          path: /v1/test
           authorizer: twitchAuthenticator
     environment:
       STAGE: ${self:custom.myStage}
