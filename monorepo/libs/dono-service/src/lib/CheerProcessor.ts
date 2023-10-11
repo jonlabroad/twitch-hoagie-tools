@@ -12,7 +12,7 @@ export class CheerProcessor {
       const stream = await twitchClient.getBroadcasterIdLiveStream(
         broadcasterId
       );
-      if (stream) {
+            if (stream) {
         const dbWriter = new DonoDbClient(broadcasterId, tableName);
         const detail = event.detail;
         await dbWriter.addCheer(

@@ -20,7 +20,7 @@ export class SubGiftProcessor {
       const stream = await this.twitchClient.getBroadcasterIdLiveStream(
         broadcasterId
       );
-      if (stream) {
+            if (stream) {
         const dbWriter = new DonoDbClient(broadcasterId, this.tableName);
         const detail = event.detail;
         await dbWriter.addGiftSubs(

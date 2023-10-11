@@ -1,7 +1,6 @@
 import { DonoData } from "../lib/DonoTypes";
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { createDocClient } from "@hoagie/api-util";
-import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 
@@ -51,10 +50,10 @@ export default class DonoDbClient {
         await this.writeItem(this.createItem(uuid, username, streamId, "subgift", 1, tier, recipient));
     }
 
-    async writeItem(item: any) {
+    async writeItem(item: Record<string, any>) {
         try {
             const client = createDocClient();
-            const input = new PutItemCommand({
+            const input = new PutCommand({
                 TableName: this.tableName,
                 Item: item,
             });
