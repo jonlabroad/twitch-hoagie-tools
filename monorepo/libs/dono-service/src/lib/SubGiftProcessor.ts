@@ -1,20 +1,27 @@
-import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
-import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
-import TwitchClient from "../twitch/TwitchClient";
+import { TwitchClient } from "@hoagie/service-clients";
 import { SubGiftEvent, getChannelName } from "./ChatEventProcessor";
+import { HoagieEventPublisher } from "@hoagie/api-util";
+import DonoDbClient from "./DonoDbClient";
 
 export class SubGiftProcessor {
-  public static async process(event: SubGiftEvent) {
+  twitchClient: TwitchClient
+  tableName: string
+  
+  constructor(twitchClient: TwitchClient, tableName: string) {
+    this.twitchClient = twitchClient;
+    this.tableName = tableName;
+  }
+
+  public async process(event: SubGiftEvent) {
     console.log("SubGiftProcessor.process", event);
-    const twitchClient = new TwitchClient();
     const broadcasterLogin = getChannelName(event.detail.channel);
-    const broadcasterId = await twitchClient.getUserId(broadcasterLogin);
+    const broadcasterId = await this.twitchClient.getUserId(broadcasterLogin);
     if (broadcasterId) {
-      const stream = await twitchClient.getBroadcasterIdLiveStream(
+      const stream = await this.twitchClient.getBroadcasterIdLiveStream(
         broadcasterId
       );
       if (stream) {
-        const dbWriter = new DonoDbClientV2(broadcasterId);
+        const dbWriter = new DonoDbClient(broadcasterId, this.tableName);
         const detail = event.detail;
         await dbWriter.addGiftSubs(
           detail.userstate.id!,

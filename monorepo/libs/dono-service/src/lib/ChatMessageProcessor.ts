@@ -1,9 +1,9 @@
-import TwitchClient from "../twitch/TwitchClient";
+import { TwitchClient } from "@hoagie/service-clients";
 import { BotDonoProcessor } from "./BotDonoProcessor";
 import { getChannelName } from "./ChatEventProcessor";
 
 export class ChatMessageProcessor {
-    public static async process(event: any) {
+    public static async process(event: any, twitchClient: TwitchClient, tableName: string) {
         console.log("ChatMessageProcessor.process", event);
 
         const detail = event.detail;
@@ -11,18 +11,14 @@ export class ChatMessageProcessor {
         const message = detail.message;
         const channel = getChannelName(detail.channel);
 
-        const twitchClient = new TwitchClient();
         const broadcasterId = await twitchClient.getUserId(channel);
         if (broadcasterId) {
             const liveStream = await twitchClient.getBroadcasterIdLiveStream(broadcasterId);
             if (liveStream) {
-                const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id);
+                const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id, tableName);
                 await donoProcessor.process(detail.userstate.id, channel, username, message);
             } else {
                 console.error(`Could not find live stream for ${broadcasterId}`);
-                console.warn("Testing parsing of dono messages in offline stream");
-                const donoProcessor = new BotDonoProcessor(broadcasterId, "test");
-                await donoProcessor.process(detail.userstate.id, channel, username, message);
             }
         } else {
             console.error(`Could not find broadcaster id for ${channel}`);

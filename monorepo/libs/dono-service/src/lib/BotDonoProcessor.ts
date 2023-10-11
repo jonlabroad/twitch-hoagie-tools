@@ -1,6 +1,7 @@
-import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
-import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
+import { HoagieEventPublisher } from "@hoagie/api-util";
 import { getChannelName } from "./ChatEventProcessor";
+import DonoDbClient from "./DonoDbClient";
+
 
 interface ChannelConfig {
   botUsername: string;
@@ -26,16 +27,18 @@ const channelConfigs: Record<string, ChannelConfig> = {
   hoagieman5000: {
     botUsername: "hoagieman5000",
     donoMessageRegex: /DONO ARIGATO! (?<username>\S+).+\$(?<amount>[0-9]+\.[0-9]+)/,
-  }
+  },
 };
 
 export class BotDonoProcessor {
   broadcasterId: string;
   streamId: string;
+  tableName: string;
 
-  constructor(broadcasterId: string, streamId: string) {
+  constructor(broadcasterId: string, streamId: string, tableName: string) {
     this.broadcasterId = broadcasterId;
     this.streamId = streamId;
+    this.tableName = tableName;
   }
 
   public async process(uuid: string, channel: string, username: string, chatMessage: string) {
@@ -47,10 +50,10 @@ export class BotDonoProcessor {
     if (config?.botUsername === username.toLowerCase()) {
       const match = chatMessage.match(config.donoMessageRegex);
       if (match) {
-        const amountMatch = match.groups?.amount;
-        const donator = match.groups?.username ?? "ERROR";
+        const amountMatch = match.groups?.["amount"];
+        const donator = match.groups?.["username"] ?? "ERROR";
         const amount = parseFloat(amountMatch ?? "0");
-        const dbWriter = new DonoDbClientV2(this.broadcasterId);
+        const dbWriter = new DonoDbClient(this.broadcasterId, this.tableName);
         console.log({ uuid, username, streamId: this.streamId, amount });
         await dbWriter.addDono(uuid, donator.toLowerCase(), this.streamId, amount);
         await HoagieEventPublisher.publishToTopic(`dono.${this.broadcasterId}`, {});

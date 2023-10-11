@@ -27,6 +27,7 @@ provider:
         - 'dynamodb:UpdateItem'
         - 'dynamodb:DeleteItem'
       Resource: "*"
+  logRetentionInDays: 30 # used to set a global value for all functions
 
 custom:
   prune:
@@ -47,6 +48,17 @@ functions:
           method: GET
           path: /api/v1/{streamerName}
           authorizer: twitchAuthenticator
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
+  twitchchatevents:
+    handler: handlers.twitchchatevents
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - 'hoagie.twitch-chat'
     environment:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}

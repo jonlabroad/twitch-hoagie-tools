@@ -3,6 +3,7 @@ import { SubGiftProcessor } from "./SubGiftProcessor"
 import { SubProcessor } from "./SubProcessor"
 import { CheerProcessor } from "./CheerProcessor"
 import { ChatMessageProcessor } from "./ChatMessageProcessor"
+import { TwitchClient } from "@hoagie/service-clients"
 
 export interface ChatEventType {
     version: string,
@@ -69,22 +70,22 @@ export interface MessageEvent extends ChatEventType {
 }
 
 export class ChatEventProcessor {
-    public static async process(event: ChatEventType) {
+    public static async process(event: ChatEventType, twitchClient: TwitchClient, tableName: string) {
         switch (event["detail-type"]) {
             case "subgift":
-                await SubGiftProcessor.process(event as SubGiftEvent)
+                await (new SubGiftProcessor(twitchClient, tableName)).process(event as SubGiftEvent)
                 break;
             case "subscription":
-                await SubProcessor.process(event as SubEvent)
+                await SubProcessor.process(event as SubEvent, twitchClient, tableName)
                 break;
             case "resub":
-                await SubProcessor.process(event as ResubEvent)
+                await SubProcessor.process(event as ResubEvent, twitchClient, tableName)
                 break;
             case "cheer":
-                await CheerProcessor.process(event as CheerEvent)
+                await CheerProcessor.process(event as CheerEvent, twitchClient, tableName)
                 break;
             case "message":
-                await ChatMessageProcessor.process(event as MessageEvent)
+                await ChatMessageProcessor.process(event as MessageEvent, twitchClient, tableName)
                 break;
             default:
                 console.error(`Unknown event type: ${event["detail-type"]}`);

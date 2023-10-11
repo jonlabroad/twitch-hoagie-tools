@@ -1,11 +1,10 @@
-import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
-import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
-import TwitchClient from "../twitch/TwitchClient";
+import { TwitchClient } from "@hoagie/service-clients";
 import { CheerEvent, getChannelName } from "./ChatEventProcessor";
+import DonoDbClient from "./DonoDbClient";
+import { HoagieEventPublisher } from "@hoagie/api-util";
 
 export class CheerProcessor {
-  public static async process(event: CheerEvent) {
-    const twitchClient = new TwitchClient();
+  public static async process(event: CheerEvent, twitchClient: TwitchClient, tableName: string) {
     console.log("CheerProcessor.process", event);
     const broadcasterLogin = getChannelName(event.detail.channel);
     const broadcasterId = await twitchClient.getUserId(broadcasterLogin);
@@ -14,7 +13,7 @@ export class CheerProcessor {
         broadcasterId
       );
       if (stream) {
-        const dbWriter = new DonoDbClientV2(broadcasterId);
+        const dbWriter = new DonoDbClient(broadcasterId, tableName);
         const detail = event.detail;
         await dbWriter.addCheer(
           detail.userstate.id!,

@@ -1,12 +1,11 @@
-import DonoDbClientV2 from "../channelDb/DonoDbClientV2";
-import { HoagieEventPublisher } from "../eventbus/HoagieEventPublisher";
-import TwitchClient from "../twitch/TwitchClient";
+import { TwitchClient } from "@hoagie/service-clients";
 import { ResubEvent, SubEvent, getChannelName } from "./ChatEventProcessor";
+import DonoDbClient from "./DonoDbClient";
+import { HoagieEventPublisher } from "@hoagie/api-util";
 
 export class SubProcessor {
-  public static async process(event: SubEvent | ResubEvent) {
+  public static async process(event: SubEvent | ResubEvent, twitchClient: TwitchClient, tableName: string) {
     console.log("SubProcessor.process", event);
-    const twitchClient = new TwitchClient();
     const broadcasterLogin = getChannelName(event.detail.channel);
     const broadcasterId = await twitchClient.getUserId(broadcasterLogin);
     if (broadcasterId) {
@@ -14,7 +13,7 @@ export class SubProcessor {
         broadcasterId
       );
       if (stream) {
-        const dbWriter = new DonoDbClientV2(broadcasterId);
+        const dbWriter = new DonoDbClient(broadcasterId, tableName);
         const detail = event.detail;
         await dbWriter.addSub(
           detail.userstate.id!,
