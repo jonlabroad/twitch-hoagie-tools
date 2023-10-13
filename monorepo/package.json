@@ -4,12 +4,13 @@
   "license": "MIT",
   "scripts": {
     "build": "nx run-many --target=build --all",
-    "build:ui": "nx run hoagie-tools-ui:build",
-    "serve:ui": "nx run hoagie-tools-ui:serve",
-    "deploy:ui": "npm run build:ui && aws s3 sync ./dist/apps/hoagie-tools-ui s3://hoagietools --acl public-read",
+    "ui:build": "nx run hoagie-tools-ui:build",
+    "ui:serve": "nx run hoagie-tools-ui:serve",
+    "ui:deploy": "npm run ui:build && aws s3 sync ./dist/apps/hoagie-tools-ui s3://hoagietools --acl public-read",
     "dono:offline": "nx run dono-service-app:offline",
     "dono:build": "nx run dono-service-app:build",
     "dono:deploy": "nx run dono-service-app:deploy",
+    "dono:deploy-dev": "nx run dono-service-app:deploy-dev",
     "songeval:offline": "nx run song-eval-service-app:offline",
     "songeval:build": "nx run song-eval-service-app:build",
     "songeval:deploy": "nx run song-eval-service-app:deploy"

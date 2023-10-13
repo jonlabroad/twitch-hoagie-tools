@@ -27,15 +27,23 @@ provider:
         - 'dynamodb:UpdateItem'
         - 'dynamodb:DeleteItem'
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - events:PutEvents
+      Resource: arn:aws:events:*:796987500533:event-bus/default
+    - Effect: Allow
+      Action:
+        - 'ecs:DescribeServices'
+      Resource: '*'
   logRetentionInDays: 30 # used to set a global value for all functions
 
 custom:
   prune:
     automatic: false
     number: 1
-  myStage: ${opt:stage, 'dev'}
-  #myTableName: HoagieTools-${opt:stage, self:provider.stage}
-  myTableName: HoagieTools-prod
+  myStage: ${opt:stage, 'development'}
+  myTableName: HoagieTools-${opt:stage, self:provider.stage}
+  #myTableName: HoagieTools-prod
   domainName:
     development: dono-dev.hoagieman.net
     prod: dono.hoagieman.net

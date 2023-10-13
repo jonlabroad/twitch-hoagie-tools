@@ -7,13 +7,11 @@ export default class ModRequestAuthorizer {
         console.log({username, streamerLogin})
 
         // Allow admins
-        /*
         const isAdminResponse = await AdminAuthorizer.auth(username);
         const isAdmin = !isAdminResponse;
         if (isAdmin) {
             return undefined;
         }
-        */
 
         // They are who they say they are, but are they a mod?
         if (!streamerLogin) {

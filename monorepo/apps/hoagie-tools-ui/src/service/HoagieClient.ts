@@ -11,8 +11,10 @@ export interface AdminData {
 }
 
 export default class HoagieClient {
-    //readonly BASE_URL = process.env.NODE_ENV === "production" ? 'https://hoagietools-svc-prod.hoagieman.net/api/' : 'https://hoagietools-svc-development.hoagieman.net/api/';
-    readonly LEGACY_BASE_URL = 'https://hoagietools-svc-prod.hoagieman.net/api/';
+    readonly LEGACY_BASE_URL = (() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return !!urlParams.get("dev") ? 'https://hoagietools-svc-development.hoagieman.net/api/' : 'https://hoagietools-svc-prod.hoagieman.net/api/';
+    })();
 
     async analyze(text: string): Promise<Record<string, number> | undefined> {
         let result = undefined;
