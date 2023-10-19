@@ -1,6 +1,7 @@
-import { APIGatewayEvent } from "aws-lambda";
-import { songEvalService } from "@hoagie/song-eval-service";
+import { APIGatewayEvent } from 'aws-lambda';
+import { songEvalService } from '@hoagie/song-eval-service';
 
-export function test() {
-  songEvalService();
+export async function songeval(apiEvent: APIGatewayEvent) {
+  const { query } = apiEvent.queryStringParameters ?? {};
+  return await songEvalService(query ?? "", apiEvent);
 }

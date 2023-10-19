@@ -52,4 +52,18 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
+  songeval:
+    handler: handlers.eval
+    timeout: 600
+    events:
+      - httpApi:
+          method: GET
+          path: /api/songeval/eval
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
 resources: ${file(../../libs/api-util/src/lib/serverless/serviceCloudfront.yml):resources}

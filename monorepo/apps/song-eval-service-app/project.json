@@ -32,6 +32,20 @@
             "projects": "dependencies"
           }
         ]
+      },
+      "deploy-dev": {
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "apps/song-eval-service-app",
+          "color": true,
+          "command": "sls deploy --stage=development --verbose --force"
+        },
+        "dependsOn": [
+          {
+            "target": "deploy",
+            "projects": "dependencies"
+          }
+        ]
       }
     },
     "tags": ["service"],
