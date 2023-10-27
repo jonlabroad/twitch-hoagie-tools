@@ -13,7 +13,8 @@
     "dono:deploy-dev": "nx run dono-service-app:deploy-dev",
     "songeval:offline": "nx run song-eval-service-app:offline",
     "songeval:build": "nx run song-eval-service-app:build",
-    "songeval:deploy": "nx run song-eval-service-app:deploy"
+    "songeval:deploy": "nx run song-eval-service-app:deploy",
+    "songeval:deploy-dev": "nx run song-eval-service-app:deploy-dev"
   },
   "private": true,
   "dependencies": {
@@ -34,6 +35,7 @@
     "format-duration": "^2.0.0",
     "googleapis": "^71.0.0",
     "html-entities": "^2.4.0",
+    "jssoup": "^0.0.15",
     "node-cache": "^5.1.2",
     "perspective-api-client": "^3.1.0",
     "qs": "^6.11.2",

@@ -177,13 +177,6 @@ export default class HoagieClient {
         });
     }
 
-    async songEval(song: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/eval?query=${song}&streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
-        });
-        return response?.data;
-    }
-
     async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
         const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamername=${streamerName}&word=${word}`, {
             headers: this.getHeaders(username, accessToken)

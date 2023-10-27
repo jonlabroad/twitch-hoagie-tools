@@ -41,24 +41,13 @@ custom:
     prod: songeval.hoagieman.net
 
 functions:
-  test:
-    handler: handlers.test
-    events:
-      - httpApi:
-          method: GET
-          path: /v1/test
-          authorizer: twitchAuthenticator
-    environment:
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
   songeval:
-    handler: handlers.eval
+    handler: handlers.songeval
     timeout: 600
     events:
       - httpApi:
           method: GET
-          path: /api/songeval/eval
+          path: /api/v1/eval
           cors: true
           authorizer:
             name: twitchAuthenticator
