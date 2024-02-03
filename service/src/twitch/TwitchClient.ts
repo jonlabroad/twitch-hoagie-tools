@@ -61,12 +61,14 @@ export default class TwitchClient {
     public async listSubscriptions() {
         const authToken = await this.getAuthToken();
         const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
-        const response = await axios.get<any>(url, {
+        const options = {
             headers: {
                 "Client-ID": `${Config.twitchClientId}`,
                 Authorization: `Bearer ${authToken?.access_token}`
             }
-        });
+        };
+
+        const response = await axios.get<any>(url, options);
         return response.data as {
             data: TwitchSubscription[],
             total: number,

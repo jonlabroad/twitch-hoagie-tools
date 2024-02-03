@@ -9,7 +9,7 @@ export interface PageConfig {
 export default class Config {
     public static environment: "dev" | "prod" = new URLSearchParams(window.location.search).get("dev") ? "dev" : "prod";
     public static admins = ["hoagieman5000"]
-    public static clientId = process.env.NODE_ENV === "production" ? "ywktn54es8x9ipwm0305v3sj3vmy7l" : "2tkbhgbkk81ylt5o22iqjk9c0sorcg";
+    public static clientId = process.env.NODE_ENV === "production" ? "ywktn54es8x9ipwm0305v3sj3vmy7l" : "ywktn54es8x9ipwm0305v3sj3vmy7l"/*"2tkbhgbkk81ylt5o22iqjk9c0sorcg"*/;
     public static overlayClientId = "tc1xzzxj1ct3a3fieahi0lqrjewk75";
     public static redirectUri = process.env.NODE_ENV === "production" ? "https://hoagietools.hoagieman.net/loginRedirect" : "http://localhost:4200/loginRedirect";
 

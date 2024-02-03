@@ -5,24 +5,24 @@ import {
   CircularProgress,
   Grid,
   TextField,
-} from "@mui/material";
-import React, { useContext, useEffect, useReducer, useState } from "react";
-import HoagieClient from "../../service/HoagieClient";
-import LocalStorage from "../../util/LocalStorage";
-import { FlexCol, FlexRow } from "../util/FlexBox";
+} from '@mui/material';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
+import HoagieClient from '../../service/HoagieClient';
+import LocalStorage from '../../util/LocalStorage';
+import { FlexCol, FlexRow } from '../util/FlexBox';
 
-import "../../styles/StreamerDashboard.scss";
+import '../../styles/StreamerDashboard.scss';
 
-import LinkIcon from "@mui/icons-material/Link";
-import LinkOffIcon from "@mui/icons-material/Link";
-import { LoginContext } from "../context/LoginContextProvider";
-import { StateContext } from "../context/StateContextProvider";
-import { createTwitchClient } from "../../util/CreateTwitchClient";
-import { TwitchSubscription } from "@hoagie/service-clients";
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/Link';
+import { LoginContext } from '../context/LoginContextProvider';
+import { StateContext } from '../context/StateContextProvider';
+import { createTwitchClient } from '../../util/CreateTwitchClient';
+import { TwitchSubscription } from '@hoagie/service-clients';
 
 const chipColors: Record<string, any> = {
-  enabled: "success",
-  webhook_callback_verification_failed: "error",
+  enabled: 'success',
+  webhook_callback_verification_failed: 'error',
 };
 
 export const StreamerDashboard = (props: {
@@ -66,7 +66,7 @@ export const StreamerDashboard = (props: {
 
   useEffect(() => {
     const path = window.location.pathname;
-    LocalStorage.set("lastPath", { path });
+    LocalStorage.set('lastPath', { path });
   }, []);
 
   useEffect(() => {
@@ -88,10 +88,10 @@ export const StreamerDashboard = (props: {
 
   const subscriptionsToDisplay = subscriptions;
 
-  let subConnectionStatus = "";
+  let subConnectionStatus = '';
   if (subscriptionsToDisplay) {
     subConnectionStatus =
-      subscriptionsToDisplay.length > 0 ? "CONNECTED" : "DISCONNECTED";
+      subscriptionsToDisplay.length > 0 ? 'CONNECTED' : 'DISCONNECTED';
   }
 
   return (
@@ -103,21 +103,21 @@ export const StreamerDashboard = (props: {
               <h2 style={{ marginRight: 20 }}>Raid Watcher</h2>
               {!subscriptionsToDisplay && <CircularProgress size={20} />}
               {subscriptionsToDisplay && subscriptionsToDisplay.length > 0 && (
-                <LinkIcon style={{ color: "green", marginRight: 10 }} />
+                <LinkIcon style={{ color: 'green', marginRight: 10 }} />
               )}
               {subscriptionsToDisplay && subscriptionsToDisplay.length <= 0 && (
-                <LinkOffIcon style={{ color: "red", marginRight: 10 }} />
+                <LinkOffIcon style={{ color: 'red', marginRight: 10 }} />
               )}
               <div
                 style={{
-                  color: subConnectionStatus === "CONNECTED" ? "green" : "red",
+                  color: subConnectionStatus === 'CONNECTED' ? 'green' : 'red',
                 }}
               >
                 {subConnectionStatus}
               </div>
             </FlexRow>
             {loginState.accessToken &&
-              subConnectionStatus === "DISCONNECTED" && (
+              subConnectionStatus === 'DISCONNECTED' && (
                 <FlexCol style={{ maxWidth: 120 }}>
                   <Button
                     color="secondary"
@@ -128,7 +128,7 @@ export const StreamerDashboard = (props: {
                   </Button>
                 </FlexCol>
               )}
-            {loginState.accessToken && subConnectionStatus === "CONNECTED" && (
+            {loginState.accessToken && subConnectionStatus === 'CONNECTED' && (
               <FlexCol style={{ maxWidth: 120 }}>
                 <Button
                   color="primary"
@@ -162,7 +162,7 @@ export const StreamerDashboard = (props: {
                       <div className="sub-status">
                         <Chip
                           label={sub.status}
-                          color={chipColors[sub.status] ?? "primary"}
+                          color={chipColors[sub.status] ?? 'primary'}
                         />
                       </div>
                       <div className="sub-delete">
