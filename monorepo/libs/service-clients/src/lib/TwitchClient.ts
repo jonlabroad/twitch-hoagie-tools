@@ -212,6 +212,14 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     };
   }
 
+  async getUserDataById(userIds: string[]): Promise<UserData[]> {
+    const url = `https://api.twitch.tv/helix/users?${userIds
+      .map((u) => `id=${u}`)
+      .join('&')}`;
+    const response = await this.get<{ data: UserData[] }>(url);
+    return response?.data ?? [];
+  }
+
   async getUsersData(userLogins: string[]) {
     const url = `https://api.twitch.tv/helix/users?${userLogins
       .map((u) => `login=${u}`)

@@ -9,6 +9,7 @@ import { StreamerListContainer } from "./StreamerListContainer";
 import { LoginContext } from "../context/LoginContextProvider";
 import { Admin } from "../../admin/Admin";
 import { HoagieSocketAdminContainer } from "./HoagieSocketAdminContainer";
+import { ManageEventSub } from "./ManageEventSub";
 
 interface AdminPageProps {}
 
@@ -58,6 +59,9 @@ export const AdminPage = (props: AdminPageProps) => {
         </Grid>
         <Grid item style={{ margin: 10 }} xs={12}>
           <HoagieSocketAdminContainer />
+        </Grid>
+        <Grid item style={{ margin: 10 }} xs={12}>
+          <ManageEventSub />
         </Grid>
       </Grid>
     </>

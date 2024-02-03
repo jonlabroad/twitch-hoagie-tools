@@ -21,6 +21,7 @@ import AdminDbClient from "./src/channelDb/AdminDbClient";
 import { EventPublisher } from "./src/eventbus/EventPublisher";
 import StreamsDbClient from "./src/channelDb/StreamsDbClient";
 import TwitchClient from "./src/twitch/TwitchClient";
+import CreateSelfSubscriptions from "./src/twitch/CreateSelfSubscriptions";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -171,6 +172,41 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
       statusCode: 200,
       body: JSON.stringify(
         await CreateSubscriptions.create(streamerLogin),
+        null,
+        2
+      ),
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (err) {
+    console.error(err.message, err);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: `${err.message}`,
+    };
+  }
+};
+
+module.exports.createselfsubscriptions = async (event: APIGatewayProxyEvent) => {
+  try {
+    Config.validate();
+
+    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    if (authenticationResponse) {
+      return authenticationResponse;
+    }
+
+    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+    console.log(`Creating subscriptions for ${streamerLogin}`);
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        await CreateSelfSubscriptions.create(streamerLogin),
         null,
         2
       ),

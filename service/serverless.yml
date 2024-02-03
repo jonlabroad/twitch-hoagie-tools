@@ -301,6 +301,25 @@ functions:
       STAGE: ${self:custom.myStage}
       SUBSCRIPTION_SECRET: ${file(secrets.yml):twitchWebhookSecret}
 
+  createselfsubscriptions:
+    handler: twitch.createselfsubscriptions
+    events:
+      - http:
+          method: GET
+          path: /api/createselfsubscriptions
+          parameters:
+            querystrings:
+              username: true
+              channelname: true
+          cors: true
+          authorizer:
+            name: twitchAuthenticator
+    environment:
+      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
+      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
+      STAGE: ${self:custom.myStage}
+      SUBSCRIPTION_SECRET: ${file(secrets.yml):twitchWebhookSecret}
+
   deletesubscription:
     handler: twitch.deletesubscription
     events:

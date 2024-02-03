@@ -9,6 +9,8 @@ import { LoginContext } from "./context/LoginContextProvider";
 import { StateContext } from "./context/StateContextProvider";
 import { StreamerInfo } from "./menu/StreamerInfo";
 
+const getStreamerScopes = false;
+
 export const PageHeader = (props: { scopes: string; clientId: string }) => {
   const { scopes } = props;
 
@@ -16,6 +18,9 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
 
   const loginContext = useContext(LoginContext);
   const { state: loginState, setState: setLoginState } = loginContext;
+
+  // HACK!!!
+  const additionalScopes = getStreamerScopes ? "channel:read:subscriptions bits:read" : [];
 
   const [] = useLogin(
     (
@@ -76,7 +81,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
             <Button
               variant="contained"
               color="secondary"
-              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
+              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes} ${additionalScopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
             >
               Login
             </Button>

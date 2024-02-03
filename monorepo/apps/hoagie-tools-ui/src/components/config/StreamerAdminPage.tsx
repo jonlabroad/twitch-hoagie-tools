@@ -6,6 +6,7 @@ import {
   StateContext,
 } from "../context/StateContextProvider";
 import { useStreamerName } from "../../hooks/useStreamerName";
+import { ManageEventSub } from "../admin/ManageEventSub";
 
 export interface StreamerAdminPageProps {}
 
