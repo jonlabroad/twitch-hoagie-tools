@@ -26,12 +26,12 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     const { state: appState } = useContext(StateContext);
     const loginContext = useContext(LoginContext);
     const { state: loginState } = loginContext;
-  
+
     const [subscriptions, setSubscriptions] = useState<
       TwitchSubscription[] | undefined
     >(undefined);
     const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
-  
+
     async function createSubscriptions() {
       if (loginState.accessToken && loginState.username && appState.streamer) {
         const client = new HoagieClient();
@@ -43,27 +43,28 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
         getSubscriptions();
       }
     }
-  
+
     async function getSubscriptions() {
-      if (loginState.username && loginState.accessToken) {
+      if (loginState.username && loginState.accessToken && appState.streamer) {
         const client = new HoagieClient();
         const subs = await client.listSubscriptions(
           loginState.username,
+          appState.streamer,
           loginState.accessToken
         );
         setSubscriptions(subs);
       }
     }
-  
+
     useEffect(() => {
       const path = window.location.pathname;
       LocalStorage.set("lastPath", { path });
     }, []);
-  
+
     useEffect(() => {
       getSubscriptions();
     }, [loginState.username, loginState.accessToken]);
-  
+
     useEffect(() => {
       async function getStreamerId() {
         if (loginState.accessToken) {
@@ -74,18 +75,18 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
       }
       getStreamerId();
     });
-  
-    const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId && 
+
+    const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId &&
       (sub.condition.to_broadcaster_user_id === `${streamerId}` ||
        sub.condition.from_broadcaster_user_id === `${streamerId}` ||
        sub.condition.broadcaster_user_id === `${streamerId}`));
-  
+
     let subConnectionStatus = "";
     if (subscriptionsToDisplay) {
       subConnectionStatus =
         subscriptionsToDisplay.length > 0 ? "CONNECTED" : "DISCONNECTED";
     }
-  
+
     return (
       <React.Fragment>
         <Grid container spacing={3}>

@@ -23,8 +23,8 @@ export interface AdminData {
 export default class HoagieClient {
     readonly BASE_URL = 'https://hoagie-unity-overlay-prod.hoagieman.net/api/';
 
-    async listSubscriptions(username: string, accessToken: string) {
-        const response = await axios.get(`${this.BASE_URL}listsubscriptions?username=${username}`, {
+    async listSubscriptions(username: string, channelName: string, accessToken: string) {
+        const response = await axios.get(`${this.BASE_URL}listsubscriptions?username=${username}&streamername=${channelName}`, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }

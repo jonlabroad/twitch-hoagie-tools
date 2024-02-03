@@ -30,8 +30,8 @@ export default class HoagieClient {
         return result;
     }
 
-    async listSubscriptions(username: string, accessToken: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}listsubscriptions`, {
+    async listSubscriptions(username: string, channelName: string, accessToken: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}listsubscriptions?streamername=${channelName}`, {
             headers: this.getHeaders(username, accessToken)
         });
         return response.data;

@@ -52,10 +52,11 @@ export const HoagieDashboard = (props: {
   }
 
   async function getSubscriptions() {
-    if (loginState.username && loginState.accessToken) {
+    if (loginState.username && loginState.accessToken && appState.streamer) {
       const client = new HoagieOverlayClient();
       const subs = await client.listSubscriptions(
         loginState.username,
+        appState.streamer,
         loginState.accessToken
       );
       setSubscriptions(subs);
