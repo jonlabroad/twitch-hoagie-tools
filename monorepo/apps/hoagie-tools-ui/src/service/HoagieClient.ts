@@ -39,17 +39,17 @@ export default class HoagieClient {
 
     async createSubscriptions(username: string, channelName: string, accessToken: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}createsubscriptions?streamername=${channelName}`, {
-            headers: this.getHeaders(username, accessToken)
+headers: this.getHeaders(username, accessToken)
         });
         return response.data;
     }
 
     async createSelfSubscriptions(username: string, channelName: string, accessToken: string) {
       const response = await axios.get(`${this.LEGACY_BASE_URL}createselfsubscriptions?streamername=${channelName}`, {
-          headers: this.getHeaders(username, accessToken)
-      });
-      return response.data;
-  }
+            headers: this.getHeaders(username, accessToken)
+        });
+        return response.data;
+    }
 
     async deleteSubscription(id: string, username: string, accessToken: string) {
         const response = await axios.post(`${this.LEGACY_BASE_URL}deletesubscription?id=${id}`, {}, {
@@ -182,6 +182,13 @@ export default class HoagieClient {
         }, {
             headers: this.getHeaders(username, accessToken)
         });
+    }
+
+    async songEval(song: string, username: string, accessToken: string, streamerName: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/eval?query=${song}&streamername=${streamerName}`, {
+            headers: this.getHeaders(username, accessToken)
+        });
+        return response?.data;
     }
 
     async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
