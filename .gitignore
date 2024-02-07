@@ -7,3 +7,4 @@
 **/.serverless
 **/.build
 **/.esbuild
+**/monorepo/.nx/**/*
