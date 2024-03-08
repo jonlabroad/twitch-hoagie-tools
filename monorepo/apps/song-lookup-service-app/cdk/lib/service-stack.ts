@@ -11,6 +11,7 @@ import {
 } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 const serviceName = "SongLookup";
 const appName = "song-lookup-service-app";
@@ -48,12 +49,18 @@ export class ServiceStack extends cdk.Stack {
       })
     );
 
+    // Retrieve a parameter from AWS Systems Manager Parameter Store
+    const spotifyClientId = ssm.StringParameter.valueForStringParameter(this, 'hoagietoolsSpotifyClientId');
+    const spotifyClientSecret = ssm.StringParameter.valueForStringParameter(this, 'hoagietoolsSpotifyClientSecret');
+
     const lambdaFunction = new lambda.Function(this, `${serviceName}-function`, {
       code: lambda.Code.fromAsset(`../../../dist/apps/${appName}`),
       handler: handler,
       runtime: lambda.Runtime.NODEJS_18_X,
       environment: {
         TABLENAME: context.tableName,
+        SPOTIFY_CLIENT_ID: spotifyClientId,
+        SPOTIFY_CLIENT_SECRET: spotifyClientSecret,
         STAGE: env, // Use a context or environment variable if this needs to be dynamic
       },
       role: lambdaExecutionRole,

@@ -20,6 +20,7 @@
       "@hoagie/secrets-provider": ["libs/secrets-provider/src/index.ts"],
       "@hoagie/service-clients": ["libs/service-clients/src/index.ts"],
       "@hoagie/song-eval-service": ["libs/song-eval-service/src/index.ts"],
+      "@hoagie/song-lookup-service": ["libs/song-lookup-service/src/index.ts"],
       "@hoagie/test": ["libs/test/src/index.ts"]
     }
   },

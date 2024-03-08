@@ -1,11 +1,23 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { corsHeaders, createCacheHeader } from '@hoagie/api-util';
+import { songLookupService } from '@hoagie/song-lookup-service';
 
 export async function songlookup(apiEvent: APIGatewayEvent) {
-  const { query } = apiEvent.queryStringParameters ?? {};
-  //const response = await songLookupService(query ?? "", apiEvent);
-  //return response;
-  return {
-    statusCode: 501,
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
   }
+
+  if (!process.env.SPOTIFY_CLIENT_ID) {
+    throw new Error('SPOTIFY_CLIENT_ID environment variable is required');
+  }
+
+  if (!process.env.SPOTIFY_CLIENT_SECRET) {
+    throw new Error('SPOTIFY_CLIENT_SECRET environment variable is required');
+  }
+
+  const response = await songLookupService({
+    tableName: process.env.TABLENAME,
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  }, apiEvent);
+  return response;
 }
