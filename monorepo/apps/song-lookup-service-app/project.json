@@ -1,0 +1,91 @@
+{
+  "name": "song-lookup-service-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/song-lookup-service-app/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/song-lookup-service-app",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/song-lookup-service-app/handlers.ts",
+        "tsConfig": "apps/song-lookup-service-app/tsconfig.app.json",
+        "generatePackageJson": true,
+        "ignore": ["cdk/**/*"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "install-deps": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{
+        "target": "build"
+      }],
+      "options": {
+        "command": "npm install",
+        "cwd": "dist/apps/song-lookup-service-app"
+      }
+    },
+    "cdk-synth": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-lookup-service-app/cdk",
+        "command": "cdk synth --context env=dev"
+      },
+      "dependsOn": [{
+        "target": "install-deps"
+      }]
+    },
+    "cdk-deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-lookup-service-app/cdk",
+        "command": "cdk deploy --require-approval never --context env=dev"
+      },
+      "dependsOn": [{
+        "target": "cdk-synth"
+      }]
+    },
+    "synth-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-lookup-service-app/cdk",
+        "command": "cdk synth --context env=dev --no-staging --context env=dev > template.yml"
+      },
+      "dependsOn": [{
+        "target": "install-deps"
+      }]
+    },
+    "run-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-lookup-service-app/cdk",
+        "command": "npm run local"
+      },
+      "dependsOn": [{
+        "target": "synth-local"
+      }]
+    }
+  },
+  "tags": []
+}

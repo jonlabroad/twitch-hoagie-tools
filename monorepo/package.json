@@ -16,7 +16,13 @@
     "songeval:build-cdk": "nx run song-eval-service-app:build-cdk  --output-style=stream",
     "songeval:deploy": "nx run song-eval-service-app:deploy --output-style=stream",
     "songeval:deploy-dev": "nx run song-eval-service-app:deploy-dev --output-style=stream",
-    "songeval:run-local": "nx run song-eval-service-app:run-local --output-style=stream"
+    "songeval:run-local": "nx run song-eval-service-app:run-local --output-style=stream",
+    "songlookup:offline": "nx run song-lookup-service-app:offline --output-style=stream",
+    "songlookup:build": "nx run song-lookup-service-app:build --output-style=stream",
+    "songlookup:build-cdk": "nx run song-lookup-service-app:build-cdk  --output-style=stream",
+    "songlookup:deploy": "nx run song-lookup-service-app:deploy --output-style=stream",
+    "songlookup:deploy-dev": "nx run song-lookup-service-app:deploy-dev --output-style=stream",
+    "songlookup:run-local": "nx run song-lookup-service-app:run-local --output-style=stream"
   },
   "private": true,
   "dependencies": {
