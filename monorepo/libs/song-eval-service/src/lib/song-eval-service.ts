@@ -37,12 +37,13 @@ export async function songEvalService(query: string, event: APIGatewayEvent) {
   const evaluator = new SongEvaluator(secrets["geniusClientSecret"], secrets["badWordsSecret"]);
   const result = await evaluator.evaluate(query);
 
-  return {
+  const returnValue = {
     statusCode: 200,
     body: JSON.stringify(result ?? {}),
     headers: {
       ...corsHeaders,
       ...createCacheHeader(60),
     }
-  }
+  };
+  return returnValue;
 }

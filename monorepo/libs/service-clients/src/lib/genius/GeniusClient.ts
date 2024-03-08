@@ -43,6 +43,7 @@ export class GeniusClient {
   }
 
   public async getSong(query: string) {
+    console.log(`Searching Genius lyrics for ${query}`);
     const accessToken = await this.getAccessToken();
 
     const queryString = qs.stringify({
@@ -55,6 +56,7 @@ export class GeniusClient {
     const response = await axios.get<GeniusSearchResponse>(request, {
       headers,
     });
+    console.log({ topGeniusHits: response.data.response.hits.slice(0, 10) });
     const result = response.data.response.hits[0]?.result;
     return result;
   }

@@ -10,12 +10,15 @@ export class SongEvaluator {
   }
 
   public async evaluate(query: string) {
+    console.log({ searchingForSong: query });
     const geniusClient = new GeniusClient(this.geniusSecret);
     const geniusSong = await geniusClient.getSong(query);
     const lyrics = geniusSong
       ? await geniusClient.getLyricsFromUrl(geniusSong.url)
       : "";
 
+    console.log({ geniusSong });
+    console.log({ lyrics });
     //Evaluate the lyrics
     let lyricsEval: any = undefined;
     if (lyrics) {
@@ -24,7 +27,7 @@ export class SongEvaluator {
       if (lyricsEval.status.isError) {
         try {
           // Use the backup
-          console.log("Using bad woards backup!");
+          console.log("Using bad words backup!");
           const hoagieClient = new HoagieBadWordsClient();
           const result = hoagieClient.eval(lyrics);
           lyricsEval = result;

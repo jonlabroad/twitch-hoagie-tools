@@ -8,3 +8,4 @@
 **/.build
 **/.esbuild
 monorepo/.nx/**/*
+monorepo/apps/song-eval-service-app/template.yml
