@@ -21,5 +21,5 @@
     "src/**/*.test.jsx",
     "cdk/**/*"
   ],
-  "include": ["**/*.ts"],
+  "include": ["cdk/**/*.ts"],
 }

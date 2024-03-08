@@ -1,4 +1,4 @@
-service: song-eval-service
+service: song-eval-service-app
 
 useDotenv: true
 plugins:

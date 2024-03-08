@@ -1,53 +1,71 @@
 {
-    "root": "song-eval-service-app",
-    "projectType": "application",
-    "sourceRoot": "apps/song-eval-service-app/src",
-    "targets": {
-      "build": {
-        "executor": "nx:run-commands",
-        "options": {
-          "cwd": "apps/song-eval-service-app",
-          "color": true,
-          "command": "sls package --stage=development --verbose"
+  "name": "song-eval-service-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/song-eval-service-app/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/song-eval-service-app",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/song-eval-service-app/handlers.ts",
+        "tsConfig": "apps/song-eval-service-app/tsconfig.app.json",
+        "generatePackageJson": true,
+        "ignore": ["cdk/**/*"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
         }
       },
-      "offline": {
-        "executor": "nx:run-commands",
-        "options": {
-          "cwd": "apps/song-eval-service-app",
-          "color": true,
-          "command": "sls offline --noAuth --stage=development --verbose"
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
         }
-      },
-      "deploy": {
-        "executor": "nx:run-commands",
-        "options": {
-          "cwd": "apps/song-eval-service-app",
-          "color": true,
-          "command": "sls deploy --stage=prod --verbose --force"
-        },
-        "dependsOn": [
-          {
-            "target": "deploy",
-            "projects": "dependencies"
-          }
-        ]
-      },
-      "deploy-dev": {
-        "executor": "nx:run-commands",
-        "options": {
-          "cwd": "apps/song-eval-service-app",
-          "color": true,
-          "command": "sls deploy --stage=development --verbose --force"
-        },
-        "dependsOn": [
-          {
-            "target": "deploy",
-            "projects": "dependencies"
-          }
-        ]
       }
     },
-    "tags": ["service"],
-    "implicitDependencies": []
-  }
+    "install-deps": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{
+        "target": "build"
+      }],
+      "options": {
+        "command": "npm install",
+        "cwd": "dist/apps/song-eval-service-app"
+      }
+    },
+    "cdk-synth": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-eval-service-app/cdk",
+        "command": "cdk synth --context env=dev"
+      },
+      "dependsOn": [{
+        "target": "install-deps"
+      }]
+    },
+    "cdk-deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/song-eval-service-app/cdk",
+        "command": "cdk deploy --require-approval never --context env=dev"
+      },
+      "dependsOn": [{
+        "target": "cdk-synth"
+      }]
+    }
+  },
+  "tags": []
+}

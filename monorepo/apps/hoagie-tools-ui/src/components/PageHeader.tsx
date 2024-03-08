@@ -81,7 +81,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
             <Button
               variant="contained"
               color="secondary"
-              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes} ${additionalScopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
+              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}${additionalScopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
             >
               Login
             </Button>

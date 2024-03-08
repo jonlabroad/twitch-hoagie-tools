@@ -2,6 +2,7 @@
   "name": "@hoagie/api-util",
   "version": "0.0.1",
   "dependencies": {
+    "atob": "^2.1.2",
     "tslib": "^2.3.0"
   },
   "type": "commonjs",

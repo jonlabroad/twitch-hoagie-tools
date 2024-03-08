@@ -14,6 +14,10 @@ export default class CreateSelfSubscriptions {
             const response3 = await client.createSubscription(broadcasterLogin, "channel.subscription.gift", {
                 broadcaster_user_id: broadcasterId
             });
+            const response4 = await client.createSubscription(broadcasterLogin, "channel.subscription.message", {
+                broadcaster_user_id: broadcasterId
+            });
+
 
             return response ?? {};
         }
