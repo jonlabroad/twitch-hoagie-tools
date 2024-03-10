@@ -67,6 +67,10 @@ export class SpotifyClient {
     };
 
     const url = 'https://accounts.spotify.com/api/token';
+    console.log(url);
+    console.log(params);
+    console.log({ clientId: this.clientId });
+
     const response = await axios.post<TokenResponse>(url, params as any, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -86,6 +90,7 @@ export class SpotifyClient {
     const url = 'https://accounts.spotify.com/api/token';
     console.log(url);
     console.log(params);
+    console.log({ clientId: this.clientId });
     try {
       const response = await axios.post<TokenResponse>(url, params as any, {
         headers: {
@@ -111,12 +116,13 @@ export class SpotifyClient {
     try {
       const response = await axios.get<SearchResponse>(url, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token.access_token}`,
         },
       });
       return response.data;
     } catch (err: any) {
       console.log(err.message);
+      console.log(err);
     }
     return undefined;
   }
@@ -127,7 +133,7 @@ export class SpotifyClient {
     console.log(url);
     const response = await axios.get<AudioAnalysisResponse>(url, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token.access_token}`,
       },
     });
     return response.data;
@@ -138,7 +144,7 @@ export class SpotifyClient {
     console.log(url);
     const response = await axios.get<any, any>(url, {
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.access_token}`
         }
     }
     );

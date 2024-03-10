@@ -17,6 +17,7 @@ export default class SpotifyGetSongs {
     const songInfos = await Promise.all(
       songs.map(async (song) => {
         try {
+          console.log({ song });
           if (song) {
             const songInfoRaw = await client.getSong(song.artist, song.title);
             if (songInfoRaw) {

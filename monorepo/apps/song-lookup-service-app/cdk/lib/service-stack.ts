@@ -12,6 +12,10 @@ import {
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 
 const serviceName = "SongLookup";
 const appName = "song-lookup-service-app";
@@ -50,8 +54,8 @@ export class ServiceStack extends cdk.Stack {
     );
 
     // Retrieve a parameter from AWS Systems Manager Parameter Store
-    const spotifyClientId = ssm.StringParameter.valueForStringParameter(this, 'hoagietoolsSpotifyClientId');
-    const spotifyClientSecret = ssm.StringParameter.valueForStringParameter(this, 'hoagietoolsSpotifyClientSecret');
+    const spotifyClientId = ssm.StringParameter.fromStringParameterName(this, "spotifyClientId", 'hoagietoolsSpotifyClientId');
+    const spotifyClientSecret = ssm.StringParameter.fromStringParameterName(this, "spotifyClientSecret", 'hoagietoolsSpotifyClientSecret');
 
     const lambdaFunction = new lambda.Function(this, `${serviceName}-function`, {
       code: lambda.Code.fromAsset(`../../../dist/apps/${appName}`),
@@ -59,8 +63,8 @@ export class ServiceStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_18_X,
       environment: {
         TABLENAME: context.tableName,
-        SPOTIFY_CLIENT_ID: spotifyClientId,
-        SPOTIFY_CLIENT_SECRET: spotifyClientSecret,
+        SPOTIFY_CLIENT_ID: spotifyClientId.stringValue,
+        SPOTIFY_CLIENT_SECRET: spotifyClientSecret.stringValue,
         STAGE: env, // Use a context or environment variable if this needs to be dynamic
       },
       role: lambdaExecutionRole,
@@ -71,7 +75,7 @@ export class ServiceStack extends cdk.Stack {
     const httpApi = new HttpApi(this, 'HttpApi', {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET],
+        allowMethods: [CorsHttpMethod.POST],
       },
     });
 
@@ -88,12 +92,29 @@ export class ServiceStack extends cdk.Stack {
 
     httpApi.addRoutes({
       path: route,
-      methods: [HttpMethod.GET],
+      methods: [HttpMethod.POST],
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'api-get-v1',
         lambdaFunction
       ),
       //authorizer: auth,
+    });
+
+    // CloudFront Distribution
+    const domainName = `songlookup-${env}.hoagieman.net`;
+    const certificateArn = 'arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2';
+    const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateArn);
+    const distribution = new cloudfront.Distribution(this, 'Distribution', {
+      defaultBehavior: {
+        origin: new HttpOrigin(`${httpApi.httpApiId}.execute-api.${this.region}.amazonaws.com`, {
+          originShieldRegion: 'us-east-1',
+        }),
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
+      certificate,
+      domainNames: [domainName],
+      minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019,
     });
 
     new logs.LogRetention(this, 'LogRetention', {

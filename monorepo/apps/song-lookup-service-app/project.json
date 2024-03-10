@@ -56,7 +56,7 @@
         "target": "install-deps"
       }]
     },
-    "cdk-deploy": {
+    "deploy-dev": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/song-lookup-service-app/cdk",

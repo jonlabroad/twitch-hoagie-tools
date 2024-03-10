@@ -1,15 +1,14 @@
 {
   "resource": "/{proxy+}",
   "path": "/example/path",
-  "httpMethod": "GET",
+  "httpMethod": "POST",
   "isBase64Encoded": false,
-  "queryStringParameters": {
-    "query": "amanda palmer want it back"
-  },
+  "queryStringParameters": {},
   "multiValueQueryStringParameters": {},
   "pathParameters": {
     "proxy": "/example/path"
   },
+  "body": "{\"songs\": [{\"songKey\": \"amanda palmer want it back\", \"title\": \"want it back\",\"artist\": \"amanda palmer\"}]}",
   "stageVariables": {},
   "headers": {
     "Accept": "*/*",
