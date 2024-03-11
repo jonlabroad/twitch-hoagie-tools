@@ -1,5 +1,5 @@
 {
-  "name": "song-lookup-service-deploy",
+  "name": "song-eval-service-deploy",
   "version": "0.1.0",
   "bin": {
     "cdk": "bin/cdk.js"
@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "local": "sam local invoke SongLookupfunctionAABF7B91 -t ./template.yml -e ./test/events/query-1.json"
+    "local": "TODO sam local invoke SongLookupfunctionAABF7B91 -t ./template.yml -e ./test/events/query-1.json"
   },
   "devDependencies": {
     "@hoagie/cdk-lib": "file:../../dist/libs/cdk-lib",

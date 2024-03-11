@@ -1,5 +1,4 @@
 import * as cdk from 'aws-cdk-lib';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs/lib/construct';
 import {
@@ -12,10 +11,11 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 
-const serviceName = 'SongLookup';
-const appName = 'song-lookup-service-app';
-const handler = 'handlers.songlookup';
-const route = '/api/v1/lookup';
+const serviceName = 'SongEval';
+const appName = 'song-eval-service-app';
+const handler = 'handlers.songeval';
+const route = '/api/v1/eval';
+const subdomain = 'songeval';
 
 export class ServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -34,18 +34,6 @@ export class ServiceStack extends cdk.Stack {
         'dynamodb:DeleteItem',
       ]).role;
 
-    // Retrieve a parameter from AWS Systems Manager Parameter Store
-    const spotifyClientId = ssm.StringParameter.fromStringParameterName(
-      this,
-      'spotifyClientId',
-      'hoagietoolsSpotifyClientId'
-    );
-    const spotifyClientSecret = ssm.StringParameter.fromStringParameterName(
-      this,
-      'spotifyClientSecret',
-      'hoagietoolsSpotifyClientSecret'
-    );
-
     const lambdaFunction = new lambda.Function(
       this,
       `${serviceName}-function`,
@@ -55,8 +43,6 @@ export class ServiceStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_18_X,
         environment: {
           TABLENAME: context.tableName,
-          SPOTIFY_CLIENT_ID: spotifyClientId.stringValue,
-          SPOTIFY_CLIENT_SECRET: spotifyClientSecret.stringValue,
           STAGE: env,
         },
         role: lambdaExecutionRole,
@@ -97,7 +83,7 @@ export class ServiceStack extends cdk.Stack {
       this,
       `${id}-ApiCloudFrontDistribution`,
       {
-        subdomain: 'songlookup',
+        subdomain,
         env,
         httpApiId: httpApi.httpApiId,
       }

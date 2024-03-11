@@ -4,7 +4,7 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 
-interface SongLookupDistributionProps {
+interface DistributionProps {
   subdomain: string;
   env: string;
   httpApiId: string;
@@ -13,7 +13,7 @@ interface SongLookupDistributionProps {
 const certificateArn = 'arn:aws:acm:us-east-1:796987500533:certificate/34ddd63f-ae46-4812-a2ee-39b9594d8ef2';
 
 export class ApiCloudFrontDistribution extends Construct {
-  constructor(scope: Construct, id: string, props: SongLookupDistributionProps) {
+  constructor(scope: Construct, id: string, props: DistributionProps) {
     super(scope, id);
 
     const domainName = `${props.subdomain}-${props.env}.hoagieman.net`;
