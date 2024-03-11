@@ -21,6 +21,12 @@ export class ApiCloudFrontDistribution extends Construct {
 
     const certificate = Certificate.fromCertificateArn(this, `${id}-Certificate`, certificateArn);
 
+    // Create a custom Cache Policy that forwards all query strings
+    const cachePolicy = new cloudfront.CachePolicy(this, `cachepolicy`, {
+      queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
+      // Additional cache policy configurations as needed
+    });
+
     const distribution = new cloudfront.Distribution(this, `${id}-Distribution`, {
       defaultBehavior: {
         origin: new HttpOrigin(`${props.httpApiId}.execute-api.${region}.amazonaws.com`, {
@@ -28,6 +34,7 @@ export class ApiCloudFrontDistribution extends Construct {
         }),
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy
       },
       certificate,
       domainNames: [domainName],

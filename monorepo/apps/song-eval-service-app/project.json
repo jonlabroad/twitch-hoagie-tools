@@ -55,36 +55,6 @@
       "dependsOn": [{
         "target": "install-deps"
       }]
-    },
-    "cdk-deploy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-eval-service-app/cdk",
-        "command": "cdk deploy --require-approval never --context env=dev"
-      },
-      "dependsOn": [{
-        "target": "cdk-synth"
-      }]
-    },
-    "synth-local": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-eval-service-app/cdk",
-        "command": "cdk synth --context env=dev --no-staging --context env=dev > template.yml"
-      },
-      "dependsOn": [{
-        "target": "install-deps"
-      }]
-    },
-    "run-local": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-eval-service-app/cdk",
-        "command": "npm run local"
-      },
-      "dependsOn": [{
-        "target": "synth-local"
-      }]
     }
   },
   "tags": []

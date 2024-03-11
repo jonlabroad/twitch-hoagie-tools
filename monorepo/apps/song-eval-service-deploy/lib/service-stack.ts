@@ -54,7 +54,7 @@ export class ServiceStack extends cdk.Stack {
     const httpApi = new HttpApi(this, 'HttpApi', {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.POST],
+        allowMethods: [CorsHttpMethod.GET],
       },
     });
 
@@ -71,7 +71,7 @@ export class ServiceStack extends cdk.Stack {
 
     httpApi.addRoutes({
       path: route,
-      methods: [HttpMethod.POST],
+      methods: [HttpMethod.GET],
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'api-get-v1',
         lambdaFunction
