@@ -22,7 +22,9 @@
     "songlookup:build-cdk": "nx run song-lookup-service-app:build-cdk  --output-style=stream",
     "songlookup:deploy": "nx run song-lookup-service-app:deploy --output-style=stream",
     "songlookup:deploy-dev": "nx run song-lookup-service-app:deploy-dev --output-style=stream",
-    "songlookup:run-local": "nx run song-lookup-service-app:run-local --output-style=stream"
+    "songlookup:run-local": "nx run song-lookup-service-app:run-local --output-style=stream",
+    "cdklib:build": "nx run cdk-lib:build --output-style=stream",
+    "cdklib:install-deps": "nx run cdk-lib:install-deps --output-style=stream"
   },
   "private": true,
   "dependencies": {
@@ -58,12 +60,13 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@nx/esbuild": "18.0.7",
+    "@nrwl/node": "^18.0.8",
+    "@nx/esbuild": "18.0.8",
     "@nx/eslint": "18.0.7",
     "@nx/eslint-plugin": "18.0.7",
-    "@nx/jest": "18.0.7",
-    "@nx/js": "18.0.7",
-    "@nx/node": "^18.0.7",
+    "@nx/jest": "18.0.8",
+    "@nx/js": "18.0.8",
+    "@nx/node": "18.0.8",
     "@nx/react": "18.0.7",
     "@nx/vite": "^18.0.7",
     "@nx/workspace": "18.0.7",

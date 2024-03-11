@@ -12,6 +12,7 @@
     "local": "sam local invoke SongLookupfunctionAABF7B91 -t ./template.yml -e ./test/events/query-1.json"
   },
   "devDependencies": {
+    "@hoagie/cdk-lib": "file:../../dist/libs/cdk-lib",
     "@types/jest": "^29.5.11",
     "@types/node": "20.11.13",
     "aws-cdk": "2.125.0",
@@ -22,7 +23,7 @@
   },
   "dependencies": {
     "@aws-sdk/core": "^3.525.0",
-    "aws-cdk-lib": "2.125.0",
+    "aws-cdk-lib": "^2.132.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }

@@ -1,0 +1,37 @@
+{
+  "name": "cdk-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/cdk-lib/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/cdk-lib",
+        "main": "libs/cdk-lib/src/index.ts",
+        "tsConfig": "libs/cdk-lib/tsconfig.lib.json",
+        "assets": ["libs/cdk-lib/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/cdk-lib/**/*.ts",
+          "libs/cdk-lib/package.json"
+        ]
+      }
+    },
+    "install-deps": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install --legacy-peer-deps",
+        "cwd": "dist/libs/cdk-lib"
+      },
+      "dependsOn": ["build"]
+    }
+  },
+  "tags": []
+}

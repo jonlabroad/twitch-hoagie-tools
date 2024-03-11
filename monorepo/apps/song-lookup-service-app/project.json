@@ -46,36 +46,6 @@
         "cwd": "dist/apps/song-lookup-service-app"
       }
     },
-    "cdk-synth": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-lookup-service-app/cdk",
-        "command": "cdk synth --context env=dev"
-      },
-      "dependsOn": [{
-        "target": "install-deps"
-      }]
-    },
-    "deploy-dev": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-lookup-service-app/cdk",
-        "command": "cdk deploy --require-approval never --context env=dev"
-      },
-      "dependsOn": [{
-        "target": "cdk-synth"
-      }]
-    },
-    "synth-local": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/song-lookup-service-app/cdk",
-        "command": "cdk synth --context env=dev --no-staging --context env=dev > template.yml"
-      },
-      "dependsOn": [{
-        "target": "install-deps"
-      }]
-    },
     "run-local": {
       "executor": "nx:run-commands",
       "options": {

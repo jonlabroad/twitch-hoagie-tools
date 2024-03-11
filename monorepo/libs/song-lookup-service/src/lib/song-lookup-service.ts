@@ -2,8 +2,10 @@ import { corsHeaders } from "@hoagie/api-util";
 import { APIGatewayEvent } from "aws-lambda";
 import SpotifyGetSongs from "./SpotifyGetSongs";
 
-export const cacheHeaders = {
-  "Cache-Control": "max-age=3600"
+const getCacheHeaders = (maxAgeSec: number) => {
+  return {
+    "Cache-Control": `max-age=${maxAgeSec}`
+  };
 }
 
 export interface GetSongsRequestBody {
@@ -32,6 +34,7 @@ export async function songLookupService(config: SongLookupConfig, event: APIGate
           statusCode: 200,
           headers: {
               ...corsHeaders,
+              ...getCacheHeaders(60 * 60),
           },
           body: JSON.stringify(songInfos)
       };
