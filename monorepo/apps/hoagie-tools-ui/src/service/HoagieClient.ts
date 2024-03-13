@@ -122,13 +122,27 @@ headers: this.getHeaders(username, accessToken)
         return response.data;
     }
 
-    async getSpotifySong(requestorUsername: string, artist: string, title: string, accessToken: string, streamerName: string) {
+    async getSpotifySongLegacy(requestorUsername: string, artist: string, title: string, accessToken: string, streamerName: string) {
         const url = `${this.LEGACY_BASE_URL}spotify/getsong?artist=${artist}&title=${title}&streamername=${streamerName}`;
         const response = await axios.get(url, {
             headers: this.getHeaders(requestorUsername, accessToken)
         })
         return response.data;
     }
+
+    async getSongInfo(requestorUsername: string, artist: string, title: string, accessToken: string, streamerName: string) {
+      const url = `https://songlookup.hoagieman.net/api/v1/lookup?streamername=${streamerName}`;
+      const response = await axios.post(url, {
+        songs: [{
+        songKey: `${artist} ${title}`, // TODO might need a real one? It also might not be used?
+        artist: artist,
+        title: title
+      }]},
+        {
+          headers: this.getHeaders(requestorUsername, accessToken)
+      })
+      return response.data?.[0];
+  }
 
     async getRaids(username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}raiddata?streamername=${streamerName}`, {
@@ -184,12 +198,20 @@ headers: this.getHeaders(username, accessToken)
         });
     }
 
-    async songEval(song: string, username: string, accessToken: string, streamerName: string) {
+    async songEvalLegacy(song: string, username: string, accessToken: string, streamerName: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/eval?query=${song}&streamername=${streamerName}`, {
             headers: this.getHeaders(username, accessToken)
         });
         return response?.data;
     }
+
+    async songEval(song: string, username: string, accessToken: string, streamerName: string) {
+      const response = await axios.get(`https://songeval.hoagieman.net/api/v1/eval?query=${song}&streamername=${streamerName}`,
+      {
+          headers: this.getHeaders(username, accessToken)
+      });
+      return response?.data;
+  }
 
     async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
         const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamername=${streamerName}&word=${word}`, {

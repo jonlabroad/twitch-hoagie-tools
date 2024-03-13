@@ -51,10 +51,11 @@ export class ServiceStack extends cdk.Stack {
     );
 
     // HTTP API Gateway
-    const httpApi = new HttpApi(this, 'HttpApi', {
+    const httpApi = new HttpApi(this, `${serviceName}-HttpApi`, {
       corsPreflight: {
         allowOrigins: ['*'],
         allowMethods: [CorsHttpMethod.GET],
+        allowHeaders: ['*'],
       },
     });
 
@@ -83,7 +84,7 @@ export class ServiceStack extends cdk.Stack {
       this,
       `${id}-ApiCloudFrontDistribution`,
       {
-        subdomain,
+        subdomain: subdomain,
         env,
         httpApiId: httpApi.httpApiId,
       }

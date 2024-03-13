@@ -6,4 +6,5 @@ import { ServiceStack } from '../lib/service-stack';
 const stackName = "SongLookupStack";
 
 const app = new cdk.App();
-new ServiceStack(app, stackName, {});
+const env = app.node.tryGetContext('env');
+new ServiceStack(app, `${stackName}-${env}`, {});

@@ -37,6 +37,10 @@ export class SongEvaluator {
       }
     }
 
-    return lyricsEval;
+    return {
+      lyricsEval,
+      lyrics,
+      song: geniusSong,
+    };
   }
 }

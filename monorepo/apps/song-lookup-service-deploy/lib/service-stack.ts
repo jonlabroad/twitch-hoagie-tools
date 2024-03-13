@@ -16,6 +16,7 @@ const serviceName = 'SongLookup';
 const appName = 'song-lookup-service-app';
 const handler = 'handlers.songlookup';
 const route = '/api/v1/lookup';
+const subdomain = 'songlookup';
 
 export class ServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -65,10 +66,11 @@ export class ServiceStack extends cdk.Stack {
     );
 
     // HTTP API Gateway
-    const httpApi = new HttpApi(this, 'HttpApi', {
+    const httpApi = new HttpApi(this, `${serviceName}-HttpApi`, {
       corsPreflight: {
         allowOrigins: ['*'],
         allowMethods: [CorsHttpMethod.POST],
+        allowHeaders: ['*'],
       },
     });
 
@@ -97,7 +99,7 @@ export class ServiceStack extends cdk.Stack {
       this,
       `${id}-ApiCloudFrontDistribution`,
       {
-        subdomain: 'songlookup',
+        subdomain,
         env,
         httpApiId: httpApi.httpApiId,
       }
