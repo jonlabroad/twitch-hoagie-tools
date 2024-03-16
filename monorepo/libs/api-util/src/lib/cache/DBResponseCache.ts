@@ -43,6 +43,7 @@ export class DBResponseCache<T> {
           ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
         },
       });
+      console.log(input);
       return await client.send(input);
     } catch (err) {
       console.error(err);

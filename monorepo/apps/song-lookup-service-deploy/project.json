@@ -29,7 +29,13 @@
         "cwd": "apps/song-lookup-service-deploy",
         "command": "cdk deploy --require-approval never --context env=dev"
       },
-      "dependsOn": ["synth"],
+      "dependsOn": [
+        {
+          "projects": ["song-lookup-service-app"],
+          "target": "install-deps"
+        },
+        "synth"
+      ],
       "configurations": {
         "prod": {
           "command": "cdk deploy --require-approval never --context env=prod"

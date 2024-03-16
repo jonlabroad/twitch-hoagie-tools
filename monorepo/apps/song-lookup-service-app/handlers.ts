@@ -1,6 +1,8 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { songLookupService } from '@hoagie/song-lookup-service';
 
+const version = "1.0.0";
+
 export async function songlookup(apiEvent: APIGatewayEvent) {
   if (!process.env.TABLENAME) {
     throw new Error('TABLENAME environment variable is required');
@@ -18,6 +20,7 @@ export async function songlookup(apiEvent: APIGatewayEvent) {
     tableName: process.env.TABLENAME,
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    version,
   }, apiEvent);
   return response;
 }

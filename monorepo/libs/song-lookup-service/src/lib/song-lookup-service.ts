@@ -20,6 +20,7 @@ export interface SongLookupConfig {
   tableName: string;
   clientId: string;
   clientSecret: string;
+  version: string;
 }
 
 export async function songLookupService(config: SongLookupConfig, event: APIGatewayEvent) {
@@ -27,8 +28,8 @@ export async function songLookupService(config: SongLookupConfig, event: APIGate
       const request = JSON.parse(event.body ?? "{}") as GetSongsRequestBody;
       console.log({ request });
 
-      const createPlaylist = new SpotifyGetSongs(config.clientId, config.clientSecret);
-      const songInfos = await createPlaylist.getSongs(request.songs ?? []);
+      const createPlaylist = new SpotifyGetSongs(config.clientId, config.clientSecret, config.tableName);
+      const songInfos = await createPlaylist.getSongs(request.songs ?? [], config.version);
 
       return {
           statusCode: 200,
