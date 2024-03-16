@@ -1,4 +1,4 @@
-import { corsHeaders } from "@hoagie/api-util";
+import { DBResponseCache, corsHeaders } from "@hoagie/api-util";
 import { APIGatewayEvent } from "aws-lambda";
 import SpotifyGetSongs from "./SpotifyGetSongs";
 

@@ -6,3 +6,4 @@ export * from './lib/db/DBUtil';
 export * from './lib/serverless/isOfflineMode';
 export * from './lib/auth/HoagieAuthHeaders';
 export * from './lib/hoagie/HoagieEventPublisher';
+export * from './lib/cache/DBResponseCache';
