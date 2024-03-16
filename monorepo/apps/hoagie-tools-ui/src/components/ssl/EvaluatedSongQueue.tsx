@@ -26,6 +26,9 @@ import { StateContext } from "../context/StateContextProvider";
 import format from "format-duration";
 import { UserDonoSummaries, UserDonoSummary } from "@hoagie/dono-service";
 
+const maxSongDurationMillis = 7 * 60 * 1e3;
+const defaultSongDurationMillis = 4 * 60 * 1e3;
+
 export interface EvaluatedSongQueueProps {
   config?: SongEvalConfig;
   isLoading: boolean;
@@ -66,9 +69,34 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
 
   const songQueue = state.songQueue?.list ?? [];
 
-  return (
+  const estimatedQueueDurationMillis = songQueue.reduce(
+    (prev, curr) => {
+      const songKey = getSongKey(curr);
+      const evaluation = evaluations[songKey] as any | undefined;
+      const spotifyInfo = evaluation?.songInfo;
+      let durationMs = spotifyInfo?.track?.duration_ms ?? defaultSongDurationMillis;
+      durationMs = Math.min(durationMs, maxSongDurationMillis);
+      return prev + durationMs;
+    },
+    0
+  );
+
+  return (<>
     <Grid item xs={12}>
       <TableContainer component={Paper} className="dono-table-container">
+        <FlexRow
+          alignItems="center"
+          style={{
+            minHeight: 30,
+          }}
+        >
+          <div style={{
+            marginLeft: 10,
+            fontSize: 14,
+          }}>
+            {estimatedQueueDurationMillis > 0 ? `Est. queue duration: ${format(estimatedQueueDurationMillis)}` : ""}
+          </div>
+        </FlexRow>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -106,12 +134,8 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
           </TableHead>
           <TableBody>
             {songQueue?.map((queueSong: any, i: number) => {
-              const sslListSong = queueSong?.song;
-              const nonListSong = queueSong?.nonlistSong;
-              const isSslListSong = !!sslListSong;
-              const songKey =
-                nonListSong ??
-                `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
+              const isSslListSong = !!queueSong?.song;
+              const songKey = getSongKey(queueSong);
               const evaluation = evaluations[songKey] as any | undefined;
               const badWordStatus = evaluation?.eval?.lyricsEval?.status;
               const badWordCounts = getBadWordsCounts(
@@ -260,6 +284,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
         </Table>
       </TableContainer>
     </Grid>
+  </>
   );
 };
 
@@ -281,4 +306,13 @@ function getBadWordsCounts(
     };
   });
   return badWordCounts;
+}
+
+function getSongKey(queueSong: any): string {
+  const sslListSong = queueSong?.song;
+  const nonListSong = queueSong?.nonlistSong;
+  const songKey =
+    nonListSong ??
+    `${sslListSong?.artist?.trim()} - ${sslListSong?.title?.trim()}`;
+  return songKey;
 }
