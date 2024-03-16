@@ -4,6 +4,7 @@ import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { LoginState } from "../state/LoginState";
+import { SongLookupClient } from "@hoagie/song-lookup-service";
 
 export type Evaluations = Record<string, any>;
 export type EvaluationsStatus = Record<string, EvaluationStatus>;
@@ -97,7 +98,8 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                                 let spotifySong: any | undefined = undefined;
                                 console.log({ evaluation, song: evaluation?.song, artist, title, doLookup })
                                 if (doLookup && artist && title) {
-                                    spotifySong = await client.getSongInfo(loginState.username ?? "", artist, title, loginState.accessToken ?? "", streamer.toLowerCase());
+                                  const lookupClient = new SongLookupClient();
+                                  spotifySong = await lookupClient.songLookup(artist, title, loginState.username ?? "", loginState.accessToken ?? "", streamer.toLowerCase());
                                 }
 
                                 setEvalLoading(songName, false, false)
