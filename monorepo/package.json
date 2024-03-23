@@ -23,6 +23,12 @@
     "songlookup:deploy": "nx run song-lookup-service-deploy:deploy --configuration=prod --output-style=stream",
     "songlookup:deploy-dev": "nx run song-lookup-service-deploy:deploy --configuration=dev --output-style=stream",
     "songlookup:run-local": "nx run song-lookup-service-app:run-local --output-style=stream",
+    "streamersonglist:offline": "nx run streamersonglist-service-app:offline --output-style=stream",
+    "streamersonglist:build": "nx run streamersonglist-service-app:build --output-style=stream",
+    "streamersonglist:build-cdk": "nx run streamersonglist-service-app:build-cdk  --output-style=stream",
+    "streamersonglist:deploy": "nx run streamersonglist-service-deploy:deploy --configuration=prod --output-style=stream",
+    "streamersonglist:deploy-dev": "nx run streamersonglist-service-deploy:deploy --configuration=dev --output-style=stream",
+    "streamersonglist:run-local": "nx run streamersonglist-service-app:run-local --output-style=stream",
     "cdklib:build": "nx run cdk-lib:build --output-style=stream",
     "cdklib:install-deps": "nx run cdk-lib:install-deps --output-style=stream"
   },
