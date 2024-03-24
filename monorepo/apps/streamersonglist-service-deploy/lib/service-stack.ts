@@ -17,7 +17,9 @@ const serviceName = 'StreamerSongList';
 const appName = 'streamersonglist-service-app';
 const writeEventHandler = 'handlers.writeEvent';
 const getEventsHandler = 'handlers.getEvents';
+const getEventDescriptionsHandler = 'handlers.getDescriptions';
 const route = '/api/v1/queueevents';
+const descriptionsRoute = '/api/v1/queueeventdescriptions';
 const subdomain = 'streamersonglist';
 
 export class ServiceStack extends cdk.Stack {
@@ -55,10 +57,26 @@ export class ServiceStack extends cdk.Stack {
 
     const getEventsFunction = new lambda.Function(
       this,
-      `${serviceName}-getevents-function`,
+      `getevents-function`,
       {
         code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
         handler: getEventsHandler,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          STAGE: env,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(90),
+      }
+    );
+
+    const getEventDescriptionsFunction = new lambda.Function(
+      this,
+      `geteventdescriptions-function`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: getEventDescriptionsHandler,
         runtime: lambda.Runtime.NODEJS_18_X,
         environment: {
           TABLENAME: context.tableName,
@@ -106,6 +124,16 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'api-get-v1',
         getEventsFunction
+      ),
+      //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: descriptionsRoute,
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'api-getdescriptions-v1',
+        getEventDescriptionsFunction
       ),
       //authorizer: auth,
     });
