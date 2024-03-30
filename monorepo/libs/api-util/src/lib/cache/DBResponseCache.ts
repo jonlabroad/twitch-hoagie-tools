@@ -31,7 +31,7 @@ export class DBResponseCache<T> {
     }
   }
 
-  public async set<T>(key: string, value: T, version: string) {
+  public async set<T>(key: string, value: T, version: string, expirySec?: number) {
     try {
       const client = createDocClient();
       const input = new PutCommand({
@@ -40,10 +40,10 @@ export class DBResponseCache<T> {
           CategoryKey: this.createCachePrimaryKey(key),
           SubKey: this.createCacheSortKey(version),
           Value: value,
-          ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
+          ExpirationTTL: Math.floor(Date.now() / 1e3 + (expirySec ?? defaultExpirySec))
         },
       });
-      console.log(input);
+      //console.log(input);
       return await client.send(input);
     } catch (err) {
       console.error(err);

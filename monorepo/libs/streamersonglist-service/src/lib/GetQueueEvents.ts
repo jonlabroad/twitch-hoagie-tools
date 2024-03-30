@@ -4,7 +4,11 @@ import {
   TwitchClient,
 } from '@hoagie/service-clients';
 import { SSLEvent, SSLEventDBClient } from './SSLEventDBClient';
-import { corsHeaders, createCacheHeader } from '@hoagie/api-util';
+import {
+  DBResponseCache,
+  corsHeaders,
+  createCacheHeader,
+} from '@hoagie/api-util';
 import {
   NewPlayHistoryEvent,
   SongQueueEvent,
@@ -61,10 +65,15 @@ export interface GetQueueEventsRequest {
 export class GetQueueEvents {
   config: GetQueueEventsConfig;
   streamerSongListClient: StreamerSongListClient;
+  sslSongApiCache: DBResponseCache<string>;
 
   constructor(config: GetQueueEventsConfig) {
     this.config = config;
     this.streamerSongListClient = new StreamerSongListClient();
+    this.sslSongApiCache = new DBResponseCache<string>(
+      'SSLSONGAPI',
+      config.tableName
+    );
   }
 
   public async getEvents(request: GetQueueEventsRequest) {
@@ -222,9 +231,23 @@ export class GetQueueEvents {
   }
 
   private async getSSLSong(streamerId: string, songId: string | number) {
-    return await this.streamerSongListClient.getSong(
+    const cachedSong = await this.sslSongApiCache.get(
+      `${streamerId}_${songId}`,
+      '1.0.0'
+    );
+    if (cachedSong) {
+      return cachedSong;
+    }
+
+    const song = await this.streamerSongListClient.getSong(
       streamerId,
       songId.toString()
     );
+
+    if (song) {
+      await this.sslSongApiCache.set(`${streamerId}_${songId}`, song, '1.0.0', 90 * 60 * 24);
+    }
+
+    return song;
   }
 }
