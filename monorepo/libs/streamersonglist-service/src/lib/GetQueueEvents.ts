@@ -140,7 +140,6 @@ export class GetQueueEvents {
     sslEventBridgeEvent: SSLEvent,
     sslSongs: Record<string, string>
   ): SSLEventListItem | undefined {
-    const now = new Date().toISOString();
     const inputType = sslEventBridgeEvent?.['detail-type'];
     const sslEvent = sslEventBridgeEvent.detail;
     if (inputType == 'queue-event') {
@@ -156,7 +155,7 @@ export class GetQueueEvents {
             position: sslData.position!,
           },
           userLogin: sslData.by,
-          timestamp: now,
+          timestamp: sslEventBridgeEvent.time,
           song: sslData.title,
         };
       } else if (sslData.oldPosition && sslData.position) {
@@ -170,7 +169,7 @@ export class GetQueueEvents {
             newPosition: sslData.position!,
           },
           userLogin: sslData.by,
-          timestamp: now,
+          timestamp: sslEventBridgeEvent.time,
           song: sslData.title,
         };
       } else if (sslData.deleted) {
@@ -183,7 +182,7 @@ export class GetQueueEvents {
             position: sslData.position!,
           },
           userLogin: sslData.by,
-          timestamp: now,
+          timestamp: sslEventBridgeEvent.time,
           song: sslData.title,
         };
       }
@@ -198,7 +197,7 @@ export class GetQueueEvents {
           song,
           requestor: sslData.requests?.[0]?.name ?? '',
         },
-        timestamp: now,
+        timestamp: sslEventBridgeEvent.time,
         song: song,
       };
     }
