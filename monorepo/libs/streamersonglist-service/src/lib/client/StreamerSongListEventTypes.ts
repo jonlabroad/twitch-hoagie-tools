@@ -5,14 +5,14 @@ export type SongListEventType = "queue-event" | "queue-update" | "reload-song-li
 export interface SongListEvent {
   channel: string
   eventType: SongListEventType
-  eventData: SongQueueEvent | SongUpdateEvent;
+  eventData: SongQueueEvent | SongUpdateEvent | NewPlayHistoryEvent;
 }
 
 export interface SongListEventDescription {
   timestamp: string
   eventType: SongListEventType
   text: string
-  userName: string
+  userName?: string
   userInfo?: UserData
   //songInfo: Record<number, any>
 }
@@ -37,6 +37,35 @@ export interface SongQueueEvent {
   deleted?: boolean
   position?: number
   oldPosition?: number
+}
+
+export interface NewPlayHistoryEvent {
+  playedAt: string
+  donationAmount: number
+  nonlistSong: string
+  note: string | null
+  streamerId: number
+  requests: {
+    id: number
+    name: string
+    note: string | null
+    amount: number
+    source: string
+    transactionId: number | null
+    playHistoryId: number
+    requestText: string | null
+    queueId: number | null
+    savedQueueId: number | null
+    userId: number | null
+    streamerId: number | null
+    updated: string
+  }[]
+  streamer: {
+    id: number
+  }
+  songId: number | null
+  id: number
+  createdAt: string
 }
 
 export type SongUpdateEvent = number;

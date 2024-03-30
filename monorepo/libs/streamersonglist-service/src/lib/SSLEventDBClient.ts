@@ -39,7 +39,7 @@ export class SSLEventDBClient {
   public async set<T>(channelId: string, value: T, timestampMillis: number) {
     try {
       const client = createDocClient();
-      const input = new PutCommand({
+      const commandData = {
         TableName: this.tableName,
         Item: {
           CategoryKey: this.createCachePrimaryKey(channelId),
@@ -47,8 +47,9 @@ export class SSLEventDBClient {
           Value: value,
           ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec),
         },
-      });
-      console.log(input);
+      };
+      console.log(commandData);
+      const input = new PutCommand(commandData);
       return await client.send(input);
     } catch (err) {
       console.error(err);

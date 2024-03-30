@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SongListEvent } from "./StreamerSongListEventTypes";
+import { SongListEvent, SongListEventDescription } from "./StreamerSongListEventTypes";
 
 const BASE_URL = "https://streamersonglist.hoagieman.net/api/v1/"
 const BASE_URL_DEV = 'https://streamersonglist-dev.hoagieman.net/api/v1/';
@@ -26,7 +26,7 @@ export class StreamerSongListHoagieClient {
         //headers: getAuthHeaders(username, accessToken),
       }
     );
-    return response?.data?.[0];
+    return response?.data;
   }
 
   async getEventDescriptions(
@@ -43,6 +43,6 @@ export class StreamerSongListHoagieClient {
         //headers: getAuthHeaders(username, accessToken),
       }
     );
-    return response?.data?.[0];
+    return response?.data as SongListEventDescription[];
   }
 }
