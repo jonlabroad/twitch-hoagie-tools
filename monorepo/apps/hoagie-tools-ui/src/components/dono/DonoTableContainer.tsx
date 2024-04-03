@@ -94,7 +94,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
         </Grid>
       )}
       {isLoggedIn && (
-        <Grid item xs={12}>
+        <Grid item xs={12} lg={8}>
           <FlexRow alignItems="center">
             <IconButton
               disabled={!enableArrow(1)}

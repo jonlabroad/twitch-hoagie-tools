@@ -12,9 +12,8 @@ import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer"
 import { DonoContext } from "./DonoContextProvider";
 import { SystemStatusContext } from "../context/SystemStatusContextProvider";
 import { ChannelInfoProvider } from "../data/ChannelInfoProvider";
-import { useStreamerSongListEvents } from "../../hooks/streamersonglistHooks";
-import { useStreamerSongListEventLog } from "../../hooks/streamerSongListEventLogHooks";
-import { EventList } from "../ssl/EventList";
+import { EventList } from "../ssl/EventList/EventList";
+import { SSLEventContext } from "../context/SSLEventProvider";
 
 export interface DonoPageContainerProps {}
 
@@ -25,7 +24,7 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
 
   const { status, refresh } = useContext(SystemStatusContext);
 
-  const { events: sslEvents } = useStreamerSongListEventLog();
+  const { events: sslEvents, fetchEvents, isLoading } = useContext(SSLEventContext);
 
   return (
     <>
@@ -40,8 +39,8 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
             isLastStream={donoContext.selection.isLast}
             getNextStream={donoContext.selection.getNextStream}
           />
-          <Grid paddingBottom={30} item xs={12}>
-            <EventList events={sslEvents} />
+          <Grid paddingBottom={30} item xs={12} lg={4}>
+            <EventList events={sslEvents} isLoading={isLoading} />
           </Grid>
         </Grid>
       </Container>

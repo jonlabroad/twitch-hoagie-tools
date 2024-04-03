@@ -1,8 +1,8 @@
 .event-list-channel-avatar {
   display: flex;
   align-items: center;
-  margin-right: 10px;
-  min-width: 30px;
+  margin-right: 5px;
+  min-width: 35px;
   img {
       height: 30px;
       border-radius: 50px;
@@ -12,8 +12,13 @@
 .event-list-item-timestamp {
   margin-right: 10px;
   font-size: 14px;
+  min-width: 100px;
 }
 
 .event-list-item-description {
   font-size: 14px;
+}
+
+.event-list-item-icon {
+  margin-right: 5px;
 }

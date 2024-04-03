@@ -6,7 +6,7 @@ import StreamerSongListClient from '../service/StreamerSongListClient';
 import { AppState, StateContextType } from '../state/AppState';
 import { UpdateSongHistoryAction, UpdateSongQueueAction } from '../state/AppStateReducer';
 
-export const useStreamerSongListEvents = (stateContext: StateContextType) => {   
+export const useStreamerSongListEvents = (stateContext: StateContextType) => {
     const client = useRef<any>(undefined);
 
     const [streamerId, setStreamerId] = useState<number | undefined>(undefined);
@@ -60,7 +60,7 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
     useEffect(() => {
 
     }, [streamerId]);
-  
+
     useEffect(() => {
         if (streamerId) {
             client.current = io(`https://api.streamersonglist.com`, { transports: ["websocket"] });
@@ -82,7 +82,7 @@ export const useStreamerSongListEvents = (stateContext: StateContextType) => {
                     console.log("update-playhistory");
                 });
                 client.current.on('reload-song-list', async () => {
-                    getQueue(streamerId);
+                    //getQueue(streamerId);
                     getHistory(streamerId);
                     console.log("reload-song-list");
                 });

@@ -116,7 +116,7 @@ export class GetQueueEvents {
       ).filter((s) => !!s) as StreamerSongListSong[];
     }
     const songRepo = sslSongs.reduce((acc, s) => {
-      acc[s.id] = `${s.title} - ${s.artist}`;
+      acc[s.id] = `${s.title}${s.artist ? ` - ${s.artist}` : ''}`;
       return acc;
     }, {} as Record<string, string>);
     console.log({ songRepo });

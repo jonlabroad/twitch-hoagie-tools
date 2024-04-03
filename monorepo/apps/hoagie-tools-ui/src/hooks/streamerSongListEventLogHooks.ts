@@ -1,4 +1,4 @@
-import { SongListEventDescription, StreamerSongListHoagieClient } from '@hoagie/streamersonglist-service';
+import { SSLEventListItem, SongListEvent, SongListEventDescription, StreamerSongListHoagieClient } from '@hoagie/streamersonglist-service';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginContext } from '../components/context/LoginContextProvider';
 import { StateContext } from '../components/context/StateContextProvider';
@@ -9,20 +9,33 @@ export const useStreamerSongListEventLog = () => {
   const { state: appState } = useContext(StateContext);
   const { state: loginState } = useContext(LoginContext);
 
-  const [events, setEvents] = useState<SongListEventDescription[]>([]);
+  const [lastQueryTime, setLastQueryTime] = useState<Date | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const fetchEvents = useCallback(async () => {
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(new Date().getDate() - 2);
+  const [events, setEvents] = useState<SSLEventListItem[]>([]);
+
+  const fetchEvents = async () => {
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(new Date().getDate() - 1);
     if (loginState?.accessToken && appState?.streamer) {
-      const response = await client.getEventDescriptions(undefined, appState.streamer, twoDaysAgo, new Date());
-      setEvents(response);
+      const now = new Date();
+      setIsLoading(true);
+      const response = await client.getEvents(undefined, appState.streamer, lastQueryTime ?? oneDayAgo);
+      setLastQueryTime(now);
+      setEvents([...events, ...response ?? []]);
+      setIsLoading(false);
     }
-  }, [appState.streamer, loginState.username, loginState.accessToken]);
+  };
 
   useEffect(() => {
     fetchEvents();
-  }, [fetchEvents]);
+  }, [appState.streamer, loginState?.accessToken, loginState?.username]);
 
-  return { events, fetchEvents };
+  useEffect(() => {
+    if (appState.songQueue) {
+      setTimeout(() => fetchEvents(), 1500);
+    }
+  }, [appState.songQueue])
+
+  return { events, fetchEvents, isLoading };
 };

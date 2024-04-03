@@ -120,6 +120,7 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
             }
         }
         case "update_songqueue": {
+          console.log("update_songqueue");
             const updateQueue = action as UpdateSongQueueAction;
             return {
                 ...state,

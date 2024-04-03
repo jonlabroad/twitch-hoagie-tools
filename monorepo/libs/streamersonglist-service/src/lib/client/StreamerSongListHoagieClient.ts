@@ -1,5 +1,6 @@
 import axios from "axios";
 import { SongListEvent, SongListEventDescription } from "./StreamerSongListEventTypes";
+import { SSLEventListItem } from "@hoagie/streamersonglist-service";
 
 const BASE_URL = "https://streamersonglist.hoagieman.net/api/v1/"
 const BASE_URL_DEV = 'https://streamersonglist-dev.hoagieman.net/api/v1/';
@@ -17,9 +18,11 @@ export class StreamerSongListHoagieClient {
     userLogin: string | undefined,
     startDate: Date,
     endDate?: Date,
-  ): Promise<SongListEvent> {
+  ): Promise<SSLEventListItem[]> {
     const userIdOrLoginParam = userId ? `userId=${userId}` : `userLogin=${userLogin}`;
-    const endDateRequest = endDate ? endDate.toISOString() : new Date().toISOString();
+    const oneMinFromNow = new Date();
+    oneMinFromNow.setMinutes(new Date().getMinutes() + 1);
+    const endDateRequest = endDate ? endDate.toISOString() : oneMinFromNow.toISOString();
     const response = await axios.get(
       `${this.url}queueevents?${userIdOrLoginParam}&startDate=${startDate.toISOString()}&endDate=${endDateRequest}`,
       {
