@@ -68,16 +68,6 @@ functions:
   twitchAuthenticator:
     handler: auth.twitch_authorizer
 
-  hello:
-    handler: hello.hello
-    events:
-      - http:
-          method: GET
-          path: /api/hello
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-
   detectstreams:
     handler: events.detectstreams
     events:
@@ -177,93 +167,6 @@ functions:
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
-
-  spotifygetsongs:
-    handler: spotify.getsongs
-    timeout: 600
-    events:
-      - http:
-          method: POST
-          path: /api/spotify/getsongs
-          cors: true
-          parameters:
-            querystrings:
-              username: true
-          authorizer:
-            name: twitchAuthenticator
-    environment:
-      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
-      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  spotifygetsong:
-    handler: spotify.getsong
-    timeout: 600
-    events:
-      - http:
-          method: GET
-          path: /api/spotify/getsong
-          cors: true
-          parameters:
-            querystrings:
-              username: true
-          authorizer:
-            name: twitchAuthenticator
-    environment:
-      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
-      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  songeval:
-    handler: songeval.eval
-    timeout: 600
-    events:
-      - http:
-          method: GET
-          path: /api/songeval/eval
-          cors: true
-          parameters:
-            querystrings:
-              username: true
-              query: true
-          authorizer:
-            name: twitchAuthenticator
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-      GENIUS_CLIENT_SECRET: ${file(secrets.yml):geniusClientSecret}
-      BAD_WORDS_SECRET: ${file(secrets.yml):badWordsSecret}
-
-  # songevaldotnet:
-  #   runtime: dotnet6.0
-  #   handler: SongEval::SongEvalFunction.Function::Eval
-  #   timeout: 600
-  #   events:
-  #     - http:
-  #         method: GET
-  #         path: /api/dotnet/songeval/eval
-  #         cors: true
-  #         parameters:
-  #           querystrings:
-  #             username: true
-  #             query: true
-  #         authorizer:
-  #           name: twitchAuthenticator
-  #   environment:
-  #     TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-  #     TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-  #     STAGE: ${self:custom.myStage}
-  #     TABLENAME: ${self:custom.myTableName}
-  #     GENIUS_CLIENT_SECRET: ${file(secrets.yml):geniusClientSecret}
-  #     BAD_WORDS_SECRET: ${file(secrets.yml):badWordsSecret}
 
   listsubscriptions:
     handler: twitch.listsubscriptions
@@ -417,25 +320,6 @@ functions:
       - http:
           method: GET
           path: /api/raiddata
-          parameters:
-            querystrings:
-              username: true
-              streamerLogin: true
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  getuserinfo:
-    handler: twitch.getuserinfo
-    events:
-      - http:
-          method: GET
-          path: /api/getuserinfo
           parameters:
             querystrings:
               username: true

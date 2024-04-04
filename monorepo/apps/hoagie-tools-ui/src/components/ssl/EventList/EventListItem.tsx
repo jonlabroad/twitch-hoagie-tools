@@ -21,6 +21,7 @@ import en from 'javascript-time-ago/locale/en';
 import { TableCell, Tooltip } from '@mui/material';
 
 import { animated, useSpring, config } from '@react-spring/web';
+import { useMemo } from 'react';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -114,25 +115,28 @@ export const EventListItem = (props: EventListItemProps) => {
     <animated.div style={{
       ...(isFirst && isVeryRecent ? springs : {})
     }}>
-      <FlexRow alignItems="center">
-        <Tooltip placement="top-end" title={timestampDate.toLocaleString()}>
-          <div className="event-list-item-timestamp">
-            <ReactTimeAgo date={timestampDate} />
-          </div>
-        </Tooltip>
-        <Tooltip placement="top-end" title={sslEvent.userLogin}>
-          <div className="event-list-channel-avatar">
-            {avatarImageUrl && <img src={avatarImageUrl} />}
-            {!avatarImageUrl && sslEvent.eventType !== "new-playhistory" &&
-              <AccountCircleIcon fontSize="large" style={{ fill: "grey" }}/>
-            }
-          </div>
-        </Tooltip>
-        <Tooltip placement="top-end" title={getTooltip(sslEvent)}>
-          <div className="event-list-item-icon">{icon}</div>
-        </Tooltip>
-        <div className="event-list-item-description">{getText(sslEvent)}</div>
-      </FlexRow>
+      {useMemo(() => (
+        <FlexRow alignItems="center">
+          <Tooltip placement="top-end" title={timestampDate.toLocaleString()}>
+            <div className="event-list-item-timestamp">
+              <ReactTimeAgo date={timestampDate} />
+            </div>
+          </Tooltip>
+          <Tooltip placement="top-end" title={sslEvent.userLogin}>
+            <div className="event-list-channel-avatar">
+              {avatarImageUrl && <img src={avatarImageUrl} />}
+              {!avatarImageUrl && sslEvent.eventType !== "new-playhistory" &&
+                <AccountCircleIcon fontSize="large" style={{ fill: "grey" }}/>
+              }
+            </div>
+          </Tooltip>
+          <Tooltip placement="top-end" title={getTooltip(sslEvent)}>
+            <div className="event-list-item-icon">{icon}</div>
+          </Tooltip>
+          <div className="event-list-item-description">{getText(sslEvent)}</div>
+        </FlexRow>
+      ), [sslEvent, userData, isFirst])}
+
       </animated.div>
     </>
   );

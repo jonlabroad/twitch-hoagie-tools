@@ -292,41 +292,6 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
   }
 };
 
-module.exports.getuserinfo = async (event: APIGatewayProxyEvent) => {
-  try {
-    Config.validate();
-
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const userLogin = event.queryStringParameters?.["username"] ?? "";
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          userLogin,
-          streamerLogin,
-          ...(await TwitchProvider.getUserData(streamerLogin, userLogin)),
-        },
-        null,
-        2
-      ),
-      headers: {
-        ...corsHeaders,
-        ...followCacheHeaders,
-      },
-    };
-  } catch (err) {
-    console.error(err.message, err);
-    return {
-      statusCode: 500,
-      headers: {
-        ...corsHeaders,
-      },
-      body: `${err.message}`,
-    };
-  }
-};
-
 module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();

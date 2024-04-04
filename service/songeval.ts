@@ -1,11 +1,8 @@
 "use strict";
 
 import { APIGatewayProxyEvent } from "aws-lambda";
-import BadWordsClient from "./src/badwords/BadWordsClient";
-import HoagieBadWordsClient from "./src/badwords/HoagieBadWordsClient";
 import EvalDbClient from "./src/channelDb/EvalDbClient";
 import Config from "./src/Config";
-import GeniusClient from "./src/genius/GeniusClient";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import { BasicAuth } from "./src/util/BasicAuth";
 import { noCacheHeaders } from "./admin";
@@ -18,69 +15,6 @@ export const corsHeaders = {
 
 export const cacheHeaders = {
   "Cache-Control": "max-age=14400",
-};
-
-module.exports.eval = async (event: APIGatewayProxyEvent) => {
-  Config.validate(["TABLENAME"]);
-
-  const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    username,
-    streamerName
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
-  }
-  let body: any = "err";
-  try {
-    const query = event.queryStringParameters?.["query"] ?? "";
-    const geniusClient = new GeniusClient(Config.GeniusClientSecret);
-    const geniusSong = await geniusClient.getSong(query);
-    const lyrics = geniusSong
-      ? await geniusClient.getLyricsFromUrl(geniusSong.url)
-      : "";
-
-    //Evaluate the lyrics
-    let lyricsEval: any = undefined;
-    if (lyrics) {
-      const badWordsClient = new BadWordsClient(Config.BadWordsSecret);
-      lyricsEval = await badWordsClient.eval(geniusSong.full_title, lyrics);
-      if (lyricsEval.status.isError) {
-        try {
-          // Use the backup
-          console.log("Using bad woards backup!");
-          const hoagieClient = new HoagieBadWordsClient();
-          const result = hoagieClient.eval(lyrics);
-          console.log({ result });
-          lyricsEval = result;
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
-
-    body = {
-      song: geniusSong,
-      lyrics,
-      lyricsEval,
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: err.message,
-    };
-  }
-
-  return {
-    statusCode: 200,
-    headers: {
-      ...corsHeaders,
-      ...cacheHeaders,
-    },
-    body: JSON.stringify(body),
-  };
 };
 
 module.exports.readconfig = async (event: APIGatewayProxyEvent) => {

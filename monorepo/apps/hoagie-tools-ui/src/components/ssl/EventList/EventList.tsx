@@ -19,7 +19,7 @@ import {
   LinearProgress,
   Tooltip,
 } from '@mui/material';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { TwitchUserInfoContext } from '../../context/TwitchUserInfoProvider';
 
 const tableHeaderStyle = {
@@ -67,15 +67,17 @@ export const EventList = (props: EventListProps) => {
             </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {sortedEvents.map((sslEvent, index) => (
-            <TableRow>
-              <TableCell>
-                <EventListItem isFirst={index === 0} key={`event-${sslEvent.id ?? sslEvent.timestamp}`} sslEvent={sslEvent} userData={userDataRepo}/>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        {useMemo(() => (
+          <TableBody>
+            {sortedEvents.map((sslEvent, index) => (
+                <TableRow>
+                <TableCell>
+                  <EventListItem isFirst={index === 0} key={`event-${sslEvent.id ?? sslEvent.timestamp}`} sslEvent={sslEvent} userData={userDataRepo}/>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          ), [sortedEvents])}
       </Table>
     </TableContainer>
   );
