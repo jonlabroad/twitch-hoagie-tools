@@ -44,6 +44,7 @@
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.14.11",
+    "@react-spring/web": "^9.7.3",
     "@swc/helpers": "~0.5.2",
     "atob": "^2.1.2",
     "axios": "^1.6.0",

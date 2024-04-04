@@ -22,7 +22,12 @@ export const useStreamerSongListEventLog = () => {
       setIsLoading(true);
       const response = await client.getEvents(undefined, appState.streamer, lastQueryTime ?? oneDayAgo);
       setLastQueryTime(now);
-      setEvents([...events, ...response ?? []]);
+      const allEvents = [...events, ...response ?? []];
+      const dedupedEvents = allEvents.reduce((acc, event) => {
+        acc[event.id] = event;
+        return acc;
+      }, {} as Record<string, SSLEventListItem>);
+      setEvents(Object.values(dedupedEvents));
       setIsLoading(false);
     }
   };

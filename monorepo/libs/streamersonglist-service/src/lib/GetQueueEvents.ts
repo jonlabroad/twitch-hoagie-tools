@@ -15,6 +15,7 @@ import {
 } from './client/StreamerSongListEventTypes';
 
 export interface SSLEventListItem {
+  id: string
   eventType: 'queue-event' | 'new-playhistory';
   type: 'added' | 'moved' | 'deleted' | 'played';
   data: SongAddedItem | SongMovedItem | SongDeletedItem | SongPlayedItem;
@@ -147,6 +148,7 @@ export class GetQueueEvents {
       const eventType = 'queue-event';
       if (sslData.added) {
         return {
+          id: sslEventBridgeEvent.id,
           eventType,
           type: 'added',
           data: {
@@ -160,6 +162,7 @@ export class GetQueueEvents {
         };
       } else if (sslData.oldPosition && sslData.position) {
         return {
+          id: sslEventBridgeEvent.id,
           eventType,
           type: 'moved',
           data: {
@@ -174,6 +177,7 @@ export class GetQueueEvents {
         };
       } else if (sslData.deleted) {
         return {
+          id: sslEventBridgeEvent.id,
           eventType,
           type: 'deleted',
           data: {
@@ -191,6 +195,7 @@ export class GetQueueEvents {
       const song =
         sslData.nonlistSong ?? sslSongs[`${sslData.songId}`] ?? sslData.songId;
       return {
+        id: sslEventBridgeEvent.id,
         eventType: 'new-playhistory',
         type: 'played',
         data: {

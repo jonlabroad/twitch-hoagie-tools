@@ -80,7 +80,7 @@ export const EventList = (props: EventListProps) => {
           {sortedEvents.map((sslEvent, index) => (
             <TableRow>
               <TableCell>
-                <EventListItem key={index} sslEvent={sslEvent} userData={userDataRepo}/>
+                <EventListItem isFirst={index === 0} key={`event-${sslEvent.id ?? sslEvent.timestamp}`} sslEvent={sslEvent} userData={userDataRepo}/>
               </TableCell>
             </TableRow>
           ))}

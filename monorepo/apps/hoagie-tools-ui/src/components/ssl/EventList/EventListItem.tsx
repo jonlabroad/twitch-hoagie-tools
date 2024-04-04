@@ -20,11 +20,14 @@ import ReactTimeAgo from 'react-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { TableCell, Tooltip } from '@mui/material';
 
+import { animated, useSpring, config } from '@react-spring/web';
+
 TimeAgo.addDefaultLocale(en);
 
 export interface EventListItemProps {
   sslEvent: SSLEventListItem;
   userData: Record<string, UserData>;
+  isFirst: boolean;
 }
 
 const getIcon = (sslEvent: SSLEventListItem) => {
@@ -86,8 +89,17 @@ const getText = (sslEvent: SSLEventListItem) => {
 };
 
 export const EventListItem = (props: EventListItemProps) => {
-  const { sslEvent, userData } = props;
+  const { sslEvent, userData, isFirst } = props;
 
+  const springs = useSpring({
+    from: { marginLeft: -400 },
+    to: { marginLeft: 0 },
+
+    config: {
+      tension: 210,
+      friction: 50,
+    }
+  });
   const icon = getIcon(sslEvent);
 
   const avatarImageUrl =
@@ -95,9 +107,13 @@ export const EventListItem = (props: EventListItemProps) => {
     userData[sslEvent.userLogin.toLowerCase()]?.profile_image_url;
 
   const timestampDate = new Date(sslEvent.timestamp);
+  const isVeryRecent = (new Date().getTime() - timestampDate.getTime())/1e3 < 60;
 
   return (
     <>
+    <animated.div style={{
+      ...(isFirst && isVeryRecent ? springs : {})
+    }}>
       <FlexRow alignItems="center">
         <Tooltip placement="top-end" title={timestampDate.toLocaleString()}>
           <div className="event-list-item-timestamp">
@@ -117,6 +133,7 @@ export const EventListItem = (props: EventListItemProps) => {
         </Tooltip>
         <div className="event-list-item-description">{getText(sslEvent)}</div>
       </FlexRow>
+      </animated.div>
     </>
   );
 };
