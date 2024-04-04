@@ -106,7 +106,7 @@ export const RaidContainer = (props: RaidContainerProps) => {
           Object.values(liveStreamsToDisplay).map((c) => c.user_name)
         );
         const cInfo: Record<string, UserData> = {};
-        users.forEach((s) => (cInfo[s.display_name] = s));
+        users?.forEach((s) => (cInfo[s.display_name] = s));
         setUserInfo(cInfo);
       }
     }

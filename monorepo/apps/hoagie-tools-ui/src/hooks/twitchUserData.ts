@@ -23,7 +23,11 @@ export const useTwitchUserData = (props: {
         const users = await client.getUsersData(
           toFetchLogins
         );
-        if (users.length > 0) {
+        console.log({ users });
+        if (!users) {
+          throw new Error("Couldn't get users, use backup method.");
+        }
+        if (users && users.length > 0) {
           setUserData((prev) => {
             const newUserData = { ...prev };
             users.forEach((u) => {
@@ -34,6 +38,24 @@ export const useTwitchUserData = (props: {
         }
       } catch (e) {
         console.error(e);
+        // Backup (when a dono user login doesn't exist on Twitch)
+        const userDataResults = (await Promise.all(toFetchLogins.map(async (u) => {
+          try {
+            return await client.getUserData(u);
+          } catch (e) {
+            return undefined;
+          }
+        })));
+        const userData = userDataResults.filter(ud => !!ud) as UserData[];
+        if (userData.length > 0) {
+          setUserData((prev) => {
+            const newUserData = { ...prev };
+            userData.forEach((u) => {
+              newUserData[u.login.toLowerCase()] = u;
+            });
+            return newUserData;
+          });
+        }
       } finally {
         toFetchLogins.forEach((u) => usersLoading.current.delete(u.toLowerCase()));
       }

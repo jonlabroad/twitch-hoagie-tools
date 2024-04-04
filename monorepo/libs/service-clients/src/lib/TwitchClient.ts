@@ -225,12 +225,12 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
       .map((u) => `login=${u}`)
       .join('&')}`;
     const response = await this.get<{ data: UserData[] }>(url);
-    return response?.data ?? [];
+    return response?.data;
   }
 
   async getUserData(userLogin: string) {
     const datas = await this.getUsersData([userLogin]);
-    return datas[0];
+    return datas?.[0];
   }
 
   private async getServiceAuthToken() {
