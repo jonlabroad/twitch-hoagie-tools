@@ -24,12 +24,13 @@ export const useTwitchUserData = (props: {
           toFetchLogins
         );
         if (users.length > 0) {
-          const newUserData = { ...userData };
-          users.forEach((u) => {
-            newUserData[u.login.toLowerCase()] = u;
+          setUserData((prev) => {
+            const newUserData = { ...prev };
+            users.forEach((u) => {
+              newUserData[u.login.toLowerCase()] = u;
+            });
+            return newUserData;
           });
-          console.log({ newUserData });
-          setUserData(newUserData);
         }
       } catch (e) {
         console.error(e);

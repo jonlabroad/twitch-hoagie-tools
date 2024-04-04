@@ -66,17 +66,19 @@ export const EventList = (props: EventListProps) => {
             </TableCell>
           </TableRow>
         </TableHead>
-        {useMemo(() => (
           <TableBody>
             {sortedEvents.map((sslEvent, index) => (
                 <TableRow>
                 <TableCell>
-                  <EventListItem isFirst={index === 0} key={`event-${sslEvent.id ?? sslEvent.timestamp}`} sslEvent={sslEvent} userData={userDataRepo}/>
+                  <EventListItem
+                    isFirst={index === 0}
+                    key={`event-${sslEvent.id ?? sslEvent.timestamp}`}
+                    sslEvent={sslEvent}
+                    userData={sslEvent.userLogin ? userDataRepo[sslEvent.userLogin] : undefined}/>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
-          ), [sortedEvents])}
       </Table>
     </TableContainer>
   );

@@ -27,7 +27,7 @@ TimeAgo.addDefaultLocale(en);
 
 export interface EventListItemProps {
   sslEvent: SSLEventListItem;
-  userData: Record<string, UserData>;
+  userData: UserData | undefined;
   isFirst: boolean;
 }
 
@@ -39,7 +39,6 @@ const getIcon = (sslEvent: SSLEventListItem) => {
           return <PlusIcon style={{ fill: '#5cffbe' }} />;
         case 'moved':
           const movedData = sslEvent.data as SongMovedItem;
-          console.log({ movedData});
           return (movedData.newPosition ?? 0) < (movedData.oldPosition ?? 0) ? (
             <NorthIcon style={{ fill: '#00ad03' }} />
           ) : (
@@ -105,7 +104,7 @@ export const EventListItem = (props: EventListItemProps) => {
 
   const avatarImageUrl =
     sslEvent.userLogin &&
-    userData[sslEvent.userLogin.toLowerCase()]?.profile_image_url;
+    userData?.profile_image_url;
 
   const timestampDate = new Date(sslEvent.timestamp);
   const isVeryRecent = (new Date().getTime() - timestampDate.getTime())/1e3 < 60;
@@ -135,7 +134,7 @@ export const EventListItem = (props: EventListItemProps) => {
           </Tooltip>
           <div className="event-list-item-description">{getText(sslEvent)}</div>
         </FlexRow>
-      ), [sslEvent, userData, isFirst])}
+      ), [sslEvent, avatarImageUrl, isFirst])}
 
       </animated.div>
     </>

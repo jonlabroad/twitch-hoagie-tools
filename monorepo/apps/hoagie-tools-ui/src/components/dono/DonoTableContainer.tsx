@@ -19,16 +19,14 @@ import { useHoagieSockets } from '../../hooks/hoagieSocketHooks';
 import UpdateIcon from '@mui/icons-material/Update';
 import { ServerStatus } from '../status/ServerStatus';
 import { StreamLiveIcon } from '../icon/StreamLive';
-import { UserData } from '@hoagie/service-clients';
+import { TwitchUserInfoContext } from '../context/TwitchUserInfoProvider';
 
 interface DonoTableContainerProps {
   streamHistory: StreamInfo[] | undefined;
   currentStreams: StreamInfo[] | undefined;
   isFirstStream: boolean;
   isLastStream: boolean;
-  twitchUserData: Record<string, UserData>;
   getNextStream: (dir: number) => any;
-  requestUserData: (usernames: string[]) => void;
 }
 
 export interface StreamInfo {
@@ -39,17 +37,18 @@ export interface StreamInfo {
 export const DonoTableContainer = (props: DonoTableContainerProps) => {
   const stateContext = useContext(StateContext);
   const donoContext = useContext(DonoContext);
+  const twitchUserDataContext = useContext(TwitchUserInfoContext);
   const { state } = stateContext;
   const { state: loginState } = useContext(LoginContext);
   const { state: donoState, refreshDonos } = donoContext;
   const { donoData, loading } = donoState;
+  const { userData: twitchUserData, addUsers } = twitchUserDataContext;
   const {
     streamHistory,
     currentStreams,
     getNextStream,
     isFirstStream,
     isLastStream,
-    requestUserData,
   } = props;
   const currentStreamsRef = useRef(currentStreams);
 
@@ -65,8 +64,8 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
   useEffect(() => {
     const userLogins = Object.values(donoData).map(d => d.username.toLowerCase());
     console.log({ userLogins });
-    requestUserData(userLogins);
-  }, [donoData]);
+    addUsers?.(userLogins);
+  }, [donoData, addUsers]);
 
   useStreamerSongListEvents(stateContext);
 
@@ -170,7 +169,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
             notEligibleDonoData={notEligible ?? []}
             songQueue={state.songQueue}
             songHistory={state.songHistory}
-            twitchUserData={props.twitchUserData}
+            twitchUserData={twitchUserData}
           />
         </Grid>
       )}

@@ -10,10 +10,9 @@ import "../../styles/Dono.scss";
 import { Container, Grid } from "@mui/material";
 import { EvaluatedSongQueueContainer } from "../ssl/EvaluatedSongQueueContainer";
 import { DonoContext } from "./DonoContextProvider";
-import { SystemStatusContext } from "../context/SystemStatusContextProvider";
 import { ChannelInfoProvider } from "../data/ChannelInfoProvider";
 import { EventList } from "../ssl/EventList/EventList";
-import { TwitchUserInfoContext } from "../context/TwitchUserInfoProvider";
+import { TwitchUserInfoProvider } from "../context/TwitchUserInfoProvider";
 
 export interface DonoPageContainerProps {}
 
@@ -22,27 +21,25 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
 
   useSaveLastPath();
 
-  const { status, refresh } = useContext(SystemStatusContext);
-
-  const { userData: userDataRepo, addUsers } = useContext(TwitchUserInfoContext);
-
   return (
     <>
       <Container maxWidth={"xl"}>
         <Grid container spacing={3}>
           <ChannelInfoProvider />
           <EvaluatedSongQueueContainer />
-          <DonoTableContainer
-            streamHistory={donoContext.selection.streamHistory}
-            currentStreams={donoContext.selection.currentStreams}
-            isFirstStream={donoContext.selection.isFirst}
-            isLastStream={donoContext.selection.isLast}
-            getNextStream={donoContext.selection.getNextStream}
-            twitchUserData={userDataRepo}
-            requestUserData={addUsers ?? ((s: string[]) => {})}
-          />
+          <TwitchUserInfoProvider>
+            <DonoTableContainer
+              streamHistory={donoContext.selection.streamHistory}
+              currentStreams={donoContext.selection.currentStreams}
+              isFirstStream={donoContext.selection.isFirst}
+              isLastStream={donoContext.selection.isLast}
+              getNextStream={donoContext.selection.getNextStream}
+            />
+          </TwitchUserInfoProvider>
           <Grid paddingBottom={30} item xs={12} lg={4}>
-            <EventList />
+            <TwitchUserInfoProvider>
+              <EventList />
+            </TwitchUserInfoProvider>
           </Grid>
         </Grid>
       </Container>

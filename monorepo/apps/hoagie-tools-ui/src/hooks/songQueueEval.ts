@@ -96,7 +96,6 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                                 const title = evaluation?.song?.title;
                                 const doLookup = !evaluation?.songInfo;
                                 let spotifySong: any | undefined = undefined;
-                                console.log({ evaluation, song: evaluation?.song, artist, title, doLookup })
                                 if (doLookup && artist && title) {
                                   const lookupClient = new SongLookupClient();
                                   spotifySong = await lookupClient.songLookup(artist, title, loginState.username ?? "", loginState.accessToken ?? "", streamer.toLowerCase());
