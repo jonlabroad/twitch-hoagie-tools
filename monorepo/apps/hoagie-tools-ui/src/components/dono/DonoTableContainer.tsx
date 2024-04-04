@@ -63,8 +63,9 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
   const { eligible, notEligible } = DonoUtil.getEligibleDonos(donoData, 5);
 
   useEffect(() => {
-    const userLogins = Object.values(donoData).map(d => d.username);
-    props.requestUserData(userLogins);
+    const userLogins = Object.values(donoData).map(d => d.username.toLowerCase());
+    console.log({ userLogins });
+    requestUserData(userLogins);
   }, [donoData]);
 
   useStreamerSongListEvents(stateContext);

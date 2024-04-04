@@ -40,8 +40,8 @@ export const DonoTable = (props: DonoTableProps) => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell><Typography style={{...tableHeaderStyle, width: "10%"}}>Username</Typography></TableCell>
-                        <TableCell align="right"><Typography style={{...tableHeaderStyle, width: "5%"}}>Value</Typography></TableCell>
+                        <TableCell><Typography style={{...tableHeaderStyle, width: "10%"}}>User</Typography></TableCell>
+                        <TableCell align="right"><Typography style={{...tableHeaderStyle, width: "5%"}}>Total</Typography></TableCell>
                         <TableCell><Typography style={{...tableHeaderStyle, width: "15%"}}>Support</Typography></TableCell>
                         <Hidden xsDown><TableCell><Typography style={{...tableHeaderStyle}}>Requests</Typography></TableCell></Hidden>
                     </TableRow>
@@ -58,7 +58,11 @@ export const DonoTable = (props: DonoTableProps) => {
                     ))}
                     <TableRow style={{ backgroundColor: theme.palette.secondary.dark}}><TableCell colSpan={8} style={{ height: 20 }}></TableCell></TableRow>
                     {notEligibleDonoData?.map(userdata => (
-                        <DonoTableRow key={userdata.username} userdata={userdata} />
+                        <DonoTableRow
+                          key={userdata.username}
+                          userdata={userdata}
+                          twitchUserData={twitchUserData?.[userdata.username.toLowerCase()]}
+                        />
                     ))}
                 </TableBody>
             </Table>
