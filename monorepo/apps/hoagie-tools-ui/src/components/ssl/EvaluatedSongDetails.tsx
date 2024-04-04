@@ -26,7 +26,7 @@ export const EvaluatedSongDetails = (props: EvaluatedSongDetailsProps) => {
                 <Grid item xs={3}>
                     <BadWordsDetails
                         badWordCounts={badWordCounts}
-                        onWordWhitelistChange={(word, type) => props.onWordWhitelistChange(word, type)}
+                        onWordWhitelistChange={props.onWordWhitelistChange}
                     />
                 </Grid>
                 <Grid item xs={4}>

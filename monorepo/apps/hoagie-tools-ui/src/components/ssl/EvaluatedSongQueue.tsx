@@ -12,7 +12,7 @@ import {
   Tooltip,
   Skeleton,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
 import { FlexCol, FlexRow } from "../util/FlexBox";
@@ -25,6 +25,8 @@ import { StateContext } from "../context/StateContextProvider";
 
 import format from "format-duration";
 import { UserDonoSummaries, UserDonoSummary } from "@hoagie/dono-service";
+import { DonoContext } from "../dono/DonoContextProvider";
+import { DonoUtil } from "../../util/DonoUtil";
 
 const maxSongDurationMillis = 7 * 60 * 1e3;
 const defaultSongDurationMillis = 4 * 60 * 1e3;
@@ -34,7 +36,6 @@ export interface EvaluatedSongQueueProps {
   isLoading: boolean;
   evaluations: Evaluations;
   evaluationsStatus: EvaluationsStatus;
-  donoData?: UserDonoSummaries;
 
   onWordWhitelistChange: (word: string, type: "add" | "remove") => void;
 }
@@ -47,18 +48,25 @@ const LoadingPlaceholder = (props: { width: number }) => {
   return <Skeleton variant="rectangular" width={props.width} />;
 };
 
-const DonoIcon = (props: { donoData: UserDonoSummary }) => {
+const DonoIcon = (props: { username: string }) => {
+  const { state: donoData } = useContext(DonoContext);
+
+  const eligibleDonoData = DonoUtil.getEligibleDonos(donoData?.donoData, 5).eligible;
+  const userDonoData = eligibleDonoData.find(d => d.username.toLowerCase() === props.username.toLowerCase());
+
   return (
-    <Tooltip title={`\$${props.donoData?.value}`}>
-      <div style={{ marginLeft: 8, height: 30, width: 30, color: "gold" }}>
-        <MonetizationOnIcon />
-      </div>
-    </Tooltip>
+    useMemo(() => (userDonoData &&
+      <Tooltip title={`\$${userDonoData?.value}`}>
+        <div style={{ marginLeft: 8, height: 30, width: 30, color: "gold" }}>
+          <MonetizationOnIcon />
+        </div>
+      </Tooltip>
+    ), [userDonoData])
   );
 };
 
 export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
-  const { evaluations, config, donoData } = props;
+  const { evaluations, config } = props;
 
   const stateContext = useContext(StateContext);
   const { state } = stateContext;
@@ -164,9 +172,6 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                 ? `(${songAnalysis?.track?.time_signature_confidence})`
                 : "";
               const genreText = genres.join(", ");
-              const userDonoData = evaluation?.user
-                ? donoData?.[evaluation?.user?.toLowerCase().trim()]
-                : undefined;
               const userName =
                 evaluation?.user ?? queueSong.requests[0]?.name ?? "";
               const evaluationStatus = props.evaluationsStatus[songKey];
@@ -198,11 +203,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                       <TableCell>
                         <FlexRow>
                           <Typography>{userName}</Typography>
-                          {userDonoData ? (
-                            <DonoIcon donoData={userDonoData} />
-                          ) : (
-                            ""
-                          )}
+                            <DonoIcon username={userName as string} />
                         </FlexRow>
                       </TableCell>
                     </Hidden>

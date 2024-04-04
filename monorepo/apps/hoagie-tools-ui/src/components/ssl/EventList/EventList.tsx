@@ -21,20 +21,19 @@ import {
 } from '@mui/material';
 import { useContext, useEffect, useMemo } from 'react';
 import { TwitchUserInfoContext } from '../../context/TwitchUserInfoProvider';
+import { SSLEventContext } from '../../context/SSLEventProvider';
 
 const tableHeaderStyle = {
   fontWeight: 600,
 };
 
 export interface EventListProps {
-  events: SSLEventListItem[];
-  isLoading: boolean;
 }
 
 export const EventList = (props: EventListProps) => {
-  const { events } = props;
-
   const { userData: userDataRepo, addUsers } = useContext(TwitchUserInfoContext);
+
+  const { events, fetchEvents, isLoading } = useContext(SSLEventContext);
 
   useEffect(() => {
     const userLogins = getAllUsers(events);
@@ -63,7 +62,7 @@ export const EventList = (props: EventListProps) => {
                   <Chip label="Beta" color="secondary" />
                 </Tooltip>
               </FlexRow>
-              <div style={{ marginTop: 8, minHeight: 5 }}>{props.isLoading && <LinearProgress />}</div>
+              <div style={{ marginTop: 8, minHeight: 5 }}>{isLoading && <LinearProgress />}</div>
             </TableCell>
           </TableRow>
         </TableHead>

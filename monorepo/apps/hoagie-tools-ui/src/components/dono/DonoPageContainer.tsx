@@ -13,7 +13,6 @@ import { DonoContext } from "./DonoContextProvider";
 import { SystemStatusContext } from "../context/SystemStatusContextProvider";
 import { ChannelInfoProvider } from "../data/ChannelInfoProvider";
 import { EventList } from "../ssl/EventList/EventList";
-import { SSLEventContext } from "../context/SSLEventProvider";
 import { TwitchUserInfoContext } from "../context/TwitchUserInfoProvider";
 
 export interface DonoPageContainerProps {}
@@ -24,8 +23,6 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
   useSaveLastPath();
 
   const { status, refresh } = useContext(SystemStatusContext);
-
-  const { events: sslEvents, fetchEvents, isLoading } = useContext(SSLEventContext);
 
   const { userData: userDataRepo, addUsers } = useContext(TwitchUserInfoContext);
 
@@ -45,7 +42,7 @@ export const DonoPageContainer = (props: DonoPageContainerProps) => {
             requestUserData={addUsers ?? ((s: string[]) => {})}
           />
           <Grid paddingBottom={30} item xs={12} lg={4}>
-            <EventList events={sslEvents} isLoading={isLoading} />
+            <EventList />
           </Grid>
         </Grid>
       </Container>

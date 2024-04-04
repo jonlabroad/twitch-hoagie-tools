@@ -11,6 +11,7 @@ import { MoneyIcon } from "../icon/MoneyIcon";
 import { UserDonoSummary } from "@hoagie/dono-service";
 import { UserData } from "@hoagie/service-clients";
 import { TwitchAvatar } from "../avatar/TwitchAvatar";
+import { useMemo } from "react";
 
 const tableHeaderStyle = {
     fontWeight: 600
@@ -36,6 +37,7 @@ export const DonoTable = (props: DonoTableProps) => {
     const theme = useTheme();
 
     return (
+      useMemo(() => (
         <TableContainer component={Paper} className="dono-table-container">
             <Table size="small">
                 <TableHead>
@@ -67,6 +69,7 @@ export const DonoTable = (props: DonoTableProps) => {
                 </TableBody>
             </Table>
         </TableContainer>
+      ), [eligibleDonoData, notEligibleDonoData, songQueue, songHistory, twitchUserData, theme])
     );
 }
 

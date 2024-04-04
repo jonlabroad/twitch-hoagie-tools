@@ -16,24 +16,18 @@ interface EvaluatedSongQueueContainerProps {
 
 export const EvaluatedSongQueueContainer = (props: EvaluatedSongQueueContainerProps) => {
     const stateContext = useContext(StateContext);
-    const donoContext = useContext(DonoContext)
-
     const { state } = stateContext;
-    const { donoData } = donoContext.state;
 
-    const [evaluations, evalIsLoading, config, onWhitelistWordChange, evaluationsStatus] = useSongQueueEval(state);   
-
-    const { eligible } = DonoUtil.getEligibleDonos(donoData, 5)
+    const [evaluations, evalIsLoading, config, onWhitelistWordChange, evaluationsStatus] = useSongQueueEval(state);
 
     return <>
         {(allowedStreamers.includes(state.streamer?.toLowerCase() ?? "")) &&
             <EvaluatedSongQueue
                 config={config}
-                onWordWhitelistChange={(word: string, type: "add" | "remove") => onWhitelistWordChange(word, type)}
+                onWordWhitelistChange={onWhitelistWordChange}
                 isLoading={evalIsLoading}
                 evaluations={evaluations}
                 evaluationsStatus={evaluationsStatus}
-                donoData={eligible.reduce((acc, cur) => ({...acc, [cur.username.toLowerCase()]: cur}), {})}
             />
         }
     </>

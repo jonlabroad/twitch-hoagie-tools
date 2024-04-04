@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SongEvalConfig } from "../components/ssl/SongEvalConfig";
 import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
@@ -42,7 +42,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
         }
     }
 
-    const onWhitelistWordChange = async (word: string, type: "add" | "remove") => {
+    const onWhitelistWordChange = useCallback(async (word: string, type: "add" | "remove") => {
         if (loginState.username && loginState.accessToken && state.streamer) {
             const client = new HoagieClient();
             if (type === "add") {
@@ -52,7 +52,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
             }
             await updateConfig();
         }
-    }
+    }, [loginState.username, loginState.accessToken, state.streamer]);
 
     const setEvalLoading = (songKey: string, isLoading: boolean, isError: boolean = false) => {
         const status = {
