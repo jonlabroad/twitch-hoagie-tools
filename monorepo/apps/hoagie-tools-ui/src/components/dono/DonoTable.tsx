@@ -9,6 +9,8 @@ import { TwitchGiftSubIcon } from "../icon/TwitchGiftSubIcon";
 import { TwitchPrimeSubIcon } from "../icon/TwitchPrimeSubIcon";
 import { MoneyIcon } from "../icon/MoneyIcon";
 import { UserDonoSummary } from "@hoagie/dono-service";
+import { UserData } from "@hoagie/service-clients";
+import { TwitchAvatar } from "../avatar/TwitchAvatar";
 
 const tableHeaderStyle = {
     fontWeight: 600
@@ -25,10 +27,11 @@ interface DonoTableProps {
     notEligibleDonoData: UserDonoSummary[];
     songQueue?: GetQueueResponse
     songHistory?: GetHistoryResponse
+    twitchUserData: Record<string, UserData>;
 }
 
 export const DonoTable = (props: DonoTableProps) => {
-    const { eligibleDonoData, notEligibleDonoData, songQueue, songHistory } = props;
+    const { eligibleDonoData, notEligibleDonoData, songQueue, songHistory, twitchUserData } = props;
 
     const theme = useTheme();
 
@@ -45,7 +48,13 @@ export const DonoTable = (props: DonoTableProps) => {
                 </TableHead>
                 <TableBody>
                     {eligibleDonoData?.map(userdata => (
-                        <DonoTableRow key={userdata.username} userdata={userdata} songQueue={songQueue} songHistory={songHistory} />
+                        <DonoTableRow
+                          key={userdata.username}
+                          userdata={userdata}
+                          songQueue={songQueue}
+                          songHistory={songHistory}
+                          twitchUserData={twitchUserData?.[userdata.username.toLowerCase()]}
+                        />
                     ))}
                     <TableRow style={{ backgroundColor: theme.palette.secondary.dark}}><TableCell colSpan={8} style={{ height: 20 }}></TableCell></TableRow>
                     {notEligibleDonoData?.map(userdata => (
@@ -61,10 +70,11 @@ interface DonoTableRowProps {
     userdata: UserDonoSummary
     songQueue?: GetQueueResponse
     songHistory?: GetHistoryResponse
+    twitchUserData?: UserData
 }
 
 const DonoTableRow = (props: DonoTableRowProps) => {
-    const { userdata, songQueue, songHistory } = props;
+    const { userdata, songQueue, songHistory, twitchUserData } = props;
 
     const queueSongs = songQueue?.list.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.username.toLowerCase()).length > 0);
     const historySongs = songHistory?.items.filter(song => song.requests.filter(r => r.name.toLowerCase().trim() === userdata.username.toLowerCase()).length > 0);
@@ -74,7 +84,14 @@ const DonoTableRow = (props: DonoTableRowProps) => {
 
     return <>
         <StyledTableRow>
-            <TableCell style={{ width: "5%" }}>{userdata.username}</TableCell>
+            <TableCell style={{ width: "5%" }}>
+              <FlexRow alignItems="center">
+                <span style={{ marginRight: 5 }}>
+                  <TwitchAvatar username={twitchUserData?.login ?? userdata.username} avatarImageUrl={twitchUserData?.profile_image_url} />
+                </span>
+                <div>{userdata.username}</div>
+              </FlexRow>
+            </TableCell>
             <TableCell align="right" style={{width: "5%"}}>${Math.round(userdata.value * 100) / 100}</TableCell>
             <Hidden xsDown><TableCell align="right" style={{width: "15%"}}>
                 <FlexRow alignItems="center">

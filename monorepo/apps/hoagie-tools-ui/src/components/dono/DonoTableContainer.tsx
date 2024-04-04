@@ -19,13 +19,16 @@ import { useHoagieSockets } from '../../hooks/hoagieSocketHooks';
 import UpdateIcon from '@mui/icons-material/Update';
 import { ServerStatus } from '../status/ServerStatus';
 import { StreamLiveIcon } from '../icon/StreamLive';
+import { UserData } from '@hoagie/service-clients';
 
 interface DonoTableContainerProps {
   streamHistory: StreamInfo[] | undefined;
   currentStreams: StreamInfo[] | undefined;
   isFirstStream: boolean;
   isLastStream: boolean;
+  twitchUserData: Record<string, UserData>;
   getNextStream: (dir: number) => any;
+  requestUserData: (usernames: string[]) => void;
 }
 
 export interface StreamInfo {
@@ -46,6 +49,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     getNextStream,
     isFirstStream,
     isLastStream,
+    requestUserData,
   } = props;
   const currentStreamsRef = useRef(currentStreams);
 
@@ -57,6 +61,11 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
   );
 
   const { eligible, notEligible } = DonoUtil.getEligibleDonos(donoData, 5);
+
+  useEffect(() => {
+    const userLogins = Object.values(donoData).map(d => d.username);
+    props.requestUserData(userLogins);
+  }, [donoData]);
 
   useStreamerSongListEvents(stateContext);
 
@@ -160,6 +169,7 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
             notEligibleDonoData={notEligible ?? []}
             songQueue={state.songQueue}
             songHistory={state.songHistory}
+            twitchUserData={props.twitchUserData}
           />
         </Grid>
       )}

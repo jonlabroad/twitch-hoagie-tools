@@ -1,0 +1,10 @@
+.twitch-avatar {
+  display: flex;
+  align-items: center;
+  margin-right: 5px;
+  min-width: 35px;
+  img {
+      height: 30px;
+      border-radius: 50px;
+  }
+}

@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import { LoginRedirect } from "./components/LoginRedirect";
 
-import { StreamerDashboard } from "./components/auth/StreamerDashboard";
 import { SpotifyConfig } from "./components/spotify/SpotifyConfig";
 import { DonoPage } from "./components/dono/DonoPage";
 
@@ -31,7 +30,6 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { RaidDashboard } from "./components/RaidDashboard";
-import { DashboardV2 } from "./components/DashboardV2";
 import { StateContextProvider } from "./components/context/StateContextProvider";
 import { PageHeader } from "./components/PageHeader";
 import Config from "./Config";

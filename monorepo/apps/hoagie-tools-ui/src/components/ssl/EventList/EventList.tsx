@@ -19,18 +19,12 @@ import {
   LinearProgress,
   Tooltip,
 } from '@mui/material';
-import { useEffect } from 'react';
-import { useTwitchUserData } from '../../../hooks/twitchUserData';
+import { useContext, useEffect } from 'react';
+import { TwitchUserInfoContext } from '../../context/TwitchUserInfoProvider';
 
 const tableHeaderStyle = {
   fontWeight: 600,
 };
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
 
 export interface EventListProps {
   events: SSLEventListItem[];
@@ -40,14 +34,11 @@ export interface EventListProps {
 export const EventList = (props: EventListProps) => {
   const { events } = props;
 
-  // TODO this should be moved to a context
-  const { userData: userDataRepo, addUsers } = useTwitchUserData({
-    initialUsers: [],
-  });
+  const { userData: userDataRepo, addUsers } = useContext(TwitchUserInfoContext);
 
   useEffect(() => {
     const userLogins = getAllUsers(events);
-    addUsers(userLogins);
+    addUsers?.(userLogins);
   }, [events]);
 
   const sortedEvents = events.sort(
