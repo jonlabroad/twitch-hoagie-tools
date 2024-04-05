@@ -167,7 +167,7 @@ export default class TwitchClient {
     }
 
     // Confirm that this Twitch user is who they say they are
-    async validateUserIdAndToken(userName: string, userToken: string) {
+    async validateUserAndToken(userNameOrId: string, userToken: string) {
         try {
             console.log("https://id.twitch.tv/oauth2/validate");
             const response = await axios.get<any>("https://id.twitch.tv/oauth2/validate", {
@@ -176,7 +176,8 @@ export default class TwitchClient {
                 }
             });
             return {
-                validated: response.status === 200 && userName === response.data.login,
+                validated: response.status === 200 && 
+                    ((!!userNameOrId && userNameOrId === response.data.login) || (!!userNameOrId && userNameOrId === response.data.user_id)),
                 validatedSession: response.data
             };
         } catch (err) {
