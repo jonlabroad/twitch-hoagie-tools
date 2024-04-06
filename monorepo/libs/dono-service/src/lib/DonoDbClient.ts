@@ -31,7 +31,7 @@ export default class DonoDbClient {
     }
 
     public async addDono(uuid: string, username: string, streamId: string, amount: number, userTwitchId: string | undefined) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "dono", amount, userTwitchId));
+        await this.writeItem(this.createItem(uuid, username, streamId, "dono", amount, undefined, undefined, userTwitchId));
     }
 
     public async addHypechat(username: string, streamId: string, amount: number) {
@@ -39,11 +39,11 @@ export default class DonoDbClient {
     }
 
     public async addCheer(uuid: string, username: string, streamId: string, bits: number | string, userTwitchId: string | undefined) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "cheer", parseInt(bits.toString()), userTwitchId));
+        await this.writeItem(this.createItem(uuid, username, streamId, "cheer", parseInt(bits.toString()), undefined, undefined, userTwitchId));
     }
 
     public async addSub(uuid: string, username: string, streamId: string, tier: string, userTwitchId: string | undefined) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "subscription", 1, tier, userTwitchId));
+        await this.writeItem(this.createItem(uuid, username, streamId, "subscription", 1, tier, undefined, userTwitchId));
     }
 
     public async addGiftSubs(uuid: string, username: string, streamId: string, tier: string, recipient: string, userTwitchId: string | undefined) {

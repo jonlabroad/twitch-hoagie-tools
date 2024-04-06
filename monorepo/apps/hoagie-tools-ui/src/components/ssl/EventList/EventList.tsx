@@ -58,9 +58,6 @@ export const EventList = (props: EventListProps) => {
                 <Typography style={{ ...tableHeaderStyle, width: '100%' }}>
                   Streamer Song List Events
                 </Typography>
-                <Tooltip title="IT SAYS 'BETA'">
-                  <Chip label="Beta" color="secondary" />
-                </Tooltip>
               </FlexRow>
               <div style={{ marginTop: 8, minHeight: 5 }}>{isLoading && <LinearProgress />}</div>
             </TableCell>
