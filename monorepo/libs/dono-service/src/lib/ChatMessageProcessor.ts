@@ -15,7 +15,7 @@ export class ChatMessageProcessor {
         if (broadcasterId) {
             const liveStream = await twitchClient.getBroadcasterIdLiveStream(broadcasterId);
             if (liveStream) {
-                const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id, tableName);
+                const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id, tableName, twitchClient);
                 await donoProcessor.process(detail.userstate.id, channel, username, message);
             } else {
                 console.error(`Could not find live stream for ${broadcasterId}`);

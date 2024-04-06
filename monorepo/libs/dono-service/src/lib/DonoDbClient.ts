@@ -30,24 +30,24 @@ export default class DonoDbClient {
         return (response?.Items ?? []) as DonoData[];
     }
 
-    public async addDono(uuid: string, username: string, streamId: string, amount: number) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "dono", amount));
+    public async addDono(uuid: string, username: string, streamId: string, amount: number, userTwitchId: string | undefined) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "dono", amount, userTwitchId));
     }
 
     public async addHypechat(username: string, streamId: string, amount: number) {
         console.log("TODO");
     }
 
-    public async addCheer(uuid: string, username: string, streamId: string, bits: number | string) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "cheer", parseInt(bits.toString())));
+    public async addCheer(uuid: string, username: string, streamId: string, bits: number | string, userTwitchId: string | undefined) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "cheer", parseInt(bits.toString()), userTwitchId));
     }
 
-    public async addSub(uuid: string, username: string, streamId: string, tier: string) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "subscription", 1, tier));
+    public async addSub(uuid: string, username: string, streamId: string, tier: string, userTwitchId: string | undefined) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "subscription", 1, tier, userTwitchId));
     }
 
-    public async addGiftSubs(uuid: string, username: string, streamId: string, tier: string, recipient: string) {
-        await this.writeItem(this.createItem(uuid, username, streamId, "subgift", 1, tier, recipient));
+    public async addGiftSubs(uuid: string, username: string, streamId: string, tier: string, recipient: string, userTwitchId: string | undefined) {
+        await this.writeItem(this.createItem(uuid, username, streamId, "subgift", 1, tier, recipient, userTwitchId));
     }
 
     async writeItem(item: Record<string, any>) {
@@ -64,7 +64,7 @@ export default class DonoDbClient {
         }
     }
 
-    createItem(uuid: string, username: string, streamId: string, type: string, amount: number, subTier?: string, subRecipient?: string) {
+    createItem(uuid: string, username: string, streamId: string, type: string, amount: number, subTier?: string, subRecipient?: string, twitchUserId?: string) {
         const key = {
             CategoryKey: this.getKey(this.broadcasterId, streamId),
             SubKey: this.getSort(uuid),
@@ -78,6 +78,7 @@ export default class DonoDbClient {
             subTier,
             subRecipient,
             type,
+            twitchUserId,
             timestamp: new Date().toISOString(),
             ExpirationTTL: Math.floor(Date.now() / 1e3 + defaultExpirySec)
         };

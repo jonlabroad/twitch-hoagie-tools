@@ -6,7 +6,7 @@ import DonoDbClient from "./DonoDbClient";
 export class SubGiftProcessor {
   twitchClient: TwitchClient
   tableName: string
-  
+
   constructor(twitchClient: TwitchClient, tableName: string) {
     this.twitchClient = twitchClient;
     this.tableName = tableName;
@@ -15,7 +15,10 @@ export class SubGiftProcessor {
   public async process(event: SubGiftEvent) {
     console.log("SubGiftProcessor.process", event);
     const broadcasterLogin = getChannelName(event.detail.channel);
-    const broadcasterId = await this.twitchClient.getUserId(broadcasterLogin);
+    const [broadcasterId, userId] = await Promise.all([
+      this.twitchClient.getUserId(broadcasterLogin),
+      (async () => { try { return this.twitchClient.getUserId(event.detail.username) } catch (e) { return undefined } })(),
+    ]);
     if (broadcasterId) {
       const stream = await this.twitchClient.getBroadcasterIdLiveStream(
         broadcasterId
@@ -28,7 +31,8 @@ export class SubGiftProcessor {
           detail.username,
           stream.id,
           detail.methods.plan!,
-          detail.recipient
+          detail.recipient,
+          userId,
         );
         await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, {});
       }

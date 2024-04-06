@@ -1,5 +1,5 @@
 {
-    "root": "dono-service-app",
+    "name": "dono-service-app",
     "projectType": "application",
     "sourceRoot": "apps/dono-service-app/src",
     "targets": {

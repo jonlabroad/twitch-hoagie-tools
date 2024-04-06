@@ -1,5 +1,6 @@
 export interface UserDonoSummary {
   username: string;
+  userId: string | undefined,
   value: number;
   subs: number;
   subtier: string;
@@ -13,6 +14,7 @@ export interface DonoData {
     CategoryKey: string
     SubKey: string
     username: string
+    twitchUserId: string | undefined
     streamId: string
     broadcasterId: string
     amount: number

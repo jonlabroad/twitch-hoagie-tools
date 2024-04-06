@@ -38,6 +38,7 @@ export class DonoProvider {
             dono: 0,
             hypechat: 0,
             subtier: '',
+            userId: donoData.twitchUserId,
           };
           summaries[username] = summary;
         }
