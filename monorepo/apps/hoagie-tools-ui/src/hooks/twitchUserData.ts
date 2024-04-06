@@ -2,26 +2,35 @@ import { TwitchClient, UserData } from "@hoagie/service-clients";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { createTwitchClient } from "../util/CreateTwitchClient";
+import { AddUsersInput } from "../components/context/TwitchUserInfoProvider";
+
+interface UsersInput {
+  userLogins: string[];
+  userIds: string[];
+}
 
 export const useTwitchUserData = (props: {
-  initialUsers: string[];
+  initialUsers: UsersInput;
 }) => {
   const { initialUsers } = props;
 
   const { state: loginState } = useContext(LoginContext);
 
-  const [usersToFetch, setUsersToFetch] = useState(initialUsers);
+  const [userLoginsToFetch, setUserLoginsToFetch] = useState(initialUsers.userLogins);
+  const [userIdsToFetch, setUserIdsToFetch] = useState(initialUsers.userIds);
   const [userData, setUserData] = useState<{ [key: string]: UserData }>({});
   const usersLoading = useRef(new Set<string>());
 
   const fetchUsers = useCallback(async () => {
     if (loginState.username && loginState.accessToken) {
       const client = createTwitchClient(loginState.accessToken);
-      const toFetchLogins = usersToFetch.filter((u) => !userData[u.toLowerCase()] && !usersLoading.current.has(u.toLowerCase()));
+      const toFetchLogins = userLoginsToFetch.filter((u) => !userData[u.toLowerCase()] && !usersLoading.current.has(u.toLowerCase()));
+      const toFetchIds = userIdsToFetch.filter((u) => !userData[u.toLowerCase()] && !usersLoading.current.has(u.toLowerCase()));
       toFetchLogins.forEach((u) => usersLoading.current.add(u.toLowerCase()));
       try {
         const users = await client.getUsersData(
-          toFetchLogins
+          toFetchLogins,
+          toFetchIds
         );
         console.log({ users });
         if (!users) {
@@ -60,25 +69,33 @@ export const useTwitchUserData = (props: {
         toFetchLogins.forEach((u) => usersLoading.current.delete(u.toLowerCase()));
       }
     }
-  }, [usersToFetch, usersLoading, userData, loginState.username, loginState.accessToken]);
+  }, [userLoginsToFetch, userIdsToFetch, usersLoading, userData, loginState.username, loginState.accessToken]);
 
   useEffect(() => {
-    if (usersToFetch.length > 0) {
+    if (userLoginsToFetch.length > 0 || userIdsToFetch.length > 0) {
       fetchUsers();
     }
-  }, [usersToFetch]);
+  }, [userLoginsToFetch, userIdsToFetch]);
 
-  const addUsers = async (userLogins: string[]) => {
+  const addUsers = async (users: AddUsersInput) => {
     let changed = false;
-    const newUsersToFetch = [...usersToFetch];
-    userLogins.forEach((username) => {
-      if (!usersToFetch.includes(username.toLowerCase())) {
+    const newUserLoginsToFetch = [...users.userLogins];
+    const newUserIdsToFetch = [...users.userIds];
+    users.userLogins.forEach((username) => {
+      if (!userLoginsToFetch.includes(username.toLowerCase())) {
         changed = true;
-        newUsersToFetch.push(username.toLowerCase());
+        newUserLoginsToFetch.push(username.toLowerCase());
+      }
+    });
+    users.userIds.forEach((userId) => {
+      if (!userIdsToFetch.includes(userId.toLowerCase())) {
+        changed = true;
+        newUserIdsToFetch.push(userId.toLowerCase());
       }
     });
     if (changed) {
-      setUsersToFetch(newUsersToFetch);
+      setUserLoginsToFetch(newUserLoginsToFetch);
+      setUserIdsToFetch(newUserIdsToFetch);
     }
   };
 

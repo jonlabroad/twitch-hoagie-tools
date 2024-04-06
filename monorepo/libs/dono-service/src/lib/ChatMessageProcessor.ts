@@ -8,6 +8,7 @@ export class ChatMessageProcessor {
 
         const detail = event.detail;
         const username = detail.userstate.username;
+        const userId = detail.userstate["user-id"];
         const message = detail.message;
         const channel = getChannelName(detail.channel);
 
@@ -16,7 +17,7 @@ export class ChatMessageProcessor {
             const liveStream = await twitchClient.getBroadcasterIdLiveStream(broadcasterId);
             if (liveStream) {
                 const donoProcessor = new BotDonoProcessor(broadcasterId, liveStream.id, tableName, twitchClient);
-                await donoProcessor.process(detail.userstate.id, channel, username, message);
+                await donoProcessor.process(detail.userstate.id, channel, username, userId, message);
             } else {
                 console.error(`Could not find live stream for ${broadcasterId}`);
             }

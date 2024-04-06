@@ -37,7 +37,10 @@ export const EventList = (props: EventListProps) => {
 
   useEffect(() => {
     const userLogins = getAllUsers(events);
-    addUsers?.(userLogins);
+    addUsers?.({
+      userLogins,
+      userIds: [], // TODO get ids in here
+    });
   }, [events]);
 
   const sortedEvents = events.sort(

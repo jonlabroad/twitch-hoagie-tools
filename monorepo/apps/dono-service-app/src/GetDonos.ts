@@ -44,7 +44,7 @@ export class GetDonos {
       statusCode: 200,
       headers: {
         ...corsHeaders,
-        ...createCacheHeader(1),
+        ...createCacheHeader(3),
       },
       body: JSON.stringify(responseData),
     };

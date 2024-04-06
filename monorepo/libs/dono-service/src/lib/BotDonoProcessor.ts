@@ -44,7 +44,7 @@ export class BotDonoProcessor {
     this.twitchClient = twitchClient;
   }
 
-  public async process(uuid: string, channel: string, username: string, chatMessage: string) {
+  public async process(uuid: string, channel: string, username: string, userId: string, chatMessage: string) {
     const config = channelConfigs[getChannelName(channel)];
     if (!config) {
       console.log(`Unable to find channel config for channel ${channel}`);
@@ -58,14 +58,16 @@ export class BotDonoProcessor {
         const amount = parseFloat(amountMatch ?? "0");
         const dbWriter = new DonoDbClient(this.broadcasterId, this.tableName);
         console.log({ uuid, username, streamId: this.streamId, amount });
-        let userId: string | undefined = undefined;
-        try {
-          userId = await this.twitchClient.getUserId(donator.toLowerCase());
-        } catch (err) {
-          console.log(err);
+        let twitchUserId: string | undefined = userId;
+        if (!twitchUserId) {
+          try {
+            twitchUserId = await this.twitchClient.getUserId(donator.toLowerCase());
+          } catch (err) {
+            console.log(err);
+          }
         }
 
-        await dbWriter.addDono(uuid, donator.toLowerCase(), this.streamId, amount, userId);
+        await dbWriter.addDono(uuid, donator.toLowerCase(), this.streamId, amount, twitchUserId);
         await HoagieEventPublisher.publishToTopic(`dono.${this.broadcasterId}`, {});
       }
     }
