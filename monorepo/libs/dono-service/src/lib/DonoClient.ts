@@ -16,11 +16,11 @@ export class DonoClient {
   public async get(
     username: string,
     accessToken: string,
-    streamerName: string,
+    streamerId: string,
     streamIds?: string[]
   ): Promise<DonoDataResponse> {
     const response = await axios.get(
-      `${this.url}${streamerName}?${
+      `${this.url}${streamerId}?${
         streamIds
           ? streamIds.map((streamId) => `&streamId=${streamId}`).join('')
           : ''

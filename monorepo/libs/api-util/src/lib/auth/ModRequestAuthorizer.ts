@@ -3,13 +3,22 @@ import ModsDbClient from '../db/ModsDbClient';
 import AdminAuthorizer from './AdminAuthorizer';
 
 export class ModRequestAuthorizer {
-  public static async auth(username: string, streamerName: string) {
+  public static async auth(username: string, streamerName: string | undefined, streamerId: string | undefined) {
     const tableName = process.env['TABLENAME'];
     if (!tableName) {
       console.error('TABLENAME not set');
       return {
         statusCode: 500,
         body: 'TABLENAME not set',
+        headers: corsHeaders,
+      };
+    }
+
+    if (!streamerName && !streamerId) {
+      console.error(`streamerName or streamerId is required`);
+      return {
+        statusCode: 400,
+        body: `streamerName or streamerId is required`,
         headers: corsHeaders,
       };
     }

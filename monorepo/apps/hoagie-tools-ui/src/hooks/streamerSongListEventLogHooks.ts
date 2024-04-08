@@ -2,10 +2,9 @@ import { SSLEventListItem, SongListEvent, SongListEventDescription, StreamerSong
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginContext } from '../components/context/LoginContextProvider';
 import { StateContext } from '../components/context/StateContextProvider';
+import Config from '../Config';
 
 export const useStreamerSongListEventLog = () => {
-  const client = new StreamerSongListHoagieClient()
-
   const { state: appState } = useContext(StateContext);
   const { state: loginState } = useContext(LoginContext);
 
@@ -15,12 +14,13 @@ export const useStreamerSongListEventLog = () => {
   const [events, setEvents] = useState<SSLEventListItem[]>([]);
 
   const fetchEvents = async () => {
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(new Date().getDate() - 1);
-    if (loginState?.accessToken && appState?.streamer) {
+    const recentDate = new Date();
+    recentDate.setHours(new Date().getHours() - 4);
+    if (loginState?.accessToken && appState?.streamerId) {
+      const client = new StreamerSongListHoagieClient(Config.environment, appState.streamerId, loginState.accessToken)
       const now = new Date();
       setIsLoading(true);
-      const response = await client.getEvents(undefined, appState.streamer, lastQueryTime ?? oneDayAgo);
+      const response = await client.getEvents(lastQueryTime ?? recentDate);
       setLastQueryTime(now);
       const allEvents = [...events, ...response ?? []];
       const dedupedEvents = allEvents.reduce((acc, event) => {
@@ -34,7 +34,7 @@ export const useStreamerSongListEventLog = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [appState.streamer, loginState?.accessToken, loginState?.username]);
+  }, [appState.streamerId, loginState?.accessToken]);
 
   useEffect(() => {
     if (appState.songQueue) {

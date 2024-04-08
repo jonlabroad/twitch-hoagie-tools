@@ -25,12 +25,14 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
   const [] = useLogin(
     (
       username: string | undefined,
+      userId: string | undefined,
       accessToken: string,
       isLoggedIn: boolean
     ) => {
       if (username) {
         setLoginState({
           username,
+          userId,
           accessToken,
           isLoggedIn,
         });

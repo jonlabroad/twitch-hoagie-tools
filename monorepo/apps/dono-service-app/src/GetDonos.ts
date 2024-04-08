@@ -12,18 +12,22 @@ import { Config } from './Config';
 import { createTwitchClient } from './createTwitchClient';
 
 export class GetDonos {
-  public static async run(streamerName: string, event: APIGatewayEvent) {
+  public static async run(streamerId: string | undefined, event: APIGatewayEvent) {
+    if (!streamerId) {
+      throw new Error(`streamerId is required`);
+    }
+
     const { streamId } = event.queryStringParameters ?? {};
     if (!streamId) {
       return {
         statusCode: 400,
-        body: 'Missing streamerLogin or streamid',
+        body: 'Missing streamerId or streamid',
       };
     }
 
     const { username } = BasicAuth.decode(event.headers.authorization ?? '');
     if (!isOfflineMode()) {
-      const auth = await ModRequestAuthorizer.auth(username, streamerName);
+      const auth = await ModRequestAuthorizer.auth(username, undefined, streamerId);
       if (auth) {
         return auth;
       }
@@ -35,7 +39,7 @@ export class GetDonos {
       createTwitchClient(),
       Config.tableName
     );
-    const donos = await donoProvider.get(streamerName, streamIds);
+    const donos = await donoProvider.get(streamerId, streamIds);
     const responseData: DonoDataResponse = {
       data: donos,
     };

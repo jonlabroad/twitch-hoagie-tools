@@ -2,10 +2,10 @@ import { StreamData, UserData } from "@hoagie/service-clients";
 import { ChatMessage } from "../components/chat/SimpleChatDisplay";
 import StreamEvent from "../events/StreamEvent";
 import { GetHistoryResponse, GetQueueResponse } from "../service/StreamerSongListClient";
-import { AppState, createIgnoreShoutoutModAction, IgnoreShoutoutModAction, ModAction } from "./AppState"
+import { AppState, createIgnoreShoutoutModAction, ModAction } from "./AppState"
 
 export interface AppStateAction {
-    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_streamer" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
+    type: "add_alerts" | "remove_alerts" | "add_event" | "add_chat_message" | "add_chat_eval" | "ignore_shoutout" | "remove_mod_actions" | "login" | "set_streamer" | "set_streamer_id" | "set_channel_info" | "set_chat_connection" | "update_songqueue" | "update_songhistory";
 }
 
 export interface AddEventAction extends AppStateAction {
@@ -37,6 +37,10 @@ export interface SetChannelInfoAction extends AppStateAction {
 
 export interface SetStreamerAction extends AppStateAction {
     streamer: string;
+}
+
+export interface SetStreamerIdAction extends AppStateAction {
+  streamerId: string;
 }
 
 export interface SetChatConnectionAction extends AppStateAction {
@@ -98,6 +102,13 @@ export const appStateReducer = (state: AppState, action: AppStateAction): AppSta
                 streamer: setStreamerAction.streamer
             }
         }
+        case "set_streamer_id": {
+          const setStreamerAction = action as SetStreamerIdAction;
+          return {
+              ...state,
+              streamerId: setStreamerAction.streamerId
+          }
+      }
         case "set_channel_info": {
             const setChannelInfoAction = action as SetChannelInfoAction;
             return {

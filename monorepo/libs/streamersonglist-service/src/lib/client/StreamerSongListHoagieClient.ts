@@ -8,18 +8,21 @@ const BASE_URL_DEV = 'https://streamersonglist-dev.hoagieman.net/api/v1/';
 export class StreamerSongListHoagieClient {
   environment: "prod" | "dev"
   url: string
-  constructor(environment: "prod" | "dev" = "prod") {
+  userId: string
+  accessToken: string
+
+  constructor(environment: "prod" | "dev" = "prod", userId: string, accessToken: string) {
     this.environment = environment;
     this.url = environment === "prod" ? BASE_URL : BASE_URL_DEV;
+    this.userId = userId;
+    this.accessToken = accessToken;
   }
 
   async getEvents(
-    userId: string | undefined,
-    userLogin: string | undefined,
     startDate: Date,
     endDate?: Date,
   ): Promise<SSLEventListItem[]> {
-    const userIdOrLoginParam = userId ? `userId=${userId}` : `userLogin=${userLogin}`;
+    const userIdOrLoginParam = `userId=${this.userId}`;
     const oneMinFromNow = new Date();
     oneMinFromNow.setMinutes(new Date().getMinutes() + 1);
     const endDateRequest = endDate ? endDate.toISOString() : oneMinFromNow.toISOString();

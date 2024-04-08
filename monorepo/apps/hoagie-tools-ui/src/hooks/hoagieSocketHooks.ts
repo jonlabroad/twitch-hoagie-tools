@@ -56,10 +56,8 @@ export const useHoagieSockets = (
   useEffect(() => {
     async function subscribe() {
       if (options.doSubscribe && isConnected && state.streamer && loginState.accessToken) {
-        const twitchClient = createTwitchClient(loginState.accessToken!);
-        const broadcasterId = await twitchClient.getUserId(state.streamer!);
-        if (broadcasterId) {
-          socketClient.current?.subscribeDono(broadcasterId);
+        if (state.streamerId) {
+          socketClient.current?.subscribeDono(state.streamerId);
         }
 
         if (pingHandler.current) {

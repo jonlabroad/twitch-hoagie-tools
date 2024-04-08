@@ -38,7 +38,6 @@ export const StreamerDashboard = (props: {
   const [subscriptions, setSubscriptions] = useState<
     TwitchSubscription[] | undefined
   >(undefined);
-  const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
 
   async function createSubscriptions() {
     if (loginState.accessToken && loginState.username && appState.streamer) {
@@ -72,19 +71,6 @@ export const StreamerDashboard = (props: {
   useEffect(() => {
     getSubscriptions();
   }, [loginState.username, loginState.accessToken]);
-
-  useEffect(() => {
-    async function getStreamerId() {
-      if (loginState.accessToken) {
-        const client = createTwitchClient(loginState.accessToken);
-        const id = await client.getUserId(props.streamerName);
-        if (id) {
-          setStreamerId(id);
-        }
-      }
-    }
-    getStreamerId();
-  });
 
   const subscriptionsToDisplay = subscriptions;
 

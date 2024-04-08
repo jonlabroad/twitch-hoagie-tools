@@ -21,8 +21,6 @@ export interface RaidConfigModuleProps {
 }
 
 export const RaidConfigModule = (props: RaidConfigModuleProps) => {
-    const { streamer } = props;
-
     const { state: appState } = useContext(StateContext);
     const loginContext = useContext(LoginContext);
     const { state: loginState } = loginContext;
@@ -30,7 +28,6 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     const [subscriptions, setSubscriptions] = useState<
       TwitchSubscription[] | undefined
     >(undefined);
-    const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
 
     async function createSubscriptions() {
       if (loginState.accessToken && loginState.username && appState.streamer) {
@@ -65,16 +62,7 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
       getSubscriptions();
     }, [loginState.username, loginState.accessToken]);
 
-    useEffect(() => {
-      async function getStreamerId() {
-        if (loginState.accessToken) {
-          const client = createTwitchClient(loginState.accessToken);
-          const id = await client.getUserId(streamer);
-          setStreamerId(id);
-        }
-      }
-      getStreamerId();
-    });
+    const streamerId = appState.streamerId;
 
     const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId &&
       (sub.condition.to_broadcaster_user_id === `${streamerId}` ||

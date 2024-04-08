@@ -7,20 +7,23 @@ const BASE_URL_DEV = 'https://songlookup-dev.hoagieman.net/api/v1/';
 export class SongLookupClient {
   environment: "prod" | "dev"
   url: string
-  constructor(environment: "prod" | "dev" = "prod") {
+  userId: string
+  accessToken: string
+
+  constructor(environment: "prod" | "dev" = "prod", userId: string, accessToken: string) {
     this.environment = environment;
     this.url = environment === "prod" ? BASE_URL : BASE_URL_DEV;
+    this.userId = userId;
+    this.accessToken = accessToken;
   }
 
   async songLookup(
     artist: string,
     title: string,
-    username: string,
-    accessToken: string,
-    streamerName: string
+    streamerId: string
   ) {
     const response = await axios.post(
-      `${this.url}lookup?streamername=${streamerName}`,
+      `${this.url}lookup?streamerid=${streamerId}`,
       {
         songs: [{
         songKey: `${artist} ${title}`,
@@ -28,7 +31,7 @@ export class SongLookupClient {
         title: title
       }]},
       {
-        headers: getAuthHeaders(username, accessToken),
+        headers: getAuthHeaders(this.userId, this.accessToken),
       }
     );
     return response?.data?.[0];

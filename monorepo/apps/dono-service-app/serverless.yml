@@ -54,7 +54,7 @@ functions:
     events:
       - httpApi:
           method: GET
-          path: /api/v1/{streamerName}
+          path: /api/v1/{streamerId}
           authorizer: twitchAuthenticator
     environment:
       STAGE: ${self:custom.myStage}

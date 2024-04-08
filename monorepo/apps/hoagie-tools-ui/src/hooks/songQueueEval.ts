@@ -5,6 +5,8 @@ import { AppState } from "../state/AppState";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { LoginState } from "../state/LoginState";
 import { SongLookupClient } from "@hoagie/song-lookup-service";
+import { SongEvalClient } from "@hoagie/song-eval-service";
+import Config from "../Config";
 
 export type Evaluations = Record<string, any>;
 export type EvaluationsStatus = Record<string, EvaluationStatus>;
@@ -67,9 +69,9 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
 
     useEffect(() => {
         async function evalSongs() {
-            if (loginState.username && loginState.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
+            if (state.streamerId && loginState.userId && loginState.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
                 setIsLoading(true);
-                const client = new HoagieClient();
+                const client = new SongEvalClient(Config.environment, loginState.userId, loginState.accessToken);
                 await Promise.all(songQueue.list.map(async (el) => {
                     const songName = el.nonlistSong ?? `${el.song?.artist?.trim()} - ${el.song?.title?.trim()}`;
                     if (songName) {
@@ -78,7 +80,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                             let evaluation: any | undefined = undefined;
                             try {
                                 setEvalLoading(songName, true, false)
-                                evaluation = await client.songEval(songName, loginState.username ?? "", loginState.accessToken ?? "", streamer.toLowerCase());
+                                evaluation = await client.songEval(songName, state.streamerId!);
                             } catch (err) {
                                 console.error(err);
                                 setEvalLoading(songName, false, true)
@@ -97,8 +99,8 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                                 const doLookup = !evaluation?.songInfo;
                                 let spotifySong: any | undefined = undefined;
                                 if (doLookup && artist && title) {
-                                  const lookupClient = new SongLookupClient();
-                                  spotifySong = await lookupClient.songLookup(artist, title, loginState.username ?? "", loginState.accessToken ?? "", streamer.toLowerCase());
+                                  const lookupClient = new SongLookupClient(Config.environment, loginState.userId!, loginState.accessToken!);
+                                  spotifySong = await lookupClient.songLookup(artist, title, state.streamerId!);
                                 }
 
                                 setEvalLoading(songName, false, false)
@@ -119,7 +121,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
             }
         }
         evalSongs();
-    }, [loginState.username, loginState.accessToken, songQueue?.list]);
+    }, [loginState.username, loginState.accessToken, songQueue?.list, state.streamerId]);
 
     return [evaluations ?? {}, isLoading, config, onWhitelistWordChange, evaluationsStatus];
 

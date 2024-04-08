@@ -11,6 +11,7 @@ export const defaultLoginState: LoginState = {
 
 export interface LoginState {
   username?: string;
+  userId?: string;
   accessToken?: string;
   isLoggedIn: boolean;
 }
