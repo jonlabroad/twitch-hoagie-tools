@@ -41,7 +41,7 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
 
     useEffect(() => {
         getDonos(currentStreams ?? []);
-    }, [loginState.username, loginState.accessToken, state.streamer, currentStreams])
+    }, [loginState.username, loginState.accessToken, state.streamer, state.streamerId, currentStreams])
 
     return [donoState, donoStateDispatch, getDonos]
 }
