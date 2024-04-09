@@ -58,19 +58,19 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async setSSLToken(sslToken: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.post(`${this.LEGACY_BASE_URL}streamersonglist/settoken?streamerLogin=${streamerName}`, {
-            username: streamerName,
+    async setSSLToken(sslToken: string, userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.post(`${this.LEGACY_BASE_URL}streamersonglist/settoken?streamerid=${streamerId}`, {
+            username: userId,
             streamerSongListToken: sslToken,
         }, {
-            headers: this.getHeaders(username, accessToken)
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
 
-    async getSSLStatus(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}streamersonglist/status?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getSSLStatus(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}streamersonglist/status?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
@@ -151,9 +151,9 @@ export default class HoagieClient {
         }
     }
 
-    async getAdminConfig(username: string, accessToken: string) {
+    async getAdminConfig(userId: string, accessToken: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}admin/config`, {
-            headers: this.getHeaders(username, accessToken)
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data as AdminData | undefined;
     }

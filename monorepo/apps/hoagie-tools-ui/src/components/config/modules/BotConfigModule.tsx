@@ -6,36 +6,34 @@ import { StateContext } from "../../context/StateContextProvider";
 import { LoginContext } from "../../context/LoginContextProvider";
 
 export interface BotConfigModuleProps {
-    streamerName: string
 }
 
 export const BotConfigModule = (props: BotConfigModuleProps) => {
-    const { streamerName } = props;
-    
     const loginContext = useContext(LoginContext);
     const { state: loginState } = loginContext;
+    const { state: appState } = useContext(StateContext);
 
     const [token, setToken] = useState<string | undefined>(undefined);
 
     async function getToken() {
-        if (loginState.username && loginState.accessToken) {
+        if (loginState.userId && loginState.accessToken && appState.streamerId) {
             const client = new HoagieClient();
-            const response = await client.getBotToken(loginState.username, loginState.accessToken, streamerName);
+            const response = await client.getBotToken(loginState.userId, loginState.accessToken, appState.streamerId);
             setToken(response?.botToken)
         }
     }
 
     async function refreshToken() {
-        if (loginState.username && loginState.accessToken) {
+        if (loginState.userId && loginState.accessToken && appState.streamerId) {
             const client = new HoagieClient();
-            const response = await client.refreshBotToken(loginState.username, loginState.accessToken, streamerName)
+            const response = await client.refreshBotToken(loginState.userId, loginState.accessToken, appState.streamerId)
             setTimeout(() => getToken(), 500)
         }
     }
 
     useEffect(() => {
         getToken();
-    }, [loginState.username, loginState.accessToken])
+    }, [loginState.userId, loginState.accessToken, appState.streamerId])
 
     return (
         <Grid item xs={12}>
