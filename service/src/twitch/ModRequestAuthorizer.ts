@@ -1,20 +1,21 @@
 import { corsHeaders } from "../../twitch";
+import Config from "../Config";
 import ModsDbClient from "../channelDb/ModsDbClient";
 import AdminAuthorizer from "./AdminAuthorizer";
 
 export default class ModRequestAuthorizer {
-    public static async auth(username: string, streamerLogin: string) {
-        console.log({username, streamerLogin})
+    public static async auth(userId: string, streamerId: string) {
+        console.log({userId, streamerId})
 
         // Allow admins
-        const isAdminResponse = await AdminAuthorizer.auth(username);
+        const isAdminResponse = await AdminAuthorizer.auth(userId);
         const isAdmin = !isAdminResponse;
         if (isAdmin) {
             return undefined;
         }
 
         // They are who they say they are, but are they a mod?
-        if (!streamerLogin) {
+        if (!streamerId) {
             console.error("Could not find streamer name");
             return {
                 statusCode: 403,
@@ -22,26 +23,26 @@ export default class ModRequestAuthorizer {
                 headers: corsHeaders,
             };
         }
-        if (username && streamerLogin) {
-            const modClient = new ModsDbClient(streamerLogin);
+        if (userId && streamerId) {
+            const modClient = new ModsDbClient(Config.tableName, streamerId);
             const mods = await modClient.readMods();
-            const isMod = mods?.mods.map(m => m.toLowerCase()).includes(username);
-            const isStreamer = streamerLogin.toLowerCase() === username
+            const isMod = mods?.mods.map(m => m.toLowerCase()).includes(userId);
+            const isStreamer = streamerId === userId
             if (isMod || isStreamer) {
                 return undefined;
             }
-            console.log(`Unauthorized, ${username} not a mod`)
+            console.log(`Unauthorized, ${userId} not a mod`)
             return {
                 statusCode: 403,
-                body: `Unauthorized, ${username} not a mod`,
+                body: `Unauthorized, ${userId} not a mod`,
                 headers: corsHeaders,
             };
         }
 
-        console.log(`Unauthorized ${username} at ${streamerLogin}`);
+        console.log(`Unauthorized ${userId} at ${streamerId}`);
         return {
             statusCode: 403,
-            body: `Unauthorized ${username} ${streamerLogin}`,
+            body: `Unauthorized ${userId} ${streamerId}`,
             headers: corsHeaders,
         };;
     }

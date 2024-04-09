@@ -23,25 +23,25 @@ export function useSystemStatus() {
   const [status, setStatus] = useState<any>(undefined);
 
   const refreshStatus = useCallback(async () => {
-    if (!loginState.username || !loginState.accessToken || !state.streamer)
+    if (!loginState.userId || !loginState.accessToken || !state.streamerId)
       return;
 
     const status = await new HoagieClient().getSystemStatus(
-      loginState.username,
+      loginState.userId,
       loginState.accessToken,
-      state.streamer
+      state.streamerId
     );
     if (status) {
       setStatus(status);
     }
-  }, [loginState.username, loginState.accessToken, state.streamer]);
+  }, [loginState.userId, loginState.accessToken, state.streamerId]);
 
   useEffect(() => {
     async function getStatus() {
       refreshStatus();
     }
     getStatus();
-  }, [loginState.username, loginState.accessToken, state.streamer]);
+  }, [loginState.userId, loginState.accessToken, state.streamerId]);
 
   return [status, refreshStatus];
 }

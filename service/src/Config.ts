@@ -6,17 +6,14 @@ export default class Config {
     public static twitchClientSecret = process.env.TWITCH_CLIENT_SECRET ?? "";
     public static subscriptionSecret = process.env.SUBSCRIPTION_SECRET ?? "";
     public static tableName = process.env.TABLENAME ?? "";
-    public static GeniusClientId = "2vmZ-eHDI3UGd_QIiS_rMjVz37mwmRAOLbQIzbO6PhDtN0QHfuN11NyJ99XTHiqV";
-    public static GeniusClientSecret = process.env.GENIUS_CLIENT_SECRET ?? "";
-    public static BadWordsSecret = process.env.BAD_WORDS_SECRET ?? "";
     public static ChatEventSource = {
         clusterName: "TwitchChatEventSource",
         serviceName: "TwitchChatEventSource",        
     };
 
     // TODO put in database
-    public static AdminUserNames = [
-        "hoagieman5000",
+    public static AdminUserIds = [
+        "408982109",
     ];
 
     public static validate(additionalVars?: string[]) {
@@ -27,7 +24,7 @@ export default class Config {
         })
     }
 
-    public static isAdmin(username: string) {
-        return Config.AdminUserNames.includes(username);
+    public static isAdmin(userId: string) {
+        return Config.AdminUserIds.includes(userId);
     }
 }

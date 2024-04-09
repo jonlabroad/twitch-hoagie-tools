@@ -14,7 +14,7 @@ export class DonoClient {
   }
 
   public async get(
-    username: string,
+    userId: string,
     accessToken: string,
     streamerId: string,
     streamIds?: string[]
@@ -26,7 +26,7 @@ export class DonoClient {
           : ''
       }`,
       {
-        headers: getAuthHeaders(username, accessToken),
+        headers: getAuthHeaders(userId, accessToken),
       }
     );
     return response.data as DonoDataResponse;

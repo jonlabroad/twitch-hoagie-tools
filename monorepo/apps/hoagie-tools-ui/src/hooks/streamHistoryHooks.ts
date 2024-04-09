@@ -10,9 +10,9 @@ export function useStreamHistory(state: AppState): [StreamInfo[] | undefined] {
 
     useEffect(() => {
         async function getStreamHistory() {
-            if (loginState.username && loginState.accessToken && state.streamer) {
+            if (loginState.userId && loginState.accessToken && state.streamerId) {
                 const client = new HoagieClient();
-                const data = await client.getStreamHistoryV2(loginState.username, loginState.accessToken, state.streamer)
+                const data = await client.getStreamHistoryV2(loginState.userId, loginState.accessToken, state.streamerId)
                 if (data) {
                     setStreamHistory(data.streams.map(stream => ({
                         streamId: stream.id,
@@ -22,7 +22,7 @@ export function useStreamHistory(state: AppState): [StreamInfo[] | undefined] {
             }
         }
         getStreamHistory()
-    }, [loginState.username, loginState.accessToken, state.streamer])
+    }, [loginState.userId, loginState.accessToken, state.streamerId])
 
     return [streamHistory]
 }

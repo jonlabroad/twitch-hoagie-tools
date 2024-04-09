@@ -16,14 +16,14 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
     } as DonoState);
 
     async function getDonos(currentStreams: StreamInfo[]) {
-        if (loginState.username && loginState.accessToken && state.streamerId && currentStreams.length > 0) {
+        if (loginState.userId && loginState.accessToken && state.streamerId && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",
                 loading: true,
             } as SetDonoLoadingAction)
             const client = new DonoClient(Config.environment);
             try {
-                const data = await client.get(loginState.username, loginState.accessToken, state.streamerId, currentStreams.map(s => s.streamId))
+                const data = await client.get(loginState.userId, loginState.accessToken, state.streamerId, currentStreams.map(s => s.streamId))
                 donoStateDispatch({
                     type: "set_donos",
                     donoData: data.data,

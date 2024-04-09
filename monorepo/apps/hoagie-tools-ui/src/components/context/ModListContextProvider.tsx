@@ -20,17 +20,17 @@ export const ModListContextProvider = (props: ModListContextProviderProps) => {
     const { state: loginState } = useContext(LoginContext)
     const { state } = useContext(StateContext)
 
-    async function getMods(username: string, accessToken: string, streamerName: string) {
+    async function getMods(userId: string, accessToken: string, streamerId: string) {
         const client = new HoagieClient()
-        const mods = await client.getMods(username, accessToken, streamerName)
+        const mods = await client.getMods(userId, accessToken, streamerId)
         setMods(mods?.mods)
     }
-    
+
     useEffect(() => {
-        if (loginState.username && loginState.accessToken && state.streamer) {
-            getMods(loginState.username, loginState.accessToken, state.streamer)
+        if (loginState.userId && loginState.accessToken && state.streamerId) {
+            getMods(loginState.userId, loginState.accessToken, state.streamerId)
         }
-    }, [loginState.username, loginState.accessToken, state.streamer])
+    }, [loginState.userId, loginState.accessToken, state.streamerId])
 
   return (
     <ModListContext.Provider

@@ -30,11 +30,11 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     >(undefined);
 
     async function createSubscriptions() {
-      if (loginState.accessToken && loginState.username && appState.streamer) {
+      if (loginState.accessToken && loginState.userId && appState.streamerId) {
         const client = new HoagieClient();
         const response = await client.createSubscriptions(
-          loginState.username,
-          appState.streamer,
+          loginState.userId,
+          appState.streamerId,
           loginState.accessToken
         );
         getSubscriptions();
@@ -42,11 +42,11 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     }
 
     async function getSubscriptions() {
-      if (loginState.username && loginState.accessToken && appState.streamer) {
+      if (loginState.userId && loginState.accessToken && appState.streamerId) {
         const client = new HoagieClient();
         const subs = await client.listSubscriptions(
-          loginState.username,
-          appState.streamer,
+          loginState.userId,
+          appState.streamerId,
           loginState.accessToken
         );
         setSubscriptions(subs);
@@ -60,7 +60,7 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
 
     useEffect(() => {
       getSubscriptions();
-    }, [loginState.username, loginState.accessToken]);
+    }, [loginState.userId, loginState.accessToken, appState.streamerId]);
 
     const streamerId = appState.streamerId;
 
@@ -121,8 +121,8 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
                           subscriptionsToDisplay?.map((sub) =>
                             client.deleteSubscription(
                               sub.id,
-                              loginState.username!,
-                              loginState.accessToken!
+                              loginState.userId!,
+                              loginState.accessToken!,
                             )
                           ) ?? []
                         );

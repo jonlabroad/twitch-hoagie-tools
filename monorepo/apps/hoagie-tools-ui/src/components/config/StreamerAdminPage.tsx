@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { BotConfigModule } from "./modules/BotConfigModule";
 import { StreamerSongListConfigModule } from "./modules/StreamerSongListConfigModule";
-import { ModsModule } from "./modules/ModsModule";
 import {
   StateContext,
 } from "../context/StateContextProvider";

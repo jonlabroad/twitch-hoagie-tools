@@ -3,7 +3,7 @@ import ModsDbClient from '../db/ModsDbClient';
 import AdminAuthorizer from './AdminAuthorizer';
 
 export class ModRequestAuthorizer {
-  public static async auth(username: string, streamerName: string | undefined, streamerId: string | undefined) {
+  public static async auth(userId: string, streamerId: string | undefined) {
     const tableName = process.env['TABLENAME'];
     if (!tableName) {
       console.error('TABLENAME not set');
@@ -14,7 +14,7 @@ export class ModRequestAuthorizer {
       };
     }
 
-    if (!streamerName && !streamerId) {
+    if (!userId && !streamerId) {
       console.error(`streamerName or streamerId is required`);
       return {
         statusCode: 400,
@@ -24,32 +24,32 @@ export class ModRequestAuthorizer {
     }
 
     // Allow admins
-    const isAdminResponse = await AdminAuthorizer.auth(username);
+    const isAdminResponse = await AdminAuthorizer.auth(userId);
     const isAdmin = !isAdminResponse;
     if (isAdmin) {
       return undefined;
     }
 
     // They are who they say they are, but are they a mod?
-    if (username && streamerName) {
-      const modClient = new ModsDbClient(tableName, streamerName);
+    if (userId && streamerId) {
+      const modClient = new ModsDbClient(tableName, streamerId);
       const mods = await modClient.readMods();
-      const isMod = mods?.mods.map((m) => m.toLowerCase()).includes(username);
-      const isStreamer = streamerName.toLowerCase() === username;
+      const isMod = mods?.mods.map((m) => m.toLowerCase()).includes(userId);
+      const isStreamer = streamerId.toLowerCase() === userId;
       if (isMod || isStreamer) {
         return undefined;
       }
       return {
         statusCode: 403,
-        body: `Unauthorized, ${username} not a mod`,
+        body: `Unauthorized, ${userId} not a mod`,
         headers: corsHeaders,
       };
     }
 
-    console.log(`Unauthorized ${username} at ${streamerName}`);
+    console.log(`Unauthorized ${userId} at ${streamerId}`);
     return {
       statusCode: 403,
-      body: `Unauthorized ${username} ${streamerName}`,
+      body: `Unauthorized ${userId} ${streamerId}`,
       headers: corsHeaders,
     };
   }

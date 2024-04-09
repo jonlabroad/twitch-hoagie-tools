@@ -124,11 +124,11 @@ module.exports.listsubscriptions = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
     const authenticationResponse = await ModRequestAuthorizer.auth(
-      username,
-      streamerName
+      userId,
+      streamerId
     );
     if (authenticationResponse) {
       return authenticationResponse;
@@ -159,19 +159,18 @@ module.exports.createsubscriptions = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
       return authenticationResponse;
     }
 
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    console.log(`Creating subscriptions for ${streamerLogin}`);
+    console.log(`Creating subscriptions for ${streamerId}`);
     return {
       statusCode: 200,
       body: JSON.stringify(
-        await CreateSubscriptions.create(streamerLogin),
+        await CreateSubscriptions.create(streamerId),
         null,
         2
       ),
@@ -194,19 +193,18 @@ module.exports.createselfsubscriptions = async (event: APIGatewayProxyEvent) => 
   try {
     Config.validate();
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
       return authenticationResponse;
     }
 
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    console.log(`Creating subscriptions for ${streamerLogin}`);
+    console.log(`Creating subscriptions for ${streamerId}`);
     return {
       statusCode: 200,
       body: JSON.stringify(
-        await CreateSelfSubscriptions.create(streamerLogin),
+        await CreateSelfSubscriptions.create(streamerId),
         null,
         2
       ),
@@ -229,9 +227,9 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
       return authenticationResponse;
     }
@@ -259,20 +257,18 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
       return authenticationResponse;
     }
-
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
 
     return {
       statusCode: 200,
       body: JSON.stringify(
         {
-          raids: await RaidProvider.get(streamerLogin),
+          raids: await RaidProvider.get(streamerId),
         },
         null,
         2
@@ -296,27 +292,22 @@ module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
   try {
     Config.validate();
 
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
 
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const auth = await ModRequestAuthorizer.auth(username, streamerName);
+    const auth = await ModRequestAuthorizer.auth(userId, streamerId);
     if (auth) {
       return auth;
     }
 
-    const broadcasterId = await (new TwitchClient()).getUserId(streamerLogin);
-    if (!broadcasterId) {
-      throw new Error(`Unable to find broadcaster id for ${streamerLogin}`)
-    }
-    const client = new StreamsDbClient(broadcasterId);
+    const client = new StreamsDbClient(streamerId);
     const streams = await client.getStreamHistory();
 
     return {
       statusCode: 200,
       body: JSON.stringify(
         {
-          streamerLogin,
+          streamerId,
           streams: streams,
         },
         null,
@@ -339,74 +330,14 @@ module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
   }
 };
 
-module.exports.refreshmods = async (event: any) => {
-  try {
-    Config.validate();
-
-    const blacklist = [
-      "songlistbot",
-      "streamelements",
-      "nightbot",
-      "streamlabs",
-      "serybot",
-    ];
-
-    const config = await ConfigProvider.get();
-    const channels = Array.from(config?.streamers.values ?? []);
-    const client = new tmi.Client({
-      channels,
-      identity: {
-        username: config?.chatUsername,
-        password: config?.chatToken,
-      },
-    });
-
-    let done = channels.map((c) => false);
-
-    client.connect();
-    client.on("connected", async (address, port) => {
-      const allData = await Promise.all(
-        channels.map(async (rawChannel) => {
-          const mods = await client.mods(rawChannel);
-          const channel = rawChannel.replace("#", "");
-          console.log(JSON.stringify({ channel, mods }, null, 2));
-          return { channel, mods };
-        })
-      );
-      await Promise.all(
-        allData.map(async (data, i) => {
-          const client = new ModsDbClient(data.channel);
-          const filtered = data.mods.filter(
-            (mod) => !blacklist.includes(mod.toLowerCase())
-          );
-          await client.writeMods([
-            ...filtered,
-            data.channel.replace("#", "").toLowerCase(),
-          ]);
-          done[i] = true;
-        })
-      );
-    });
-
-    console.log(done.findIndex((d) => !d) >= 0);
-    while (done.findIndex((d) => !d) >= 0) {
-      console.log("Sleeping...");
-      await sleep(1000);
-    }
-  } catch (err) {
-    console.error(err);
-    return `${err.message}`;
-  }
-};
-
 module.exports.getmods = async (event: any) => {
   Config.validate();
 
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-  if (!streamerName) {
-    throw new Error("streamername not defined");
+  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+  if (!streamerId) {
+    throw new Error("streamerId not defined");
   }
-  const client = new ModsDbClient(streamerName);
+  const client = new ModsDbClient(Config.tableName, streamerId);
   const mods = await client.readMods();
   return {
     statusCode: 200,
@@ -421,24 +352,24 @@ module.exports.getmods = async (event: any) => {
 module.exports.addmod = async (event: any) => {
   Config.validate();
 
-  const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-  const auth = await ModRequestAuthorizer.auth(username, streamerName);
+  const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
   if (auth) {
     return auth;
   }
 
-  const modUsername = event.queryStringParameters?.["username"] ?? "";
-  if (!streamerName) {
-    throw new Error("streamername not defined");
+  const modId = event.queryStringParameters?.["userid"] ?? "";
+  if (!streamerId) {
+    throw new Error("streamerId not defined");
   }
 
-  if (!username) {
-    throw new Error("username not defined");
+  if (!userId) {
+    throw new Error("userId not defined");
   }
 
-  const client = new ModsDbClient(streamerName);
-  await client.addMod(modUsername);
+  const client = new ModsDbClient(Config.tableName, streamerId);
+  await client.addMod(modId);
   return {
     statusCode: 200,
     body: "OK",
@@ -451,23 +382,23 @@ module.exports.addmod = async (event: any) => {
 module.exports.removemod = async (event: any) => {
   Config.validate();
 
-  const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-  const auth = await ModRequestAuthorizer.auth(username, streamerName);
+  const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
   if (auth) {
     return auth;
   }
 
-  const modUsername = event.queryStringParameters?.["username"] ?? "";
-  if (!streamerName) {
+  const modUsername = event.queryStringParameters?.["userid"] ?? "";
+  if (!streamerId) {
     throw new Error("streamername not defined");
   }
 
-  if (!username) {
+  if (!userId) {
     throw new Error("username not defined");
   }
 
-  const client = new ModsDbClient(streamerName);
+  const client = new ModsDbClient(Config.tableName, streamerId);
   const mods = await client.readMods();
   if (mods) {
     const index = mods?.mods.findIndex(

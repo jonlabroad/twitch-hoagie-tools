@@ -16,9 +16,9 @@ export interface EvaluationStatus {
 }
 
 async function readConfig(state: AppState, loginState: LoginState) {
-    if (loginState.username && loginState.accessToken && state.streamer) {
+    if (loginState.userId && loginState.accessToken && state.streamerId) {
         const client = new HoagieClient();
-        const config = await client.readSongEvalConfig(loginState.username, loginState.accessToken, state.streamer);
+        const config = await client.readSongEvalConfig(loginState.userId, loginState.accessToken, state.streamerId);
         return config as SongEvalConfig | undefined;
     }
 }
@@ -35,7 +35,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
 
     useEffect(() => {
         updateConfig();
-    }, [loginState.username, loginState.accessToken])
+    }, [loginState.userId, loginState.accessToken, state.streamerId])
 
     const updateConfig = async () => {
         const config = await readConfig(state, loginState);
@@ -45,16 +45,16 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
     }
 
     const onWhitelistWordChange = useCallback(async (word: string, type: "add" | "remove") => {
-        if (loginState.username && loginState.accessToken && state.streamer) {
+        if (loginState.userId && loginState.accessToken && state.streamerId) {
             const client = new HoagieClient();
             if (type === "add") {
-                await client.addWhitelistWord(word, loginState.username, loginState.accessToken, state.streamer);
+                await client.addWhitelistWord(word, loginState.userId, loginState.accessToken, state.streamerId);
             } else if (type === "remove") {
-                await client.removeWhitelistWord(word, loginState.username, loginState.accessToken, state.streamer);
+                await client.removeWhitelistWord(word, loginState.userId, loginState.accessToken, state.streamerId);
             }
             await updateConfig();
         }
-    }, [loginState.username, loginState.accessToken, state.streamer]);
+    }, [loginState.userId, loginState.accessToken, state.streamerId]);
 
     const setEvalLoading = (songKey: string, isLoading: boolean, isError: boolean = false) => {
         const status = {

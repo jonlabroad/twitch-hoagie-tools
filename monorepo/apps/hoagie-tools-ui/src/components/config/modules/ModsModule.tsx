@@ -7,46 +7,46 @@ import { StateContext } from "../../context/StateContextProvider";
 import { LoginContext } from "../../context/LoginContextProvider";
 
 export interface BotConfigModuleProps {
-    streamerName: string
+    streamerId: string
 }
 
 export const ModsModule = (props: BotConfigModuleProps) => {
-    const { streamerName } = props;
+    const { streamerId } = props;
     const { state } = useContext(StateContext)
 
     const loginContext = useContext(LoginContext);
     const { state: loginState } = loginContext;
 
     const [mods, setMods] = useState<string[]>([])
-    const [modName, setModName] = useState<string>("")
+    const [modId, setModId] = useState<string>("")
 
-    async function getMods(username: string, accessToken: string, streamerName: string) {
+    async function getMods(userId: string, accessToken: string, streamerId: string) {
         const client = new HoagieClient()
-        const mods = await client.getMods(username, accessToken, streamerName)
+        const mods = await client.getMods(userId, accessToken, streamerId)
         console.log({mods})
         setMods(mods?.mods)
     }
 
-    async function addMod(username: string, accessToken: string, streamerName: string, modName: string) {
+    async function addMod(userId: string, accessToken: string, streamerId: string, modId: string) {
         const client = new HoagieClient()
-        console.log({username, accessToken, streamerName, modName})
-        await client.addMod(username, accessToken, streamerName, modName)
-        setTimeout(() => getMods(username, accessToken, streamerName), 1000)
+        console.log({userId, accessToken, streamerId, modId})
+        await client.addMod(userId, accessToken, streamerId, modId)
+        setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 
-    async function removeMod(username: string, accessToken: string, streamerName: string, modName: string) {
+    async function removeMod(userId: string, accessToken: string, streamerId: string, modId: string) {
         const client = new HoagieClient()
-        await client.removeMod(username, accessToken, streamerName, modName)
-        setTimeout(() => getMods(username, accessToken, streamerName), 1000)
+        await client.removeMod(userId, accessToken, streamerId, modId)
+        setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 
     useEffect(() => {
-        if (loginState.username && loginState.accessToken && streamerName) {
-            getMods(loginState.username, loginState.accessToken, streamerName);
+        if (loginState.userId && loginState.accessToken && streamerId) {
+            getMods(loginState.userId, loginState.accessToken, streamerId);
         }
-    }, [loginState.username, loginState.accessToken, streamerName])
+    }, [loginState.userId, loginState.accessToken, streamerId])
 
-    const enableButtons = loginState.username && loginState.accessToken && state.streamer;
+    const enableButtons = loginState.userId && loginState.accessToken && state.streamerId;
 
     return (
         <Grid item xs={12}>
@@ -59,17 +59,17 @@ export const ModsModule = (props: BotConfigModuleProps) => {
                         <Typography style={{ overflow: "ellipsis", width: 130 }}>{mod}</Typography>
                         <IconButton
                             onClick={() => {
-                                removeMod(loginState!.username!, loginState!.accessToken!, state!.streamer!, mod)
+                                removeMod(loginState!.userId!, loginState!.accessToken!, state!.streamerId!, mod)
                             }}
                             size="large"><BlockIcon fontSize="small" color="primary" /></IconButton>
                     </FlexRow>
                 ))}
                 <FlexRow alignItems="center">
-                    <TextField label="Add Mod" variant="filled" style={{ maxWidth: 300, marginRight: 20 }} value={modName} onChange={(ev) => setModName(ev.target.value)} />
-                    <Button style={{ maxWidth: 160, marginRight: 30 }} variant="contained" color={"primary"} disabled={!enableButtons || !modName} onClick={() => {
-                        if (loginState.username && loginState.accessToken && state.streamer && state.streamer && modName.length > 0) {
-                            addMod(loginState.username, loginState.accessToken, state.streamer, modName);
-                            setModName("");
+                    <TextField label="Add Mod" variant="filled" style={{ maxWidth: 300, marginRight: 20 }} value={modId} onChange={(ev) => setModId(ev.target.value)} />
+                    <Button style={{ maxWidth: 160, marginRight: 30 }} variant="contained" color={"primary"} disabled={!enableButtons || !modId} onClick={() => {
+                        if (loginState.userId && loginState.accessToken && state.streamerId && modId.length > 0) {
+                            addMod(loginState.userId, loginState.accessToken, state.streamerId, modId);
+                            setModId("");
                         }
                     }}>
                         Add

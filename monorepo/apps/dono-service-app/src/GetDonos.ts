@@ -25,9 +25,9 @@ export class GetDonos {
       };
     }
 
-    const { username } = BasicAuth.decode(event.headers.authorization ?? '');
+    const { username: userId } = BasicAuth.decode(event.headers.authorization ?? '');
     if (!isOfflineMode()) {
-      const auth = await ModRequestAuthorizer.auth(username, undefined, streamerId);
+      const auth = await ModRequestAuthorizer.auth(userId, streamerId);
       if (auth) {
         return auth;
       }
