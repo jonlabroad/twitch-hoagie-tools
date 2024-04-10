@@ -1,0 +1,61 @@
+{
+  "name": "config-service-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/config-service-app/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/config-service-app",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/config-service-app/handlers.ts",
+        "tsConfig": "apps/config-service-app/tsconfig.app.json",
+        "generatePackageJson": true,
+        "ignore": ["cdk/**/*"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "install-deps": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{
+        "target": "build"
+      }],
+      "options": {
+        "command": "npm install",
+        "cwd": "dist/apps/config-service-app"
+      }
+    },
+    "run-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/config-service-app/cdk",
+        "command": "npm run local"
+      },
+      "dependsOn": [{
+        "target": "synth-local"
+      }]
+    }
+  },
+  "tags": []
+}
