@@ -19,7 +19,7 @@
   "context": {
     "dev": {
       "env": "dev",
-      "tableName": "HoagieTools-dev"
+      "tableName": "HoagieTools-development"
     },
     "prod": {
       "env": "prod",

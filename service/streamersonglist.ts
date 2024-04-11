@@ -52,21 +52,22 @@ module.exports.settoken = async (event: APIGatewayProxyEvent) => {
 module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
         return authenticationResponse;
     }
 
     let tokenValidated = false;
     try {
-        const sslToken = await StreamerSongListToken.readToken(streamerName);
+        const sslToken = await StreamerSongListToken.readToken(streamerId);
         if (!sslToken) {
-            throw new Error(`No ssl token found for user ${streamerName}`);
+            throw new Error(`No ssl token found for user ${streamerId}`);
         }
-        tokenValidated = await StreamerSongListToken.validateToken(streamerName, sslToken);
+        tokenValidated = await StreamerSongListToken.validateToken(streamerId, sslToken);
     } catch (err) {
+        console.error(err);
         return {
             statusCode: 500,
             headers: corsHeaders,

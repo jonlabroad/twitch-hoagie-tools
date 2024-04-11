@@ -7,21 +7,24 @@ const BASE_URL_DEV = 'https://songeval-dev.hoagieman.net/api/v1/';
 export class SongEvalClient {
   environment: "prod" | "dev"
   url: string
-  constructor(environment: "prod" | "dev" = "prod") {
+  userId: string
+  accessToken: string
+
+  constructor(environment: "prod" | "dev" = "prod", userId: string, accessToken: string) {
     this.environment = environment;
+    this.userId = userId;
+    this.accessToken = accessToken;
     this.url = environment === "prod" ? BASE_URL : BASE_URL_DEV;
   }
 
   async songEval(
     song: string,
-    username: string,
-    accessToken: string,
-    streamerName: string
+    streamerId: string
   ) {
     const response = await axios.get(
-      `${this.url}eval?query=${song}&streamername=${streamerName}`,
+      `${this.url}eval?query=${song}&streamerid=${streamerId}`,
       {
-        headers: getAuthHeaders(username, accessToken),
+        headers: getAuthHeaders(this.userId, this.accessToken),
       }
     );
     return response?.data;

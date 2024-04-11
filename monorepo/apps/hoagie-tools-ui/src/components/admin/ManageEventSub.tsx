@@ -58,14 +58,14 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
     }
 
     getUserInfo();
-  }, [subscriptions, loginState.username && loginState.accessToken]);
+  }, [subscriptions, loginState.userId, loginState.accessToken]);
 
   async function createSubscriptions() {
-    if (loginState.accessToken && loginState.username && appState.streamer) {
+    if (loginState.accessToken && loginState.userId && appState.streamerId) {
       const client = new HoagieClient();
       const response = await client.createSubscriptions(
-        loginState.username,
-        appState.streamer,
+        loginState.userId,
+        appState.streamerId,
         loginState.accessToken
       );
       getSubscriptions();
@@ -73,11 +73,11 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
   }
 
   async function createSelfSubscriptions() {
-    if (loginState.accessToken && loginState.username) {
+    if (loginState.accessToken && loginState.userId) {
       const client = new HoagieClient();
       const response = await client.createSelfSubscriptions(
-        loginState.username,
-        loginState.username,
+        loginState.userId,
+        loginState.userId,
         loginState.accessToken
       );
       getSubscriptions();
@@ -85,11 +85,11 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
   }
 
   async function getSubscriptions() {
-    if (loginState.username && loginState.accessToken) {
+    if (loginState.userId && loginState.accessToken) {
       const client = new HoagieClient();
       const subs = await client.listSubscriptions(
-        loginState.username,
-        appState.streamer ?? 'hoagieman5000',
+        loginState.userId,
+        appState.streamerId ?? 'hoagieman5000',
         loginState.accessToken
       );
       setSubscriptions(subs);

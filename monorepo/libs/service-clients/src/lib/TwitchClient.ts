@@ -42,9 +42,7 @@ export class TwitchClient {
     let request = this.userIdCache[username.toLowerCase()];
     if (!request) {
       request = (async () => {
-        return this.get<any>(
-          `https://api.twitch.tv/helix/users?login=${username}`
-        );
+        return this.get<any>(url);
       })();
 
       this.userIdCache[username.toLowerCase()] = request;

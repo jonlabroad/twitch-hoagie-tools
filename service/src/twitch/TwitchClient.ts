@@ -78,13 +78,7 @@ export default class TwitchClient {
         };
     }
 
-    public async createSubscription(username: string, type: string, condition: Record<string, string>) {
-        const client = new TwitchClient();
-        const userId = await client.getUserId(username);
-        if (!userId) {
-            return;
-        }
-
+    public async createSubscription(type: string, condition: Record<string, string>) {
         const authToken = await this.getAuthToken();
 
         const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
@@ -213,7 +207,7 @@ export default class TwitchClient {
         return this.authToken;
     }
 
-    isAdmin(userName: string) {
-        return Config.AdminUserNames.includes(userName);
+    isAdmin(userId: string) {
+        return Config.AdminUserIds.includes(userId);
     }
 }

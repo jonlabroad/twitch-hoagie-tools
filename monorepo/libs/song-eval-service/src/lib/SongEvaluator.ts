@@ -17,8 +17,6 @@ export class SongEvaluator {
       ? await geniusClient.getLyricsFromUrl(geniusSong.url)
       : "";
 
-    console.log({ geniusSong });
-    console.log({ lyrics });
     //Evaluate the lyrics
     let lyricsEval: any = undefined;
     if (lyrics) {

@@ -30,16 +30,16 @@ export default class HoagieClient {
         return result;
     }
 
-    async listSubscriptions(username: string, channelName: string, accessToken: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}listsubscriptions?streamername=${channelName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async listSubscriptions(userId: string, streamerId: string, accessToken: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}listsubscriptions?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
 
-    async createSubscriptions(username: string, channelName: string, accessToken: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}createsubscriptions?streamername=${channelName}`, {
-headers: this.getHeaders(username, accessToken)
+    async createSubscriptions(userId: string, streamerId: string, accessToken: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}createsubscriptions?streamerid=${streamerId}`, {
+          headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
@@ -51,26 +51,26 @@ headers: this.getHeaders(username, accessToken)
         return response.data;
     }
 
-    async deleteSubscription(id: string, username: string, accessToken: string) {
+    async deleteSubscription(id: string, userId: string, accessToken: string) {
         const response = await axios.post(`${this.LEGACY_BASE_URL}deletesubscription?id=${id}`, {}, {
-            headers: this.getHeaders(username, accessToken)
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
 
-    async setSSLToken(sslToken: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.post(`${this.LEGACY_BASE_URL}streamersonglist/settoken?streamerLogin=${streamerName}`, {
-            username: streamerName,
+    async setSSLToken(sslToken: string, userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.post(`${this.LEGACY_BASE_URL}streamersonglist/settoken?streamerid=${streamerId}`, {
+            username: userId,
             streamerSongListToken: sslToken,
         }, {
-            headers: this.getHeaders(username, accessToken)
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
 
-    async getSSLStatus(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}streamersonglist/status?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getSSLStatus(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}streamersonglist/status?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data;
     }
@@ -139,19 +139,9 @@ headers: this.getHeaders(username, accessToken)
         }
     }
 
-    async getStreamHistory(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}streamhistory?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
-        });
-        return response.data as {
-            streamId: string,
-            timestamp: string,
-        }[]
-    }
-
-    async getStreamHistoryV2(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}v2/streamhistory?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getStreamHistoryV2(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}v2/streamhistory?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data as {
             streams: {
@@ -161,9 +151,9 @@ headers: this.getHeaders(username, accessToken)
         }
     }
 
-    async getAdminConfig(username: string, accessToken: string) {
+    async getAdminConfig(userId: string, accessToken: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}admin/config`, {
-            headers: this.getHeaders(username, accessToken)
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data as AdminData | undefined;
     }
@@ -184,13 +174,6 @@ headers: this.getHeaders(username, accessToken)
         });
     }
 
-    async songEvalLegacy(song: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/eval?query=${song}&streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
-        });
-        return response?.data;
-    }
-
     async songEval(song: string, username: string, accessToken: string, streamerName: string) {
       const response = await axios.get(`https://songeval.hoagieman.net/api/v1/eval?query=${song}&streamername=${streamerName}`,
       {
@@ -199,51 +182,51 @@ headers: this.getHeaders(username, accessToken)
       return response?.data;
   }
 
-    async addWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamername=${streamerName}&word=${word}`, {
-            headers: this.getHeaders(username, accessToken)
+    async addWhitelistWord(word: string, userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamerid=${streamerId}&word=${word}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }
 
-    async removeWhitelistWord(word: string, username: string, accessToken: string, streamerName: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamername=${streamerName}&word=${word}&remove=true`, {
-            headers: this.getHeaders(username, accessToken)
+    async removeWhitelistWord(word: string, userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.put(`${this.LEGACY_BASE_URL}songeval/whitelistwords?streamerid=${streamerId}&word=${word}&remove=true`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }
 
-    async readSongEvalConfig(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/config?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async readSongEvalConfig(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}songeval/config?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }
 
-    async getMods(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}mods?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getMods(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}mods?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }
 
-    async addMod(username: string, accessToken: string, streamerName: string, modName: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}addmod?username=${modName}&streamername=${streamerName}`, {}, {
-            headers: this.getHeaders(username, accessToken),
+    async addMod(userId: string, accessToken: string, streamerId: string, modId: string) {
+        const response = await axios.put(`${this.LEGACY_BASE_URL}addmod?userid=${modId}&streamerid=${streamerId}`, {}, {
+            headers: this.getHeaders(userId, accessToken),
         });
         return response?.data;
     }
 
-    async removeMod(username: string, accessToken: string, streamerName: string, modName: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}removemod?username=${modName}&streamername=${streamerName}`, {}, {
-            headers: this.getHeaders(username, accessToken)
+    async removeMod(userId: string, accessToken: string, streamerId: string, modId: string) {
+        const response = await axios.put(`${this.LEGACY_BASE_URL}removemod?userid=${modId}&streamerid=${streamerId}`, {}, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }
 
-    async getSystemStatus(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}admin/system/status?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getSystemStatus(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}admin/system/status?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response?.data;
     }

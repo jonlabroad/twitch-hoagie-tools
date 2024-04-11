@@ -17,7 +17,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/Link';
 import { LoginContext } from '../context/LoginContextProvider';
 import { StateContext } from '../context/StateContextProvider';
-import { createTwitchClient } from '../../util/CreateTwitchClient';
 import { TwitchSubscription } from '@hoagie/service-clients';
 
 const chipColors: Record<string, any> = {
@@ -38,14 +37,13 @@ export const StreamerDashboard = (props: {
   const [subscriptions, setSubscriptions] = useState<
     TwitchSubscription[] | undefined
   >(undefined);
-  const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
 
   async function createSubscriptions() {
-    if (loginState.accessToken && loginState.username && appState.streamer) {
+    if (loginState.accessToken && loginState.userId && appState.streamerId) {
       const client = new HoagieClient();
       const response = await client.createSubscriptions(
-        loginState.username,
-        appState.streamer,
+        loginState.userId,
+        appState.streamerId,
         loginState.accessToken
       );
       getSubscriptions();
@@ -53,11 +51,11 @@ export const StreamerDashboard = (props: {
   }
 
   async function getSubscriptions() {
-    if (loginState.username && loginState.accessToken && appState.streamer) {
+    if (loginState.userId && loginState.accessToken && appState.streamerId) {
       const client = new HoagieClient();
       const subs = await client.listSubscriptions(
-        loginState.username,
-        appState.streamer,
+        loginState.userId,
+        appState.streamerId,
         loginState.accessToken
       );
       setSubscriptions(subs);
@@ -71,20 +69,7 @@ export const StreamerDashboard = (props: {
 
   useEffect(() => {
     getSubscriptions();
-  }, [loginState.username, loginState.accessToken]);
-
-  useEffect(() => {
-    async function getStreamerId() {
-      if (loginState.accessToken) {
-        const client = createTwitchClient(loginState.accessToken);
-        const id = await client.getUserId(props.streamerName);
-        if (id) {
-          setStreamerId(id);
-        }
-      }
-    }
-    getStreamerId();
-  });
+  }, [loginState.userId, loginState.accessToken]);
 
   const subscriptionsToDisplay = subscriptions;
 
@@ -134,13 +119,13 @@ export const StreamerDashboard = (props: {
                   color="primary"
                   variant="contained"
                   onClick={async () => {
-                    if (loginState.username && loginState.accessToken) {
+                    if (loginState.userId && loginState.accessToken) {
                       const client = new HoagieClient();
                       await Promise.all(
                         subscriptionsToDisplay?.map((sub) =>
                           client.deleteSubscription(
                             sub.id,
-                            loginState.username!,
+                            loginState.userId!,
                             loginState.accessToken!
                           )
                         ) ?? []
@@ -171,11 +156,11 @@ export const StreamerDashboard = (props: {
                           variant="contained"
                           className="sub-delete-button"
                           onClick={async () => {
-                            if (loginState.username && loginState.accessToken) {
+                            if (loginState.userId && loginState.accessToken) {
                               const client = new HoagieClient();
                               await client.deleteSubscription(
                                 sub.id,
-                                loginState.username,
+                                loginState.userId,
                                 loginState.accessToken
                               );
                               getSubscriptions();

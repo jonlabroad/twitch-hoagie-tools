@@ -9,6 +9,7 @@ export interface StateContextType {
 }
 
 export const defaultAppState: AppState = {
+    streamerId: undefined,
     chat: {
         connected: false,
         messages: [],
@@ -23,6 +24,7 @@ export const defaultAppState: AppState = {
 
 export interface AppState {
     streamer?: string;
+    streamerId: string | undefined;
     streamerData?: {
         userData: UserData;
         streamData: StreamData;

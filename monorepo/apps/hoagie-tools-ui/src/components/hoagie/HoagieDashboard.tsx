@@ -29,16 +29,12 @@ export const HoagieDashboard = (props: {
   streamerName: string;
   scopes: string;
 }) => {
-  const { streamerName, scopes } = props;
-
   const { state: appState } = useContext(StateContext);
   const { state: loginState } = useContext(LoginContext);
 
   const [subscriptions, setSubscriptions] = useState<
     TwitchSubscription[] | undefined
   >(undefined);
-  const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
-
   async function createSubscriptions() {
     if (loginState.accessToken && loginState.username && appState.streamer) {
       const client = new HoagieOverlayClient();
@@ -72,16 +68,7 @@ export const HoagieDashboard = (props: {
     getSubscriptions();
   }, [loginState.username, loginState.accessToken]);
 
-  useEffect(() => {
-    async function getStreamerId() {
-      if (loginState.accessToken) {
-        const client = createTwitchClient(loginState.accessToken);
-        const id = await client.getUserId(props.streamerName);
-        setStreamerId(id);
-      }
-    }
-    getStreamerId();
-  });
+  const streamerId = appState.streamerId;
 
   const subscriptionsToDisplay = subscriptions?.filter(
     (sub) =>

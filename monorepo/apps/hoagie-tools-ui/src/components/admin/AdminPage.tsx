@@ -22,10 +22,10 @@ export const AdminPage = (props: AdminPageProps) => {
   const [adminData, setAdminData] = useState<AdminData | undefined>(undefined);
 
   async function getAdminConfig() {
-    if (loginState.username && loginState.accessToken) {
+    if (loginState.userId && loginState.accessToken) {
       const client = new HoagieClient();
       const data = await client.getAdminConfig(
-        loginState.username,
+        loginState.userId,
         loginState.accessToken
       );
       setAdminData(data);
@@ -34,7 +34,7 @@ export const AdminPage = (props: AdminPageProps) => {
 
   useEffect(() => {
     getAdminConfig();
-  }, [loginState.username, loginState.accessToken]);
+  }, [loginState.userId, loginState.accessToken]);
 
   const isAdmin = Admin.isAdmin(loginState);
 

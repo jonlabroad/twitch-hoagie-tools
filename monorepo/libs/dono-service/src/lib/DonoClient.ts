@@ -14,19 +14,19 @@ export class DonoClient {
   }
 
   public async get(
-    username: string,
+    userId: string,
     accessToken: string,
-    streamerName: string,
+    streamerId: string,
     streamIds?: string[]
   ): Promise<DonoDataResponse> {
     const response = await axios.get(
-      `${this.url}${streamerName}?${
+      `${this.url}${streamerId}?${
         streamIds
           ? streamIds.map((streamId) => `&streamId=${streamId}`).join('')
           : ''
       }`,
       {
-        headers: getAuthHeaders(username, accessToken),
+        headers: getAuthHeaders(userId, accessToken),
       }
     );
     return response.data as DonoDataResponse;

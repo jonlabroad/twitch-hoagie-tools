@@ -21,8 +21,6 @@ export interface RaidConfigModuleProps {
 }
 
 export const RaidConfigModule = (props: RaidConfigModuleProps) => {
-    const { streamer } = props;
-
     const { state: appState } = useContext(StateContext);
     const loginContext = useContext(LoginContext);
     const { state: loginState } = loginContext;
@@ -30,14 +28,13 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     const [subscriptions, setSubscriptions] = useState<
       TwitchSubscription[] | undefined
     >(undefined);
-    const [streamerId, setStreamerId] = useState<string | undefined>(undefined);
 
     async function createSubscriptions() {
-      if (loginState.accessToken && loginState.username && appState.streamer) {
+      if (loginState.accessToken && loginState.userId && appState.streamerId) {
         const client = new HoagieClient();
         const response = await client.createSubscriptions(
-          loginState.username,
-          appState.streamer,
+          loginState.userId,
+          appState.streamerId,
           loginState.accessToken
         );
         getSubscriptions();
@@ -45,11 +42,11 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     }
 
     async function getSubscriptions() {
-      if (loginState.username && loginState.accessToken && appState.streamer) {
+      if (loginState.userId && loginState.accessToken && appState.streamerId) {
         const client = new HoagieClient();
         const subs = await client.listSubscriptions(
-          loginState.username,
-          appState.streamer,
+          loginState.userId,
+          appState.streamerId,
           loginState.accessToken
         );
         setSubscriptions(subs);
@@ -63,18 +60,9 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
 
     useEffect(() => {
       getSubscriptions();
-    }, [loginState.username, loginState.accessToken]);
+    }, [loginState.userId, loginState.accessToken, appState.streamerId]);
 
-    useEffect(() => {
-      async function getStreamerId() {
-        if (loginState.accessToken) {
-          const client = createTwitchClient(loginState.accessToken);
-          const id = await client.getUserId(streamer);
-          setStreamerId(id);
-        }
-      }
-      getStreamerId();
-    });
+    const streamerId = appState.streamerId;
 
     const subscriptionsToDisplay = subscriptions?.filter(sub => streamerId &&
       (sub.condition.to_broadcaster_user_id === `${streamerId}` ||
@@ -133,8 +121,8 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
                           subscriptionsToDisplay?.map((sub) =>
                             client.deleteSubscription(
                               sub.id,
-                              loginState.username!,
-                              loginState.accessToken!
+                              loginState.userId!,
+                              loginState.accessToken!,
                             )
                           ) ?? []
                         );

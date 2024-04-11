@@ -10,7 +10,7 @@ export interface LoginRedirectProps {
 export const LoginRedirect = (props: LoginRedirectProps) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
-    const [] = useLogin((username: string | undefined, accessToken: string, isLoggedIn: boolean) => {
+    const [] = useLogin((username: string | undefined, userId: string | undefined, accessToken: string, isLoggedIn: boolean) => {
         if (username) {
             setLoggedIn(isLoggedIn);
         }

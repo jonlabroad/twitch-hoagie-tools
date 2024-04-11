@@ -1,5 +1,4 @@
 import { DynamoDB } from "aws-sdk";
-import Config from "../Config";
 
 export interface ModsData {
     mods: string[]
@@ -7,24 +6,27 @@ export interface ModsData {
 }
 
 export default class ModsDbClient {
-    public static readonly CATEGORY = "DonoWatch";
+    public static readonly CATEGORY = "SETTINGS";
+    public static readonly SUBCATEGORY = "MODS";
 
-    private broadcasterLogin: string;
+    private broadcasterId: string;
+    private tableName: string;
 
-    constructor(broadcasterLogin: string) {
-        this.broadcasterLogin = broadcasterLogin;
+    constructor(tableName: string, broadcasterId: string) {
+        this.tableName = tableName;
+        this.broadcasterId = broadcasterId;
     }
 
     public async readMods(): Promise<ModsData | undefined> {
         const client = new DynamoDB.DocumentClient();
 
         const request: DynamoDB.DocumentClient.GetItemInput = {
-            TableName: Config.tableName,
+            TableName: this.tableName,
             Key: {
-                CategoryKey: this.getKey(this.broadcasterLogin),
-                SubKey: "mods"
+                CategoryKey: this.getKey(this.broadcasterId),
+                SubKey: ModsDbClient.SUBCATEGORY
             }
-        }
+        };
         const response = await client.get(request).promise();
         console.log({ mods: response.Item});
         return (response?.Item) as ModsData | undefined;
@@ -34,28 +36,28 @@ export default class ModsDbClient {
         try {
             const client = new DynamoDB.DocumentClient();
             const input: DynamoDB.DocumentClient.PutItemInput = {
-                TableName: Config.tableName,
+                TableName: this.tableName,
                 Item: {
-                    CategoryKey: this.getKey(this.broadcasterLogin),
-                    SubKey: "mods",
+                    CategoryKey: this.getKey(this.broadcasterId),
+                    SubKey: ModsDbClient.SUBCATEGORY,
                     mods,
-                    channel: this.broadcasterLogin
+                    channel: this.broadcasterId
                 }
-            }
+            };
             await client.put(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-    public async addMod(username: string) {
+    public async addMod(userId: string) {
         try {
             const client = new DynamoDB.DocumentClient();
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
-                TableName: Config.tableName,
+                TableName: this.tableName,
                 Key: {
-                    CategoryKey: this.getKey(this.broadcasterLogin),
-                    SubKey: "mods",
+                    CategoryKey: this.getKey(this.broadcasterId),
+                    SubKey: ModsDbClient.SUBCATEGORY,
                 },
                 ConditionExpression: "not(contains(#listAttr, :newItem))",
                 UpdateExpression: "SET #listAttr = list_append(if_not_exists(#listAttr, :emptyList), :newItem)",
@@ -63,23 +65,24 @@ export default class ModsDbClient {
                     "#listAttr": "mods",
                 },
                 ExpressionAttributeValues: {
-                    ":newItem": [username],
+                    ":newItem": [userId],
                     ":emptyList": []
                 },
-            }
+            };
+            console.log({ input });
             await client.update(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-    public async deleteMod(username: string, indexToRemove: number) {
+    public async deleteMod(userId: string, indexToRemove: number) {
         try {
             const client = new DynamoDB.DocumentClient();
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
-                TableName: Config.tableName,
+                TableName: this.tableName,
                 Key: {
-                    CategoryKey: this.getKey(this.broadcasterLogin),
+                    CategoryKey: this.getKey(this.broadcasterId),
                     SubKey: "mods",
                 },
                 ConditionExpression: `#listAttr[${indexToRemove}] = :valueToRemove`,
@@ -88,16 +91,16 @@ export default class ModsDbClient {
                     "#listAttr": "mods",
                 },
                 ExpressionAttributeValues: {
-                    ":valueToRemove": username,
+                    ":valueToRemove": userId,
                 },
-            }
+            };
             await client.update(input).promise();
         } catch (err) {
             console.error(err);
         }
     }
 
-   getKey(channel: string) {
-        return `DonoWatch_${channel.toLowerCase()}_config`;
+   getKey(channelId: string) {
+        return `${ModsDbClient.CATEGORY}_${channelId}`;
     }
 }

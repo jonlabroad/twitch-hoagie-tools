@@ -36,12 +36,13 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
   const { state: loginState } = useContext(LoginContext);
 
   const { mods } = useContext(ModListContext);
+  console.log({ mods });
   const isMod = mods?.length > 0 &&
-    loginState.username &&
+    loginState.userId &&
     loginState.isLoggedIn &&
     mods
       .map((m) => m.toLowerCase())
-      .includes(loginState.username.toLowerCase());
+      .includes(loginState.userId.toLowerCase());
 
   const isAdmin = Admin.isAdmin(loginState);
 

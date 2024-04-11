@@ -12,13 +12,13 @@ export interface StreamerConfigProps {}
 
 export const StreamerConfigPage = (props: StreamerConfigProps) => {
   const {
-    state: { streamer },
+    state: { streamer, streamerId },
   } = useContext(StateContext);
   useStreamerName();
 
   return (
     <>
-      <ModsModule streamerName={streamer ?? ""} />
+      <ModsModule streamerId={streamerId ?? ""} />
       <RaidConfigModule streamer={streamer ?? ""}/>
     </>
   );

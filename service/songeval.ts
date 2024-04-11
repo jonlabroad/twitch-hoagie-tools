@@ -20,11 +20,11 @@ export const cacheHeaders = {
 module.exports.readconfig = async (event: APIGatewayProxyEvent) => {
   Config.validate(["TABLENAME"]);
 
-  const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
+  const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
   const authenticationResponse = await ModRequestAuthorizer.auth(
-    username,
-    streamerName
+    userId,
+    streamerId
   );
   if (authenticationResponse) {
     return authenticationResponse;
@@ -32,9 +32,8 @@ module.exports.readconfig = async (event: APIGatewayProxyEvent) => {
 
   let config: any = "err";
   try {
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
     const client = new EvalDbClient();
-    config = await client.read(streamerLogin);
+    config = await client.read(streamerId);
     console.log({ config });
     return {
       statusCode: 200,
@@ -64,15 +63,15 @@ module.exports.addwhitelistword = async (event: APIGatewayProxyEvent) => {
   try {
     const word = event.queryStringParameters?.["word"] ?? "";
     const remove = event.queryStringParameters?.["remove"];
-    const streamerLogin = event.queryStringParameters?.["streamername"] ?? "";
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
     console.log({ word, remove });
     if (word) {
       const client = new EvalDbClient();
-      console.log({ streamerLogin, word });
+      console.log({ streamerId, word });
       if (!remove || remove?.toLowerCase() !== "true") {
-        await client.addWhitelistWord(streamerLogin, word);
+        await client.addWhitelistWord(streamerId, word);
       } else {
-        await client.removeWhitelistWord(streamerLogin, word);
+        await client.removeWhitelistWord(streamerId, word);
       }
     }
   } catch (err) {

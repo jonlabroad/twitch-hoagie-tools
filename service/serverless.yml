@@ -395,18 +395,6 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
-  refreshmods:
-    handler: twitch.refreshmods
-    events:
-      - schedule:
-        rate: rate(2 hours)
-        enabled: false
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
   getmods:
     handler: twitch.getmods
     events:

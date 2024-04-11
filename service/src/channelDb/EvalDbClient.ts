@@ -16,13 +16,13 @@ export default class EvalDbClient {
     constructor() {
     }
 
-    public async read(channel: string): Promise<EvalData | undefined> {
+    public async read(channelId: string): Promise<EvalData | undefined> {
         const client = new DynamoDB.DocumentClient();
 
         const request: DynamoDB.DocumentClient.GetItemInput = {
             TableName: Config.tableName,
             Key: {
-                CategoryKey: this.getKey(channel),
+                CategoryKey: this.getKey(channelId),
                 SubKey: this.getSort(),
             }
         }
@@ -31,11 +31,11 @@ export default class EvalDbClient {
         return response?.Item as EvalData | undefined;
     }
 
-    public async addWhitelistWord(channel: string, word: string): Promise<void> {
+    public async addWhitelistWord(channelId: string, word: string): Promise<void> {
         try {
             const client = new DynamoDB.DocumentClient();
             const key = {
-                CategoryKey: this.getKey(channel),
+                CategoryKey: this.getKey(channelId),
                 SubKey: this.getSort(),
             };
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
@@ -54,11 +54,11 @@ export default class EvalDbClient {
         }
     }
 
-    public async removeWhitelistWord(channel: string, word: string): Promise<void> {
+    public async removeWhitelistWord(channelId: string, word: string): Promise<void> {
         try {
             const client = new DynamoDB.DocumentClient();
             const key = {
-                CategoryKey: this.getKey(channel),
+                CategoryKey: this.getKey(channelId),
                 SubKey: this.getSort(),
             };
             const input: DynamoDB.DocumentClient.UpdateItemInput = {
@@ -77,8 +77,8 @@ export default class EvalDbClient {
         }
     }
 
-    getKey(channel: string) {
-        return `${EvalDbClient.CATEGORY}_${channel.toLowerCase()}`;
+    getKey(channelId: string) {
+        return `${EvalDbClient.CATEGORY}_${channelId}`;
     }
 
     getSort() {

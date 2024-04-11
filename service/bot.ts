@@ -55,9 +55,9 @@ module.exports.command = async (event: APIGatewayProxyEvent) => {
 module.exports.refreshtoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
         return authenticationResponse;
     }
@@ -83,16 +83,15 @@ module.exports.refreshtoken = async (event: APIGatewayProxyEvent) => {
 module.exports.gettoken = async (event: APIGatewayProxyEvent) => {
     Config.validate(["TABLENAME"]);
 
-    const { username } = BasicAuth.decode(event.headers.Authorization ?? "")
-    const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "")
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
     if (authenticationResponse) {
         return authenticationResponse;
     }
 
     try {
-        const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-        const botToken = await new BotTokenDbClient().read(streamerName)
+        const botToken = await new BotTokenDbClient().read(streamerId)
         const response = {
             statusCode: 200,
             headers: {

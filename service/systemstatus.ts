@@ -1,7 +1,6 @@
 'use strict';
 
 import { APIGatewayProxyEvent } from "aws-lambda";
-import TwitchClient from "./src/twitch/TwitchClient";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import { GetSystemStatus } from "./src/system/status/GetSystemStatus";
@@ -22,20 +21,15 @@ const cacheHeaders = {
 
 module.exports.getstatus = async (event: APIGatewayProxyEvent) => {
     try {
-        const { username } = BasicAuth.decode(event.headers.Authorization ?? "");
+        const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
 
-        const streamerName = event.queryStringParameters?.streamername ?? event.queryStringParameters?.streamerlogin ?? event.queryStringParameters?.streamerLogin ?? "";
-        const authenticationResponse = await ModRequestAuthorizer.auth(username, streamerName);
+        const streamerId = event.queryStringParameters?.streamerid ?? "No streamer id specified";
+        const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
         if (authenticationResponse) {
           return authenticationResponse;
         }
 
-        const broadcasterId = await (new TwitchClient()).getUserId(streamerName);
-        if (!broadcasterId) {
-            throw new Error(`Broadcaster ID for ${streamerName} not found`);
-        }
-
-        const status = await GetSystemStatus.get(broadcasterId);
+        const status = await GetSystemStatus.get(streamerId);
         return {
             statusCode: 200,
             body: JSON.stringify({

@@ -2,17 +2,17 @@ import StreamerSongListClient from "./StreamerSongListClient";
 import StreamerSongListDbClient from "./StreamerSongListDbClient";
 
 export default class StreamerSongListToken {
-    public static async validateToken(username: string, token: string): Promise<boolean> {
+    public static async validateToken(userId: string, token: string): Promise<boolean> {
         const client = new StreamerSongListClient(token);
-        return await client.isAdmin(username);
+        return await client.isAdmin(userId);
     }
 
-    public static async setToken(username: string, token: string) {
-        await StreamerSongListDbClient.setToken(username, token);
+    public static async setToken(userId: string, token: string) {
+        await StreamerSongListDbClient.setToken(userId, token);
     }
 
-    public static async readToken(username: string): Promise<string | undefined> {
-        const item = await StreamerSongListDbClient.getToken(username);
+    public static async readToken(userId: string): Promise<string | undefined> {
+        const item = await StreamerSongListDbClient.getToken(userId);
         return item?.Value?.token as string;
     }
 }

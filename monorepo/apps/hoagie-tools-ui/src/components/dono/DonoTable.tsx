@@ -121,7 +121,7 @@ const DonoTableRow = (props: DonoTableRowProps) => {
                         <Chip key={s} style={{marginRight: 5}} label={"Queued"} color="secondary" size="small" />
                     </Tooltip>)}
                     {historySongTitles?.map(s => <Tooltip title={s}>
-                        <Chip key={s} label={"Complete"} color="primary" size="small" />
+                        <Chip key={s} style={{marginRight: 5}} label={"Complete"} color="primary" size="small" />
                     </Tooltip>)}
                 </FlexRow>
             </TableCell>

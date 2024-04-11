@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import LoginUtil from "../util/LoginUtil";
 import { TwitchClient } from "@hoagie/service-clients";
 
-export function useLogin(setLogin: (username: string | undefined, accessToken: string, loggedIn: boolean) => void) {
+export function useLogin(setLogin: (username: string | undefined, userId: string | undefined, accessToken: string, loggedIn: boolean) => void) {
     useEffect(() => {
         async function login() {
             const sessionData = LoginUtil.getSessionData();
@@ -15,11 +15,11 @@ export function useLogin(setLogin: (username: string | undefined, accessToken: s
                 if (validatedSession.validated) {
                     LoginUtil.saveSessionData(validatedSession?.validatedSession?.login ?? "", parsed.access_token as string, parsed.token_type as string);
                 }
-                setLogin(validatedSession?.validatedSession?.login, parsed.access_token as string, validatedSession?.validated ?? false);
+                setLogin(validatedSession?.validatedSession?.login, validatedSession?.validatedSession?.user_id, parsed.access_token as string, validatedSession?.validated ?? false);
             } else if (sessionData && sessionData.accessToken) {
                 // Validate with the Twitch API, reset the session if it is no longer valid
                 const validatedSession = await TwitchClient.validateSession(sessionData.accessToken);
-                setLogin(validatedSession?.validatedSession?.login, sessionData.accessToken, validatedSession?.validated ?? false);
+                setLogin(validatedSession?.validatedSession?.login, validatedSession?.validatedSession?.user_id, sessionData.accessToken, validatedSession?.validated ?? false);
             }
         }
         login();
