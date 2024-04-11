@@ -29,6 +29,12 @@
     "streamersonglist:deploy": "nx run streamersonglist-service-deploy:deploy --configuration=prod --output-style=stream",
     "streamersonglist:deploy-dev": "nx run streamersonglist-service-deploy:deploy --configuration=dev --output-style=stream",
     "streamersonglist:run-local": "nx run streamersonglist-service-app:run-local --output-style=stream",
+    "config:offline": "nx run config-service-app:offline --output-style=stream",
+    "config:build": "nx run config-service-app:build --output-style=stream",
+    "config:build-cdk": "nx run config-service-app:build-cdk  --output-style=stream",
+    "config:deploy": "nx run config-service-deploy:deploy --configuration=prod --output-style=stream",
+    "config:deploy-dev": "nx run config-service-deploy:deploy --configuration=dev --output-style=stream",
+    "config:run-local": "nx run config-service-app:run-local --output-style=stream",
     "cdklib:build": "nx run cdk-lib:build --output-style=stream",
     "cdklib:install-deps": "nx run cdk-lib:install-deps --output-style=stream"
   },
