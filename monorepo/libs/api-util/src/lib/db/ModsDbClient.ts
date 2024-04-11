@@ -21,13 +21,14 @@ export default class ModsDbClient {
     public async readMods(): Promise<ModsData | undefined> {
         const client = createDocClient();
 
-        const request: GetCommand = new GetCommand({
-            TableName: this.tableName,
-            Key: {
-                CategoryKey: this.getKey(this.broadcasterId),
-                SubKey: ModsDbClient.SUBCATEGORY
-            }
-        });
+        const input = {
+          TableName: this.tableName,
+          Key: {
+              CategoryKey: this.getKey(this.broadcasterId),
+              SubKey: ModsDbClient.SUBCATEGORY
+          }
+        };
+        const request: GetCommand = new GetCommand(input);
         const response = await client.send(request);
         console.log({ mods: response.Item});
         return (response?.Item) as ModsData | undefined;
