@@ -203,27 +203,6 @@ export default class HoagieClient {
         return response?.data;
     }
 
-    async getMods(userId: string, accessToken: string, streamerId: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}mods?streamerid=${streamerId}`, {
-            headers: this.getHeaders(userId, accessToken)
-        });
-        return response?.data;
-    }
-
-    async addMod(userId: string, accessToken: string, streamerId: string, modId: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}addmod?userid=${modId}&streamerid=${streamerId}`, {}, {
-            headers: this.getHeaders(userId, accessToken),
-        });
-        return response?.data;
-    }
-
-    async removeMod(userId: string, accessToken: string, streamerId: string, modId: string) {
-        const response = await axios.put(`${this.LEGACY_BASE_URL}removemod?userid=${modId}&streamerid=${streamerId}`, {}, {
-            headers: this.getHeaders(userId, accessToken)
-        });
-        return response?.data;
-    }
-
     async getSystemStatus(userId: string, accessToken: string, streamerId: string) {
         const response = await axios.get(`${this.LEGACY_BASE_URL}admin/system/status?streamerid=${streamerId}`, {
             headers: this.getHeaders(userId, accessToken)

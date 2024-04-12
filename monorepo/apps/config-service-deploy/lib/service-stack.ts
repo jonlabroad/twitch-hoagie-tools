@@ -5,6 +5,9 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 import * as awsEvents from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
+import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
+import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import { get } from 'http';
 
 const serviceName = 'ConfigService';
 const appName = 'config-service-app';
@@ -52,5 +55,100 @@ export class ServiceStack extends cdk.Stack {
       logGroupName: `/aws/lambda/${configUpdateFunction.functionName}`,
       retention: logs.RetentionDays.TWO_MONTHS,
     });
+
+    // Mods
+    const getModsFunction = new lambda.Function(
+      this,
+      `GetMods`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getmods",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+      }
+    );
+
+    const addModFunction = new lambda.Function(
+      this,
+      `AddMod`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.addmod",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+      }
+    );
+
+    const removeModFunction = new lambda.Function(
+      this,
+      `RemoveMod`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.removemod",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+      }
+    );
+
+    // HTTP API Gateway
+    const httpApi = new HttpApi(this, `ModApi`, {
+      corsPreflight: {
+        allowOrigins: ['*'],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE],
+        allowHeaders: ['*'],
+      },
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/mods",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'mods-get-v1',
+        getModsFunction,
+      ),
+      //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/mods/{modId}",
+      methods: [HttpMethod.PUT],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'mods-add-v1',
+        addModFunction,
+      ),
+      //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/mods/{modId}",
+      methods: [HttpMethod.DELETE],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'mods-delete-v1',
+        removeModFunction,
+      ),
+      //authorizer: auth,
+    });
+
+    const distribution = new ApiCloudFrontDistribution(
+      this,
+      `distribution`,
+      {
+        subdomain: subdomain,
+        env,
+        httpApiId: httpApi.httpApiId,
+      }
+    );
   }
 }
