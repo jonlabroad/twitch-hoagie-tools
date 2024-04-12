@@ -394,63 +394,6 @@ functions:
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
-
-  getmods:
-    handler: twitch.getmods
-    events:
-      - http:
-          method: GET
-          path: /api/mods
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-          parameters:
-            querystrings:
-              streamername: true
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  addmod:
-    handler: twitch.addmod
-    events:
-      - http:
-          method: PUT
-          path: /api/addmod
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-          parameters:
-            querystrings:
-              streamername: true
-              username: true
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  removemod:
-    handler: twitch.removemod
-    events:
-      - http:
-          method: PUT
-          path: /api/removemod
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-          parameters:
-            querystrings:
-              streamername: true
-              username: true
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
   getadminconfig:
     handler: admin.getconfig
     events:
