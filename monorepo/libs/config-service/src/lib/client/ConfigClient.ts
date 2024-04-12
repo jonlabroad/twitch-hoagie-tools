@@ -39,6 +39,7 @@ export class ConfigClient {
   ): Promise<void> {
     const response = await axios.put(
       `${this.url}${streamerId}/mods/${modId}`,
+      {},
       {
         headers: getAuthHeaders(this.userId, this.accessToken),
       }

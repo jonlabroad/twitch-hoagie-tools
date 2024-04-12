@@ -1,3 +1,3 @@
 export class AuthConfig {
-  public static AdminUserNames = ['hoagieman5000'];
+  public static AdminUserIds = ['408982109'];
 }

@@ -43,6 +43,7 @@ export class ServiceStack extends cdk.Stack {
         },
         role: lambdaExecutionRole,
         timeout: cdk.Duration.seconds(90),
+        memorySize: 1024,
       }
     );
     const scheduleRule = new awsEvents.Rule(this, 'ScheduleRule', {
@@ -69,6 +70,7 @@ export class ServiceStack extends cdk.Stack {
         },
         role: lambdaExecutionRole,
         timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
       }
     );
 
@@ -84,6 +86,7 @@ export class ServiceStack extends cdk.Stack {
         },
         role: lambdaExecutionRole,
         timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
       }
     );
 
@@ -99,6 +102,7 @@ export class ServiceStack extends cdk.Stack {
         },
         role: lambdaExecutionRole,
         timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
       }
     );
 

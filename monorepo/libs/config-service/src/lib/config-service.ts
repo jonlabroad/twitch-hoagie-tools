@@ -42,5 +42,9 @@ export async function periodicConfigUpdate(props: PeriodicConfigUpdateProps) {
 
   console.log({ moddedChannelsByUserId});
 
-  console.log("<( HAI! )");
+  for (const userId of Object.keys(moddedChannelsByUserId)) {
+    await configClient.setUserStreamerIds(userId, moddedChannelsByUserId[userId]);
+  }
+
+  return "OK";
 }
