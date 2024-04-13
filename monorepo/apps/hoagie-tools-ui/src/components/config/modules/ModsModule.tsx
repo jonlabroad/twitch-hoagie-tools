@@ -23,19 +23,19 @@ export const ModsModule = (props: BotConfigModuleProps) => {
 
     async function getMods(userId: string, accessToken: string, streamerId: string) {
       const client = new ConfigClient(userId, accessToken, Config.environment);
-        const mods = await client.get(streamerId)
+        const mods = await client.getMods(streamerId)
         setMods(mods?.mods)
     }
 
     async function addMod(userId: string, accessToken: string, streamerId: string, modId: string) {
         const client = new ConfigClient(userId, accessToken, Config.environment);
-        await client.add(streamerId, modId)
+        await client.addMod(streamerId, modId)
         setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 
     async function removeMod(userId: string, accessToken: string, streamerId: string, modId: string) {
       const client = new ConfigClient(userId, accessToken, Config.environment);
-        await client.delete(streamerId, modId)
+        await client.deleteMod(streamerId, modId)
         setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 

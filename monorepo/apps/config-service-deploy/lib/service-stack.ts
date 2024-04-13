@@ -106,6 +106,22 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const getUserDataFunction = new lambda.Function(
+      this,
+      `GetUserData`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getUserData",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ModApi`, {
       corsPreflight: {
@@ -141,6 +157,16 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'mods-delete-v1',
         removeModFunction,
+      ),
+      //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/userdata",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'userdata-get-v1',
+        getUserDataFunction,
       ),
       //authorizer: auth,
     });

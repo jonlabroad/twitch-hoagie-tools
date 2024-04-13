@@ -1,5 +1,6 @@
 import { getAuthHeaders } from '@hoagie/api-util';
 import axios from 'axios';
+import { UserData } from './ConfigDBClient';
 
 const BASE_URL = 'https://config.hoagieman.net/api/v1/';
 const BASE_URL_DEV = 'https://config-dev.hoagieman.net/api/v1/';
@@ -21,7 +22,7 @@ export class ConfigClient {
     this.url = environment === 'prod' ? BASE_URL : BASE_URL_DEV;
   }
 
-  public async get(
+  public async getMods(
     streamerId: string,
   ): Promise<ModsResponse> {
     const response = await axios.get(
@@ -33,7 +34,7 @@ export class ConfigClient {
     return response.data as ModsResponse;
   }
 
-  public async add(
+  public async addMod(
     streamerId: string,
     modId: string,
   ): Promise<void> {
@@ -46,7 +47,7 @@ export class ConfigClient {
     );
   }
 
-  public async delete(
+  public async deleteMod(
     streamerId: string,
     modId: string,
   ): Promise<void> {
@@ -56,5 +57,17 @@ export class ConfigClient {
         headers: getAuthHeaders(this.userId, this.accessToken),
       }
     );
+  }
+
+  public async getUserData(
+    userId: string,
+  ): Promise<UserData> {
+    const response = await axios.get(
+      `${this.url}/userdata`,
+      {
+        headers: getAuthHeaders(this.userId, this.accessToken),
+      }
+    );
+    return response.data as UserData;
   }
 }

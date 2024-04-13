@@ -23,7 +23,7 @@ export const ModListContextProvider = (props: ModListContextProviderProps) => {
 
     async function getMods(userId: string, accessToken: string, streamerId: string) {
         const client = new ConfigClient(userId, accessToken, Config.environment);
-        const mods = await client.get(streamerId)
+        const mods = await client.getMods(streamerId)
         setMods(mods?.mods)
     }
 

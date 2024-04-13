@@ -8,3 +8,8 @@ export * from './lib/auth/HoagieAuthHeaders';
 export * from './lib/hoagie/HoagieEventPublisher';
 export * from './lib/cache/DBResponseCache';
 export * from './lib/mods/ModsDbClientV2';
+export * from './lib/auth/AdminAuthorizer';
+export * from './lib/auth/AuthConfig';
+export * from './lib/auth/ModRequestAuthorizer';
+export * from './lib/auth/AuthHeaderUtil';
+export * from './lib/auth/TwitchAuthenticator';

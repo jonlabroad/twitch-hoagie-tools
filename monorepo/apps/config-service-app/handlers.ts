@@ -3,7 +3,8 @@ import { periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/con
 import { TwitchClient } from '@hoagie/service-clients';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, corsHeaders, createCacheHeader } from '@hoagie/api-util';
+import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader } from '@hoagie/api-util';
+import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClient';
 
 const version = "1.0.0";
 
@@ -126,6 +127,42 @@ export async function removemod (event: APIGatewayEvent) {
     body: "OK",
     headers: {
       ...corsHeaders,
+    },
+  };
+};
+
+export async function getUserData (event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  const { username: userId } = BasicAuth.decode(event.headers.authorization ?? "");
+
+  const authenticationError = await TwitchRequestAuthenticator.authFromRequest(event);
+  if (authenticationError) {
+    console.log(`Unauthorized user: ${userId}`);
+    return authenticationError;
+  }
+
+  // TODO authenticator should return the userId on success instead of parsing this twice
+  console.log(`User ${userId} authenticated with Twitch`);
+
+  const client = new ConfigDBClient(process.env.TABLENAME);
+  const userData = await client.getUserData(userId);
+  if (!userData) {
+    return {
+      statusCode: 404,
+      body: "User not found",
+      headers: corsHeaders,
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(userData, null, 2),
+    headers: {
+      ...corsHeaders,
+      ...createCacheHeader(60),
     },
   };
 };
