@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext } from "react";
+import { useEffect, useReducer, useContext, useCallback } from "react";
 import { StreamInfo } from "../components/dono/DonoTableContainer";
 import { AppState } from "../state/AppState";
 import { defaultDonoState, DonoState } from "../state/DonoState";
@@ -6,16 +6,19 @@ import { donoStateReducer, SetDonoLoadingAction, SetDonosAction } from "../state
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { DonoClient } from "@hoagie/dono-service";
 import Config from "../Config";
+import { StateContext } from "../components/context/StateContextProvider";
 
-export function useDonoData(state: AppState, currentStreams: StreamInfo[] | undefined): [DonoState, any, (currentStreams: StreamInfo[]) => any] {
-    const { state: loginState } = useContext(LoginContext)
+export function useDonoData(currentStreams: StreamInfo[] | undefined): [DonoState, any, (currentStreams: StreamInfo[]) => any] {
+  const { state } = useContext(StateContext);
+  const { state: loginState } = useContext(LoginContext)
 
     const [donoState, donoStateDispatch] = useReducer(donoStateReducer, {
         ...defaultDonoState,
         streamer: state.streamer,
     } as DonoState);
 
-    async function getDonos(currentStreams: StreamInfo[]) {
+    const getDonos = useCallback(async (currentStreams: StreamInfo[]) => {
+        console.log("getDonos", loginState.userId, loginState.accessToken, state.streamerId, currentStreams);
         if (loginState.userId && loginState.accessToken && state.streamerId && currentStreams.length > 0) {
             donoStateDispatch({
                 type: "set_loading",
@@ -37,11 +40,11 @@ export function useDonoData(state: AppState, currentStreams: StreamInfo[] | unde
                 } as SetDonoLoadingAction)
             }
         }
-    }
+    }, [loginState.userId, loginState.accessToken, state.streamerId, currentStreams]);
 
     useEffect(() => {
         getDonos(currentStreams ?? []);
-    }, [loginState.username, loginState.accessToken, state.streamer, state.streamerId, currentStreams])
+    }, [loginState.userId, loginState.accessToken, state.streamer, state.streamerId, currentStreams])
 
     return [donoState, donoStateDispatch, getDonos]
 }

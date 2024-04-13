@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { ArrowLeft, ArrowRight } from '@mui/icons-material';
-import { useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { useStreamerSongListEvents } from '../../hooks/streamersonglistHooks';
 import { DonoUtil } from '../../util/DonoUtil';
 import { FlexCol, FlexRow } from '../util/FlexBox';
@@ -51,12 +51,19 @@ export const DonoTableContainer = (props: DonoTableContainerProps) => {
     isLastStream,
   } = props;
   const currentStreamsRef = useRef(currentStreams);
+  const lastTimeoutHandle = useRef<NodeJS.Timeout | null>(null);
+
+  const getLatestDonos = useCallback(() => {
+    lastTimeoutHandle.current = setTimeout(() => refreshDonos(currentStreamsRef.current ?? []), 1000);
+  }, [refreshDonos, currentStreamsRef.current]);
+  const getLatestDonosRef = useRef(getLatestDonos);
+  useEffect(() => {
+    getLatestDonosRef.current = getLatestDonos;
+  }, [getLatestDonos])
+
 
   const [hoagieSockets, isHoagieSocketConnected] = useHoagieSockets(
-    (msg: any) => {
-      console.log({ refreshDonos: msg });
-      setTimeout(() => refreshDonos(currentStreamsRef.current ?? []), 1000);
-    }
+    () => getLatestDonosRef.current(),
   );
 
   const { eligible, notEligible } = DonoUtil.getEligibleDonos(donoData, 5);

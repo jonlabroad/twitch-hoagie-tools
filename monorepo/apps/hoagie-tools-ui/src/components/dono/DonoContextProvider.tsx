@@ -20,7 +20,7 @@ export const DonoContext = createContext<DonoStateContextType>({
       isLast: false,
       getNextStream: () => {
         throw new Error("getNextStream not defined");
-      },  
+      },
     },
     refreshDonos: () => {
       throw new Error("refreshDonos not defined");
@@ -35,7 +35,6 @@ export const DonoContextProvider = (props: { children: any }) => {
     streamHistory
   );
   const [donoState, donoDispatch, refreshDonos] = useDonoData(
-    state,
     currentStreams
   );
 
@@ -55,7 +54,7 @@ export const DonoContextProvider = (props: { children: any }) => {
             isLast,
             getNextStream
           }
-          
+
         }}
       >
         {props.children}
