@@ -4,7 +4,7 @@ import { StateContext } from "../context/StateContextProvider"
 
 export const ChannelInfoProvider = () => {
     const stateContext = useContext(StateContext)
-    useChannelInfo(stateContext.state?.streamer, stateContext)
+    useChannelInfo(stateContext.state?.streamerId, stateContext)
 
     return <></>
 }

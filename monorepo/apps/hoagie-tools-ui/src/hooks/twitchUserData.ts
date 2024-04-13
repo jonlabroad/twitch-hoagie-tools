@@ -72,6 +72,7 @@ export const useTwitchUserData = (props: {
   }, [userLoginsToFetch, userIdsToFetch, usersLoading, userData, loginState.username, loginState.accessToken]);
 
   useEffect(() => {
+    console.log({ userIdsToFetch });
     if (userLoginsToFetch.length > 0 || userIdsToFetch.length > 0) {
       fetchUsers();
     }

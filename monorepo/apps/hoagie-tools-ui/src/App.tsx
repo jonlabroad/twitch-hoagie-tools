@@ -38,7 +38,10 @@ import { Redirect } from "./Redirect";
 import { StreamerAdminPage } from "./components/config/StreamerAdminPage";
 import { ModListContextProvider } from "./components/context/ModListContextProvider";
 import { SystemStatusContextProvider } from "./components/context/SystemStatusContextProvider";
-import { HoagieUserDataContextProvider, HoagieUserDataProvider } from "./components/context/HoagieUserDataContextProvider";
+import { HoagieUserDataContextProvider } from "./components/context/HoagieUserDataContextProvider";
+import { LandingPage } from "./components/pages/LandingPage";
+import { NotFound } from "./components/pages/NotFound";
+import { LandingPageContainer } from "./components/pages/LandingPageContainer";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -132,6 +135,24 @@ function App() {
                                 streamerName="hoagieman5000"
                                 scopes={"channel:read:subscriptions bits:read"}
                               />
+                            }
+                          />
+                          <Route
+                            path="/landing"
+                            element={
+                              <LandingPageContainer />
+                            }
+                          />
+                          <Route
+                            path="/"
+                            element={
+                              <Navigate to="/landing" replace={true} />
+                            }
+                          />
+                          <Route
+                            path="*"
+                            element={
+                              <NotFound />
                             }
                           />
                         </Routes>

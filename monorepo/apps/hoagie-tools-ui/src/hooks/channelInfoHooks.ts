@@ -5,26 +5,26 @@ import { LoginContext } from '../components/context/LoginContextProvider';
 import { createTwitchClient } from '../util/CreateTwitchClient';
 
 export const useChannelInfo = (
-  streamer: string | undefined,
+  streamerId: string | undefined,
   stateContext: StateContextType
 ) => {
   const { state: loginState } = useContext(LoginContext);
 
   useEffect(() => {
     async function getChannelInfo() {
-      if (streamer && loginState.accessToken) {
+      if (streamerId && loginState.accessToken) {
         const twitchClient = createTwitchClient(loginState.accessToken);
-        const userData = await twitchClient.getUserData(streamer);
-        const streamData = await twitchClient.getStreamsByUsernames([streamer]);
+        const userData = (await twitchClient.getUserDataById([streamerId]))?.[0];
+        const streamData = (await twitchClient.getStreamsByUserId([streamerId]))?.[0];
         if (userData) {
           stateContext.dispatch({
             type: 'set_channel_info',
             userData: userData,
-            streamData: streamData[0],
+            streamData: streamData,
           } as SetChannelInfoAction);
         }
       }
     }
     getChannelInfo();
-  }, [streamer, loginState.accessToken]);
+  }, [streamerId, loginState.accessToken]);
 };

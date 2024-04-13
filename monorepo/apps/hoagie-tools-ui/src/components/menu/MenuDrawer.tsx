@@ -48,7 +48,7 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
 
   const navigate = useNavigate();
 
-  useChannelInfo(state.streamer, stateContext);
+  useChannelInfo(state.streamerId, stateContext);
 
   const currentPath = window.location.pathname;
 

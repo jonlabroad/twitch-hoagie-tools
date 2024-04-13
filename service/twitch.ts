@@ -16,6 +16,7 @@ import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import AdminDbClient from "./src/channelDb/AdminDbClient";
 import { EventPublisher } from "./src/eventbus/EventPublisher";
 import CreateSelfSubscriptions from "./src/twitch/CreateSelfSubscriptions";
+import StreamsDbClient from "./src/channelDb/StreamsDbClient";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +26,10 @@ export const corsHeaders = {
 
 export const noCacheHeaders = {
   "Cache-Control": "no-cache",
+};
+
+const followCacheHeaders = {
+  "Cache-Control": "max-age=5",
 };
 
 const handler = new TwitchEventhandler();
@@ -269,6 +274,48 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     return {
       statusCode: 500,
       headers: corsHeaders,
+      body: `${err.message}`,
+    };
+  }
+};
+
+module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
+  try {
+    Config.validate();
+
+    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
+    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
+
+    const auth = await ModRequestAuthorizer.auth(userId, streamerId);
+    if (auth) {
+      return auth;
+    }
+
+    const client = new StreamsDbClient(streamerId);
+    const streams = await client.getStreamHistory();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        {
+          streamerId,
+          streams: streams,
+        },
+        null,
+        2
+      ),
+      headers: {
+        ...corsHeaders,
+        ...followCacheHeaders,
+      },
+    };
+  } catch (err) {
+    console.error(err.message, err);
+    return {
+      statusCode: 500,
+      headers: {
+        ...corsHeaders,
+      },
       body: `${err.message}`,
     };
   }
