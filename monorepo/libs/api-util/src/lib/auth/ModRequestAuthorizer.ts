@@ -1,4 +1,4 @@
-import { corsHeaders } from '@hoagie/api-util';
+import { ModsDbClientV2, corsHeaders } from '@hoagie/api-util';
 import ModsDbClient from '../db/ModsDbClient';
 import AdminAuthorizer from './AdminAuthorizer';
 
@@ -32,7 +32,9 @@ export class ModRequestAuthorizer {
 
     // They are who they say they are, but are they a mod?
     if (userId && streamerId) {
-      const modClient = new ModsDbClient(tableName, streamerId);
+      const modClient = new ModsDbClientV2(tableName, {
+        broadcasterId: streamerId
+      });
       const mods = await modClient.readMods();
       const isMod = mods?.mods.map((m) => m.toLowerCase()).includes(userId);
       const isStreamer = streamerId.toLowerCase() === userId;

@@ -11,16 +11,10 @@ import DeleteSubscription from "./src/twitch/DeleteSubscription";
 import TwitchEventhandler from "./src/eventsub/TwitchEventHandler";
 import TwitchWebhookEvent from "./src/twitch/TwitchWebhook";
 import RaidProvider from "./src/twitch/RaidProvider";
-import TwitchProvider from "./src/twitch/TwitchProvider";
-import * as tmi from "tmi.js";
-import ModsDbClient from "./src/channelDb/ModsDbClient";
-import ConfigProvider from "./src/config/ConfigProvider";
 import { BasicAuth } from "./src/util/BasicAuth";
 import ModRequestAuthorizer from "./src/twitch/ModRequestAuthorizer";
 import AdminDbClient from "./src/channelDb/AdminDbClient";
 import { EventPublisher } from "./src/eventbus/EventPublisher";
-import StreamsDbClient from "./src/channelDb/StreamsDbClient";
-import TwitchClient from "./src/twitch/TwitchClient";
 import CreateSelfSubscriptions from "./src/twitch/CreateSelfSubscriptions";
 
 export const corsHeaders = {
@@ -32,14 +26,6 @@ export const corsHeaders = {
 export const noCacheHeaders = {
   "Cache-Control": "no-cache",
 };
-
-const followCacheHeaders = {
-  "Cache-Control": "max-age=5",
-};
-
-const donoDataHeaders = {
-  "Cache-Control": "max-age=1",
-}
 
 const handler = new TwitchEventhandler();
 
@@ -287,138 +273,3 @@ module.exports.getraiddata = async (event: APIGatewayProxyEvent) => {
     };
   }
 };
-
-module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
-  try {
-    Config.validate();
-
-    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
-    const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
-
-    const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-    if (auth) {
-      return auth;
-    }
-
-    const client = new StreamsDbClient(streamerId);
-    const streams = await client.getStreamHistory();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          streamerId,
-          streams: streams,
-        },
-        null,
-        2
-      ),
-      headers: {
-        ...corsHeaders,
-        ...followCacheHeaders,
-      },
-    };
-  } catch (err) {
-    console.error(err.message, err);
-    return {
-      statusCode: 500,
-      headers: {
-        ...corsHeaders,
-      },
-      body: `${err.message}`,
-    };
-  }
-};
-
-module.exports.getmods = async (event: any) => {
-  Config.validate();
-
-  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
-  if (!streamerId) {
-    throw new Error("streamerId not defined");
-  }
-  const client = new ModsDbClient(Config.tableName, streamerId);
-  const mods = await client.readMods();
-  return {
-    statusCode: 200,
-    body: JSON.stringify(mods, null, 2),
-    headers: {
-      ...corsHeaders,
-      ...followCacheHeaders,
-    },
-  };
-};
-
-module.exports.addmod = async (event: any) => {
-  Config.validate();
-
-  const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
-  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-  if (auth) {
-    return auth;
-  }
-
-  const modId = event.queryStringParameters?.["userid"] ?? "";
-  if (!streamerId) {
-    throw new Error("streamerId not defined");
-  }
-
-  if (!userId) {
-    throw new Error("userId not defined");
-  }
-
-  const client = new ModsDbClient(Config.tableName, streamerId);
-  await client.addMod(modId);
-  return {
-    statusCode: 200,
-    body: "OK",
-    headers: {
-      ...corsHeaders,
-    },
-  };
-};
-
-module.exports.removemod = async (event: any) => {
-  Config.validate();
-
-  const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
-  const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
-  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-  if (auth) {
-    return auth;
-  }
-
-  const modUsername = event.queryStringParameters?.["userid"] ?? "";
-  if (!streamerId) {
-    throw new Error("streamername not defined");
-  }
-
-  if (!userId) {
-    throw new Error("username not defined");
-  }
-
-  const client = new ModsDbClient(Config.tableName, streamerId);
-  const mods = await client.readMods();
-  if (mods) {
-    const index = mods?.mods.findIndex(
-      (m) => m.toLowerCase() === modUsername.toLowerCase()
-    );
-    console.log({modUsername, index})
-    if (index >= 0) {
-      await client.deleteMod(modUsername, index);
-    }
-  }
-
-  return {
-    statusCode: 200,
-    body: "OK",
-    headers: {
-      ...corsHeaders,
-    },
-  };
-};
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

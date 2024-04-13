@@ -1,10 +1,11 @@
 import { Grid, TextField, Button, Typography, IconButton } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
-import HoagieClient from "../../../service/HoagieClient";
 import { FlexCol, FlexRow } from "../../util/FlexBox";
 import BlockIcon from '@mui/icons-material/Block';
 import { StateContext } from "../../context/StateContextProvider";
 import { LoginContext } from "../../context/LoginContextProvider";
+import { ConfigClient } from "@hoagie/config-service";
+import Config from "../../../Config";
 
 export interface BotConfigModuleProps {
     streamerId: string
@@ -21,22 +22,20 @@ export const ModsModule = (props: BotConfigModuleProps) => {
     const [modId, setModId] = useState<string>("")
 
     async function getMods(userId: string, accessToken: string, streamerId: string) {
-        const client = new HoagieClient()
-        const mods = await client.getMods(userId, accessToken, streamerId)
-        console.log({mods})
+      const client = new ConfigClient(userId, accessToken, Config.environment);
+        const mods = await client.getMods(streamerId)
         setMods(mods?.mods)
     }
 
     async function addMod(userId: string, accessToken: string, streamerId: string, modId: string) {
-        const client = new HoagieClient()
-        console.log({userId, accessToken, streamerId, modId})
-        await client.addMod(userId, accessToken, streamerId, modId)
+        const client = new ConfigClient(userId, accessToken, Config.environment);
+        await client.addMod(streamerId, modId)
         setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 
     async function removeMod(userId: string, accessToken: string, streamerId: string, modId: string) {
-        const client = new HoagieClient()
-        await client.removeMod(userId, accessToken, streamerId, modId)
+      const client = new ConfigClient(userId, accessToken, Config.environment);
+        await client.deleteMod(streamerId, modId)
         setTimeout(() => getMods(userId, accessToken, streamerId), 1000)
     }
 

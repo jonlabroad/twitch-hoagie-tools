@@ -10,9 +10,9 @@ export interface ModsDataV2 {
   channelId: string;
 }
 
-export default class ModsDbClientV2 {
-  public static readonly CATEGORY = 'CHANNELADMIN';
-  public static readonly SORT_KEY = 'mods';
+export class ModsDbClientV2 {
+  public static readonly CATEGORY = 'SETTINGS';
+  public static readonly SORT_KEY = 'MODS';
 
   private broadcasterId: string;
   private tableName: string;
@@ -24,14 +24,16 @@ export default class ModsDbClientV2 {
 
   public async readMods(): Promise<ModsDataV2 | undefined> {
     const client = createDocClient();
-
-    const request: GetCommand = new GetCommand({
+    const input = {
       TableName: this.tableName,
       Key: {
         CategoryKey: this.getKey(this.broadcasterId),
         SubKey: ModsDbClientV2.SORT_KEY,
       },
-    });
+    };
+
+    console.log({ input });
+    const request: GetCommand = new GetCommand(input);
     const response = await client.send(request);
     console.log({ mods: response.Item });
     return response?.Item as ModsDataV2 | undefined;
@@ -105,7 +107,7 @@ export default class ModsDbClientV2 {
     }
   }
 
-  getKey(channel: string) {
-    return `${ModsDbClientV2.CATEGORY}_${channel.toLowerCase()}`;
+  getKey(channelId: string) {
+    return `${ModsDbClientV2.CATEGORY}_${channelId}`;
   }
 }

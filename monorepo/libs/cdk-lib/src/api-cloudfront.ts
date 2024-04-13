@@ -67,7 +67,7 @@ export class ApiCloudFrontDistribution extends Construct {
               originShieldRegion: region,
             },
           ),
-          originRequestPolicy,
+          originRequestPolicy, //: cloudfront.OriginRequestPolicy.ALL_VIEWER,
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           viewerProtocolPolicy:
             cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

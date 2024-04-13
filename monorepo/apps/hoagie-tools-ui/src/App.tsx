@@ -38,6 +38,7 @@ import { Redirect } from "./Redirect";
 import { StreamerAdminPage } from "./components/config/StreamerAdminPage";
 import { ModListContextProvider } from "./components/context/ModListContextProvider";
 import { SystemStatusContextProvider } from "./components/context/SystemStatusContextProvider";
+import { HoagieUserDataContextProvider, HoagieUserDataProvider } from "./components/context/HoagieUserDataContextProvider";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -83,58 +84,60 @@ function App() {
             <LoginContextProvider>
               <StateContextProvider>
                 <ModListContextProvider>
-                  <SystemStatusContextProvider>
-                    <Router>
-                      <PageHeader
-                        scopes={Config.scopes}
-                        clientId={Config.clientId}
-                      />
-                      <Routes>
-                        <Route
-                          path="/s/:streamer/dono"
-                          element={<DonoPage />}
+                  <HoagieUserDataContextProvider>
+                    <SystemStatusContextProvider>
+                      <Router>
+                        <PageHeader
+                          scopes={Config.scopes}
+                          clientId={Config.clientId}
                         />
-                        <Route
-                          path="/s/:streamer/raid"
-                          element={<RaidDashboard />}
-                        />
-                        <Route
-                          path="/s/:streamer/config"
-                          element={<StreamerConfigPage />}
-                        />
-                        <Route
-                          path="/s/:streamer/admin"
-                          element={<StreamerAdminPage />}
-                        />
-                        <Route
-                          path="/loginRedirect"
-                          element={<LoginRedirect />}
-                        />
-                        <Route
-                          path="/config/:streamer"
-                          element={<StreamerConfigPage />}
-                        />
-                        <Route path="/admin" element={<AdminPage />} />
-                        <Route
-                          path="/dono/:streamer"
-                          element={<Redirect to={"/s/:streamer/dono"} />}
-                        />
-                        <Route
-                          path="/spotify/config"
-                          element={<SpotifyConfig />}
-                        />
-                        <Route
-                          path="/hoagie"
-                          element={
-                            <HoagieDashboard
-                              streamerName="hoagieman5000"
-                              scopes={"channel:read:subscriptions bits:read"}
-                            />
-                          }
-                        />
-                      </Routes>
-                    </Router>
-                  </SystemStatusContextProvider>
+                        <Routes>
+                          <Route
+                            path="/s/:streamer/dono"
+                            element={<DonoPage />}
+                          />
+                          <Route
+                            path="/s/:streamer/raid"
+                            element={<RaidDashboard />}
+                          />
+                          <Route
+                            path="/s/:streamer/config"
+                            element={<StreamerConfigPage />}
+                          />
+                          <Route
+                            path="/s/:streamer/admin"
+                            element={<StreamerAdminPage />}
+                          />
+                          <Route
+                            path="/loginRedirect"
+                            element={<LoginRedirect />}
+                          />
+                          <Route
+                            path="/config/:streamer"
+                            element={<StreamerConfigPage />}
+                          />
+                          <Route path="/admin" element={<AdminPage />} />
+                          <Route
+                            path="/dono/:streamer"
+                            element={<Redirect to={"/s/:streamer/dono"} />}
+                          />
+                          <Route
+                            path="/spotify/config"
+                            element={<SpotifyConfig />}
+                          />
+                          <Route
+                            path="/hoagie"
+                            element={
+                              <HoagieDashboard
+                                streamerName="hoagieman5000"
+                                scopes={"channel:read:subscriptions bits:read"}
+                              />
+                            }
+                          />
+                        </Routes>
+                      </Router>
+                    </SystemStatusContextProvider>
+                  </HoagieUserDataContextProvider>
                 </ModListContextProvider>
               </StateContextProvider>
             </LoginContextProvider>

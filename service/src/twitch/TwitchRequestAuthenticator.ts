@@ -18,7 +18,7 @@ export default class TwitchRequestAuthenticator {
         }
 
         const client = new TwitchClient();
-        const validationResponse = await client.validateUserIdAndToken(username, authToken);
+        const validationResponse = await client.validateUserAndToken(username, authToken);
         if (!validationResponse.validated) {
             return {
                 statusCode: 401,

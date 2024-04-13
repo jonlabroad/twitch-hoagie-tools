@@ -23,6 +23,7 @@
       "@hoagie/song-eval-service": ["libs/song-eval-service/src/index.ts"],
       "@hoagie/song-lookup-service": ["libs/song-lookup-service/src/index.ts"],
       "@hoagie/streamersonglist-service": ["libs/streamersonglist-service/src/index.ts"],
+      "@hoagie/config-service": ["libs/config-service/src/index.ts"],
       "@hoagie/test": ["libs/test/src/index.ts"]
     }
   },

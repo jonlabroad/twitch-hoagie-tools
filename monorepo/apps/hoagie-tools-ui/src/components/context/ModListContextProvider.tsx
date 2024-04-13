@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { LoginContext } from "../context/LoginContextProvider";
-import HoagieClient from "../../service/HoagieClient";
 import { StateContext } from "./StateContextProvider";
+import { ConfigClient } from "@hoagie/config-service";
+import Config from "../../Config";
 
 export interface ModListContextType {
     mods: string[]
@@ -21,8 +22,8 @@ export const ModListContextProvider = (props: ModListContextProviderProps) => {
     const { state } = useContext(StateContext)
 
     async function getMods(userId: string, accessToken: string, streamerId: string) {
-        const client = new HoagieClient()
-        const mods = await client.getMods(userId, accessToken, streamerId)
+        const client = new ConfigClient(userId, accessToken, Config.environment);
+        const mods = await client.getMods(streamerId)
         setMods(mods?.mods)
     }
 

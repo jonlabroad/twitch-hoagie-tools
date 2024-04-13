@@ -168,7 +168,7 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
 
   // Confirm that this Twitch user is who they say they are
   public static async validateUserIdAndToken(
-    userName: string,
+    userId: string,
     userToken: string
   ) {
     try {
@@ -182,7 +182,7 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
         }
       );
       return {
-        validated: response.status === 200 && userName === response.data.login,
+        validated: response.status === 200 && userId === response.data.user_id,
         validatedSession: response.data,
       };
     } catch (err: any) {
