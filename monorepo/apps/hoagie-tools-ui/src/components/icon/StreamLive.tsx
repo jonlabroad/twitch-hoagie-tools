@@ -2,7 +2,7 @@ import { FlexRow } from '../util/FlexBox';
 import './StreamLiveIcon.scss';
 
 interface StreamLiveIconProps {
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   isLive: boolean;
 }
 
