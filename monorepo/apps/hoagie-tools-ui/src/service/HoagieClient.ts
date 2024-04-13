@@ -130,9 +130,9 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async getRaids(username: string, accessToken: string, streamerName: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}raiddata?streamername=${streamerName}`, {
-            headers: this.getHeaders(username, accessToken)
+    async getRaids(userId: string, accessToken: string, streamerId: string) {
+        const response = await axios.get(`${this.LEGACY_BASE_URL}raiddata?streamerid=${streamerId}`, {
+            headers: this.getHeaders(userId, accessToken)
         });
         return response.data as {
             raids: RaidEvent[];

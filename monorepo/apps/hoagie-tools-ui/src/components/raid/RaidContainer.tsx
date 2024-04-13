@@ -115,25 +115,25 @@ export const RaidContainer = (props: RaidContainerProps) => {
 
   useEffect(() => {
     async function getRaids() {
-      if (loginState.username && state.streamer && loginState.accessToken) {
+      if (loginState.userId && state.streamerId && loginState.accessToken) {
         const client = new HoagieClient();
         const raidData = await client.getRaids(
-          loginState.username,
+          loginState.userId,
           loginState.accessToken,
-          state.streamer
+          state.streamerId
         );
         if (raidData) {
           const raidByStreamer: RaidsByStreamer = {};
           raidData.raids.forEach((raid) => {
             const direction =
-              state?.streamer?.toLowerCase() ===
-              raid.to_broadcaster_user_login.toLowerCase()
+              state?.streamerId ===
+              raid.to_broadcaster_user_id
                 ? "in"
                 : "out";
             const key =
               direction === "in"
-                ? raid.from_broadcaster_user_login.toLowerCase()
-                : raid.to_broadcaster_user_login.toLowerCase();
+                ? raid.from_broadcaster_user_id
+                : raid.to_broadcaster_user_id;
             raidByStreamer[key] = raidByStreamer[key] ?? {
               raidsIn: [],
               raidsOut: [],
@@ -149,9 +149,9 @@ export const RaidContainer = (props: RaidContainerProps) => {
       }
     }
     getRaids();
-  }, [state.streamer, loginState.username, loginState.accessToken]);
+  }, [state.streamerId, loginState.userId, loginState.accessToken]);
 
-  if (loginState.username && !loginState.accessToken) {
+  if (loginState.userId && !loginState.accessToken) {
     return <CircularProgress />;
   }
 
@@ -214,9 +214,9 @@ export const RaidContainer = (props: RaidContainerProps) => {
               </Hidden>
               <TableCell>
                 <RaidHistory
-                  raidsIn={raids[stream.user_name.toLowerCase()]?.raidsIn ?? []}
+                  raidsIn={raids[stream.user_id]?.raidsIn ?? []}
                   raidsOut={
-                    raids[stream.user_name.toLowerCase()]?.raidsOut ?? []
+                    raids[stream.user_id]?.raidsOut ?? []
                   }
                 />
               </TableCell>

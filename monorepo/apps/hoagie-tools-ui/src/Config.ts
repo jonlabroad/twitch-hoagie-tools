@@ -3,7 +3,7 @@ import { ModActionType } from "./state/AppState";
 export interface PageConfig {
     title: string
     path: string
-    access: "admin" | "mod"
+    access: "admin" | "mod" | "all"
 }
 
 export default class Config {
@@ -28,6 +28,11 @@ export default class Config {
     public static minChatEvalProbability = 0.60;
 
     public static pages: Record<string, PageConfig> = {
+        "home": {
+          title: "Home",
+          path: "/",
+          access: "all"
+        },
         "songlistAndDono": {
             title: "Songlist and Donos",
             path: "/s/:streamer/dono",

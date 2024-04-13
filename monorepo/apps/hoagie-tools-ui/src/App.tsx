@@ -83,7 +83,7 @@ function App() {
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <div className="App">
+          <div>
             <LoginContextProvider>
               <StateContextProvider>
                 <ModListContextProvider>

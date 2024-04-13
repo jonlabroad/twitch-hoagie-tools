@@ -16,10 +16,10 @@ export default class ModRequestAuthorizer {
 
         // They are who they say they are, but are they a mod?
         if (!streamerId) {
-            console.error("Could not find streamer name");
+            console.error("Could not find streamer id");
             return {
                 statusCode: 403,
-                body: "Could not find streamer name",
+                body: "Could not find streamer id",
                 headers: corsHeaders,
             };
         }

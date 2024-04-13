@@ -1,4 +1,4 @@
-import { AppBar, Button, Hidden, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Hidden, Toolbar, Typography, useMediaQuery } from "@mui/material";
 import Config from "../Config";
 import { useLogin } from "../hooks/loginHooks";
 import LoginUtil from "../util/LoginUtil";
@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { LoginContext } from "./context/LoginContextProvider";
 import { StateContext } from "./context/StateContextProvider";
 import { StreamerInfo } from "./menu/StreamerInfo";
+import { useNavigate } from "react-router";
 
 const getStreamerScopes = false;
 
@@ -18,6 +19,8 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
 
   const loginContext = useContext(LoginContext);
   const { state: loginState, setState: setLoginState } = loginContext;
+
+  const navigate = useNavigate();
 
   // HACK!!!
   const additionalScopes = getStreamerScopes ? "channel:read:subscriptions bits:read" : [];
@@ -54,7 +57,11 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
           alignItems="center"
         >
           <FlexRow>
-            <Typography variant="h6" style={{ marginRight: "20px" }}>
+            <Typography
+              variant="h6"
+              style={{ marginRight: "20px", cursor: "pointer" }}
+              onClick={() => navigate("/")}
+            >
               HoagieTools
             </Typography>
             {state.streamerData && (

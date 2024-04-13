@@ -323,7 +323,7 @@ functions:
           parameters:
             querystrings:
               username: true
-              streamerLogin: true
+              streamerId: true
           cors: true
           authorizer:
             name: twitchAuthenticator
