@@ -16,7 +16,6 @@ import { useContext, useMemo, useState } from "react";
 import { GeniusLink } from "../links/GeniusLink";
 import { SpotifyLink } from "../links/SpotifyLink";
 import { FlexCol, FlexRow } from "../util/FlexBox";
-import { SongEvalConfig } from "./SongEvalConfig";
 import { EvaluatedSongDetails } from "./EvaluatedSongDetails";
 import { Evaluations, EvaluationsStatus } from "../../hooks/songQueueEval";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
@@ -24,15 +23,15 @@ import { SslIcon } from "../icon/SslIcon";
 import { StateContext } from "../context/StateContextProvider";
 
 import format from "format-duration";
-import { UserDonoSummaries, UserDonoSummary } from "@hoagie/dono-service";
 import { DonoContext } from "../dono/DonoContextProvider";
 import { DonoUtil } from "../../util/DonoUtil";
+import { SongEvalConfigData } from "@hoagie/song-eval-service";
 
 const maxSongDurationMillis = 7 * 60 * 1e3;
 const defaultSongDurationMillis = 4 * 60 * 1e3;
 
 export interface EvaluatedSongQueueProps {
-  config?: SongEvalConfig;
+  config?: SongEvalConfigData;
   isLoading: boolean;
   evaluations: Evaluations;
   evaluationsStatus: EvaluationsStatus;

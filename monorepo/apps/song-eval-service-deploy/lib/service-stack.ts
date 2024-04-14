@@ -50,11 +50,59 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const getConfigFunction = new lambda.Function(
+      this,
+      `getConfigFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: 'handlers.getConfig',
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          STAGE: env,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(90),
+      }
+    );
+
+    const addAllowListWordFunction = new lambda.Function(
+      this,
+      `addAllowlistWordFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: 'handlers.addAllowListWord',
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          STAGE: env,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(90),
+      }
+    );
+
+    const removeAllowListWordFunction = new lambda.Function(
+      this,
+      `removeAllowlistWordFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: 'handlers.removeAllowListWord',
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          STAGE: env,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(90),
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `${serviceName}-HttpApi`, {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE],
         allowHeaders: ['*'],
       },
     });
@@ -78,6 +126,33 @@ export class ServiceStack extends cdk.Stack {
         lambdaFunction
       ),
       //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: '/api/v1/{streamerId}/config',
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'api-config-v1',
+        getConfigFunction
+      ),
+    });
+
+    httpApi.addRoutes({
+      path: '/api/v1/{streamerId}/allowlist',
+      methods: [HttpMethod.PUT],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'api-allowlist-add-v1',
+        addAllowListWordFunction
+      ),
+    });
+
+    httpApi.addRoutes({
+      path: '/api/v1/{streamerId}/allowlist',
+      methods: [HttpMethod.DELETE],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'api-allowlist-remove-v1',
+        removeAllowListWordFunction
+      ),
     });
 
     const distribution = new ApiCloudFrontDistribution(

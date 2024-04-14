@@ -70,4 +70,15 @@ export class ConfigClient {
     );
     return response.data as UserData;
   }
+
+  public async getSystemStatus(
+  ): Promise<any> {
+    const response = await axios.get(
+      `${this.url}/system/status`,
+      {
+        headers: getAuthHeaders(this.userId, this.accessToken),
+      }
+    );
+    return response.data;
+  }
 }

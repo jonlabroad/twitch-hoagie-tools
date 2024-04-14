@@ -28,6 +28,7 @@ export class ServiceStack extends cdk.Stack {
         'dynamodb:PutItem',
         'dynamodb:UpdateItem',
         'dynamodb:DeleteItem',
+        'ecs:DescribeServices',
       ]).role;
 
     const configUpdateFunction = new lambda.Function(
@@ -122,6 +123,22 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const systemStatusFunction = new lambda.Function(
+      this,
+      `SystemStatus`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.systemStatus",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ModApi`, {
       corsPreflight: {
@@ -167,6 +184,16 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'userdata-get-v1',
         getUserDataFunction,
+      ),
+      //authorizer: auth,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/system/status",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'systemstatus-get-v1',
+        systemStatusFunction,
       ),
       //authorizer: auth,
     });

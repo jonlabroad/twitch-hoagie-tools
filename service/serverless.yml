@@ -352,48 +352,6 @@ functions:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}
 
-  readsongevalconfig:
-    handler: songeval.readconfig
-    timeout: 10
-    events:
-      - http:
-          method: GET
-          path: /api/songeval/config
-          cors: true
-          authorizer:
-            name: twitchAuthenticator
-          parameters:
-            querystrings:
-              username: true
-              streamername: true
-    environment:
-      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
-      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  addwhitelistword:
-    handler: songeval.addwhitelistword
-    timeout: 10
-    events:
-      - http:
-          method: PUT
-          path: /api/songeval/whitelistwords
-          cors: true
-          parameters:
-            querystrings:
-              username: true
-              streamername: true
-              word: true
-    environment:
-      SPOTIFY_CLIENT_ID: ${file(secrets.yml):spotifyClientId}
-      SPOTIFY_CLIENT_SECRET: ${file(secrets.yml):spotifyClientSecret}
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
   getadminconfig:
     handler: admin.getconfig
     events:
@@ -429,22 +387,6 @@ functions:
       - http:
           method: POST
           path: /api/admin/setconfig
-          cors: true
-    environment:
-      TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
-      TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
-      STAGE: ${self:custom.myStage}
-      TABLENAME: ${self:custom.myTableName}
-
-  getsystemstatus:
-    handler: systemstatus.getstatus
-    events:
-      - http:
-          method: GET
-          path: /api/admin/system/status
-          parameters:
-            querystrings:
-              streamerName: true
           cors: true
     environment:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}

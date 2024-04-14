@@ -5,7 +5,7 @@ import { AppState } from "../state/AppState";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { LoginState } from "../state/LoginState";
 import { SongLookupClient } from "@hoagie/song-lookup-service";
-import { SongEvalClient } from "@hoagie/song-eval-service";
+import { SongEvalClient, SongEvalConfigData } from "@hoagie/song-eval-service";
 import Config from "../Config";
 
 export type Evaluations = Record<string, any>;
@@ -17,20 +17,20 @@ export interface EvaluationStatus {
 
 async function readConfig(state: AppState, loginState: LoginState) {
     if (loginState.userId && loginState.accessToken && state.streamerId) {
-        const client = new HoagieClient();
-        const config = await client.readSongEvalConfig(loginState.userId, loginState.accessToken, state.streamerId);
-        return config as SongEvalConfig | undefined;
+        const client = new SongEvalClient(Config.environment, loginState.userId, loginState.accessToken);
+        const config = await client.getConfig(state.streamerId);
+        return config;
     }
 }
 
-export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean, SongEvalConfig | undefined, (word: string, type: "add" | "remove") => Promise<void>, EvaluationsStatus] => {
+export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean, SongEvalConfigData | undefined, (word: string, type: "add" | "remove") => Promise<void>, EvaluationsStatus] => {
     const songQueue = state.songQueue;
     const streamer = state.streamer;
 
     const [evaluations, setEvaluations] = useState<Evaluations | undefined>({});
     const [evaluationsStatus, setEvaluationsStatus] = useState<EvaluationsStatus>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [config, setConfig] = useState<SongEvalConfig | undefined>(undefined);
+    const [config, setConfig] = useState<SongEvalConfigData | undefined>(undefined);
     const { state: loginState } = useContext(LoginContext)
 
     useEffect(() => {
@@ -46,11 +46,11 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
 
     const onWhitelistWordChange = useCallback(async (word: string, type: "add" | "remove") => {
         if (loginState.userId && loginState.accessToken && state.streamerId) {
-            const client = new HoagieClient();
+            const client = new SongEvalClient(Config.environment, loginState.userId, loginState.accessToken);
             if (type === "add") {
-                await client.addWhitelistWord(word, loginState.userId, loginState.accessToken, state.streamerId);
+                await client.addAllowListWord(state.streamerId, word);
             } else if (type === "remove") {
-                await client.removeWhitelistWord(word, loginState.userId, loginState.accessToken, state.streamerId);
+                await client.removeAllowListWord(state.streamerId, word);
             }
             await updateConfig();
         }

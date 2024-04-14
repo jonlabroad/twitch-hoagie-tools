@@ -1,5 +1,5 @@
 import { DescribeServicesCommand, ECSClient } from "@aws-sdk/client-ecs";
-import Config from "../../Config";
+import { ConfigServiceConfig } from "../ConfigServiceConfig";
 
 export type ChatEventServiceStatus = "running" | "stopped"
 
@@ -37,10 +37,10 @@ export class TwitchChatEventSourceClient {
 
     public static async getServiceDescription() {
         const describeServices = await ecs.send(new DescribeServicesCommand({
-            cluster: Config.ChatEventSource.clusterName,
-            services: [Config.ChatEventSource.serviceName],
+            cluster: ConfigServiceConfig.ChatEventSource.clusterName,
+            services: [ConfigServiceConfig.ChatEventSource.serviceName],
         }));
-    
+
         const serviceDescription = describeServices?.services?.[0];
         return serviceDescription;
     }

@@ -1,7 +1,9 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { LoginContext } from "../components/context/LoginContextProvider";
-import { StateContext } from "../components/context/StateContextProvider";
-import HoagieClient from "../service/HoagieClient";
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { LoginContext } from '../components/context/LoginContextProvider';
+import { StateContext } from '../components/context/StateContextProvider';
+import HoagieClient from '../service/HoagieClient';
+import { ConfigClient } from '@hoagie/config-service';
+import Config from '../Config';
 
 export interface SystemStatus {
   status: {
@@ -26,11 +28,11 @@ export function useSystemStatus() {
     if (!loginState.userId || !loginState.accessToken || !state.streamerId)
       return;
 
-    const status = await new HoagieClient().getSystemStatus(
+    const status = await new ConfigClient(
       loginState.userId,
       loginState.accessToken,
-      state.streamerId
-    );
+      Config.environment
+    ).getSystemStatus();
     if (status) {
       setStatus(status);
     }

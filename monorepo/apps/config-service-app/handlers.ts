@@ -1,5 +1,5 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/config-service';
+import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/config-service';
 import { TwitchClient } from '@hoagie/service-clients';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
@@ -166,3 +166,27 @@ export async function getUserData (event: APIGatewayEvent) {
     },
   };
 };
+
+export async function systemStatus (event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  const status = await GetSystemStatus.get("NONE");
+  if (!status) {
+    return {
+      statusCode: 500,
+      body: "Could not get system status",
+      headers: corsHeaders,
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ status }, null, 2),
+    headers: {
+      ...corsHeaders,
+      ...createCacheHeader(5),
+    },
+  };
+}
