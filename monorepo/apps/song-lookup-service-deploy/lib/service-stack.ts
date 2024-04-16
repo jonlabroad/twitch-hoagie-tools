@@ -62,6 +62,7 @@ export class ServiceStack extends cdk.Stack {
         },
         role: lambdaExecutionRole,
         timeout: cdk.Duration.seconds(90),
+        memorySize: 1024,
       }
     );
 

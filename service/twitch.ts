@@ -292,7 +292,7 @@ module.exports.streamhistoryV2 = async (event: APIGatewayProxyEvent) => {
     }
 
     const client = new StreamsDbClient(streamerId);
-    const streams = await client.getStreamHistory();
+    const streams = await client.getStreamHistory(10);
 
     return {
       statusCode: 200,
