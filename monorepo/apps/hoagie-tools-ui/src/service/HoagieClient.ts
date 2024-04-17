@@ -1,5 +1,7 @@
 import axios from "axios";
 import { RaidEvent } from "../components/raid/RaidEvent";
+import { StreamHistoryClient } from "@hoagie/streamer-service";
+import Config from "../Config";
 
 export interface AdminData {
     CategoryKey: string
@@ -139,16 +141,10 @@ export default class HoagieClient {
         }
     }
 
-    async getStreamHistoryV2(userId: string, accessToken: string, streamerId: string) {
-        const response = await axios.get(`${this.LEGACY_BASE_URL}v2/streamhistory?streamerid=${streamerId}`, {
-            headers: this.getHeaders(userId, accessToken)
-        });
-        return response.data as {
-            streams: {
-                id: string
-                started_at: string
-            }[],
-        }
+    async getStreamHistory(userId: string, accessToken: string, streamerId: string) {
+      const client = new StreamHistoryClient(Config.environment, userId, accessToken);
+        const data = await client.get(streamerId);
+        return data;
     }
 
     async getAdminConfig(userId: string, accessToken: string) {

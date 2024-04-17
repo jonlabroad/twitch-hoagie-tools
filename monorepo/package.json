@@ -36,7 +36,13 @@
     "config:deploy-dev": "nx run config-service-deploy:deploy --configuration=dev --output-style=stream",
     "config:run-local": "nx run config-service-app:run-local --output-style=stream",
     "cdklib:build": "nx run cdk-lib:build --output-style=stream",
-    "cdklib:install-deps": "nx run cdk-lib:install-deps --output-style=stream"
+    "cdklib:install-deps": "nx run cdk-lib:install-deps --output-style=stream",
+    "streamer:offline": "nx run streamer-service-app:offline --output-style=stream",
+    "streamer:build": "nx run streamer-service-app:build --output-style=stream",
+    "streamer:build-cdk": "nx run streamer-service-app:build-cdk  --output-style=stream",
+    "streamer:deploy": "nx run streamer-service-deploy:deploy --configuration=prod --output-style=stream",
+    "streamer:deploy-dev": "nx run streamer-service-deploy:deploy --configuration=dev --output-style=stream",
+    "streamer:run-local": "nx run streamer-service-app:run-local --output-style=stream"
   },
   "private": true,
   "dependencies": {

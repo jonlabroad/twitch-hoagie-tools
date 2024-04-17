@@ -12,7 +12,8 @@ export function useStreamHistory(state: AppState): [StreamInfo[] | undefined] {
         async function getStreamHistory() {
             if (loginState.userId && loginState.accessToken && state.streamerId) {
                 const client = new HoagieClient();
-                const data = await client.getStreamHistoryV2(loginState.userId, loginState.accessToken, state.streamerId)
+                const data = await client.getStreamHistory(loginState.userId, loginState.accessToken, state.streamerId);
+                console.log({ data });
                 if (data) {
                     setStreamHistory(data.streams.map(stream => ({
                         streamId: stream.id,
