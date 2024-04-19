@@ -80,12 +80,11 @@ export class GetQueueEvents {
   public async getEvents(request: GetQueueEventsRequest) {
     console.log(request);
     let userId: string = request.userId ?? '';
-    console.time('getUserId');
     if (!userId) {
-      const twitchClient = this.config.twitchClient;
-      userId = (await twitchClient.getUserId(request.userLogin!)) ?? '';
+      if (!request.userLogin) {
+        throw new Error('userId required');
+      }
     }
-    console.timeEnd('getUserId');
 
     console.time('getSSLEvents');
     const dbReader = new SSLEventDBClient(this.config.tableName);

@@ -42,7 +42,9 @@
     "streamer:build-cdk": "nx run streamer-service-app:build-cdk  --output-style=stream",
     "streamer:deploy": "nx run streamer-service-deploy:deploy --configuration=prod --output-style=stream",
     "streamer:deploy-dev": "nx run streamer-service-deploy:deploy --configuration=dev --output-style=stream",
-    "streamer:run-local": "nx run streamer-service-app:run-local --output-style=stream"
+    "streamer:run-local": "nx run streamer-service-app:run-local --output-style=stream",
+    "all:deploy": "nx run-many --target=deploy --all --configuration=prod --output-style=stream",
+    "all:deploy-dev": "nx run-many --target=deploy --configuration=dev --all --output-style=stream"
   },
   "private": true,
   "dependencies": {

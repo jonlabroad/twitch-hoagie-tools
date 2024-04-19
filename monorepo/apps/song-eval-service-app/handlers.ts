@@ -2,10 +2,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 import { addWord, getSongEvalConfig, removeWord, songEvalService } from '@hoagie/song-eval-service';
 import { Config } from './src/Config';
 import {
-  BasicAuth,
-  ModRequestAuthorizer,
   corsHeaders,
-  getAuthHeaderFromEvent,
   twitchModStreamerLamdbaAuthorizer,
 } from '@hoagie/api-util';
 
@@ -29,9 +26,6 @@ export async function getConfig(apiEvent: APIGatewayEvent) {
   }
 
   console.log({ apiEvent });
-  const { username: userId } = BasicAuth.decode(
-    getAuthHeaderFromEvent(apiEvent)
-  );
   const streamerId = apiEvent.pathParameters?.streamerId;
   if (!streamerId) {
     return {
@@ -39,14 +33,6 @@ export async function getConfig(apiEvent: APIGatewayEvent) {
       body: 'Missing streamerId',
       headers: corsHeaders,
     };
-  }
-
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    userId,
-    streamerId
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
   }
 
   try {
@@ -66,9 +52,6 @@ export async function addAllowListWord(apiEvent: APIGatewayEvent) {
   }
 
   console.log({ apiEvent });
-  const { username: userId } = BasicAuth.decode(
-    getAuthHeaderFromEvent(apiEvent)
-  );
   const streamerId = apiEvent.pathParameters?.streamerId;
   if (!streamerId) {
     return {
@@ -76,14 +59,6 @@ export async function addAllowListWord(apiEvent: APIGatewayEvent) {
       body: 'Missing streamerId',
       headers: corsHeaders,
     };
-  }
-
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    userId,
-    streamerId
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
   }
 
   const word = apiEvent.queryStringParameters?.word;
@@ -112,9 +87,6 @@ export async function removeAllowListWord(apiEvent: APIGatewayEvent) {
   }
 
   console.log({ apiEvent });
-  const { username: userId } = BasicAuth.decode(
-    getAuthHeaderFromEvent(apiEvent)
-  );
   const streamerId = apiEvent.pathParameters?.streamerId;
   if (!streamerId) {
     return {
@@ -122,14 +94,6 @@ export async function removeAllowListWord(apiEvent: APIGatewayEvent) {
       body: 'Missing streamerId',
       headers: corsHeaders,
     };
-  }
-
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    userId,
-    streamerId
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
   }
 
   const word = apiEvent.queryStringParameters?.word;

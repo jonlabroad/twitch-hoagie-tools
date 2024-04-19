@@ -22,7 +22,7 @@ export class ApiGatewayLambdaAuthorizer extends Construct {
 
     const lambdaAuthFunction = new lambda.Function(this, `Auth`, {
       code: lambda.Code.fromAsset(`../../dist/apps/${props.appName}`),
-      handler: props.handler ?? 'handlers.authenticator',
+      handler: props.handler ?? 'handlers.authorizer',
       runtime: lambda.Runtime.NODEJS_18_X,
       environment: {
         TABLENAME: props.tableName,

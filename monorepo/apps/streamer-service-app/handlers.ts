@@ -1,10 +1,14 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { corsHeaders } from '@hoagie/api-util';
+import { corsHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
 import { getStreamHistory as getStreamHistoryFunction } from '@hoagie/streamer-service';
 import { createTwitchClient } from './src/createTwitchClient';
 
 const version = '1.0.0';
+
+export async function authorizer(event: APIGatewayEvent, context: any, callback: any) {
+  return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
+}
 
 export async function getStreamHistory(apiEvent: APIGatewayEvent) {
   try {

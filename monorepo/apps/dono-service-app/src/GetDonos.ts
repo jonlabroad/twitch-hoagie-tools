@@ -1,10 +1,7 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import {
-  BasicAuth,
-  ModRequestAuthorizer,
   corsHeaders,
   createCacheHeader,
-  isOfflineMode,
 } from '@hoagie/api-util';
 import { SecretsProvider } from '@hoagie/secrets-provider';
 import { DonoDataResponse, DonoProvider } from '@hoagie/dono-service';
@@ -23,14 +20,6 @@ export class GetDonos {
         statusCode: 400,
         body: 'Missing streamerId or streamid',
       };
-    }
-
-    const { username: userId } = BasicAuth.decode(event.headers.authorization ?? '');
-    if (!isOfflineMode()) {
-      const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-      if (auth) {
-        return auth;
-      }
     }
 
     await SecretsProvider.init();

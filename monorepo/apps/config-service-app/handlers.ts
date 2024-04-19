@@ -7,7 +7,7 @@ import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClien
 
 const version = "1.0.0";
 
-export async function authenticator(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
+export async function authorizer(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
   return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
 }
 

@@ -11,15 +11,13 @@ import {
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
+import { ApiCloudFrontDistribution, ApiGatewayLambdaAuthorizer, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 
 const serviceName = 'StreamerSongList';
 const appName = 'streamersonglist-service-app';
 const writeEventHandler = 'handlers.writeEvent';
 const getEventsHandler = 'handlers.getEvents';
-const getEventDescriptionsHandler = 'handlers.getDescriptions';
-const route = '/api/v1/queueevents';
-const descriptionsRoute = '/api/v1/queueeventdescriptions';
+const route = '/api/v1/{streamerId}/queueevents';
 const subdomain = 'streamersonglist';
 
 export class ServiceStack extends cdk.Stack {
@@ -73,23 +71,6 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
-    const getEventDescriptionsFunction = new lambda.Function(
-      this,
-      `geteventdescriptions-function`,
-      {
-        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
-        handler: getEventDescriptionsHandler,
-        runtime: lambda.Runtime.NODEJS_18_X,
-        environment: {
-          TABLENAME: context.tableName,
-          STAGE: env,
-        },
-        role: lambdaExecutionRole,
-        timeout: cdk.Duration.seconds(90),
-        memorySize: 1024,
-      }
-    );
-
     const eventBridgeRule = new events.Rule(this, `${serviceName}-eventBridgeRule`, {
       eventPattern: {
         source: ['hoagie.streamersonglist'],
@@ -110,16 +91,11 @@ export class ServiceStack extends cdk.Stack {
       },
     });
 
-    /*
-    const auth = new authorizers.HttpLambdaAuthorizer(
-      'TwitchAuthorizer',
-      songEvalFunction, // this is not correct
-      {
-        authorizerName: 'twitchAuthenticator',
-        identitySource: ['$request.header.Authorization'],
-      }
-    );
-    */
+    const authorizerConstruct = new ApiGatewayLambdaAuthorizer(this, `${serviceName}-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
+    });
 
     httpApi.addRoutes({
       path: route,
@@ -128,17 +104,7 @@ export class ServiceStack extends cdk.Stack {
         'api-get-v1',
         getEventsFunction
       ),
-      //authorizer: auth,
-    });
-
-    httpApi.addRoutes({
-      path: descriptionsRoute,
-      methods: [HttpMethod.GET],
-      integration: new apigwIntegrations.HttpLambdaIntegration(
-        'api-getdescriptions-v1',
-        getEventDescriptionsFunction
-      ),
-      //authorizer: auth,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     const distribution = new ApiCloudFrontDistribution(

@@ -1,7 +1,12 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { songLookupService } from '@hoagie/song-lookup-service';
+import { twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
 
 const version = "1.0.0";
+
+export async function authorizer(event: APIGatewayEvent, context: any, callback: any) {
+  return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
+}
 
 export async function songlookup(apiEvent: APIGatewayEvent) {
   if (!process.env.TABLENAME) {
