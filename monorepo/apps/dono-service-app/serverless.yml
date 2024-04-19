@@ -14,9 +14,10 @@ provider:
   httpApi:
     cors: true
     authorizers:
-      twitchAuthenticator:
+      twitchAuthorizer:
+        functionName: twitchAuthorizer
         type: request
-        functionArn: arn:aws:lambda:us-east-1:796987500533:function:hoagietools-service-prod-twitchAuthenticator
+        enableSimpleResponses: true
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -43,19 +44,24 @@ custom:
     number: 1
   myStage: ${opt:stage, 'development'}
   myTableName: HoagieTools-${opt:stage, self:provider.stage}
-  #myTableName: HoagieTools-prod
   domainName:
     development: dono-dev.hoagieman.net
     prod: dono.hoagieman.net
 
 functions:
+  twitchAuthorizer:
+    handler: handlers.authorizer
+    environment:
+      STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
+
   getdono:
     handler: handlers.getdono
     events:
       - httpApi:
           method: GET
           path: /api/v1/{streamerId}
-          authorizer: twitchAuthenticator
+          authorizer: twitchAuthorizer
     environment:
       STAGE: ${self:custom.myStage}
       TABLENAME: ${self:custom.myTableName}

@@ -39,6 +39,8 @@ export class ApiCloudFrontDistribution extends Construct {
         "Access-Control-Request-Headers",
         "Access-Control-Allow-Credentials"
       ),
+      minTtl: cdk.Duration.seconds(0),
+      defaultTtl: cdk.Duration.seconds(0),
     });
 
     const originRequestPolicy = new cloudfront.OriginRequestPolicy(
