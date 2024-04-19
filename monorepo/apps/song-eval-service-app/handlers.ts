@@ -6,7 +6,12 @@ import {
   ModRequestAuthorizer,
   corsHeaders,
   getAuthHeaderFromEvent,
+  twitchModStreamerLamdbaAuthorizer,
 } from '@hoagie/api-util';
+
+export async function authorizer(event: APIGatewayEvent, context: any, callback: any) {
+  return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
+}
 
 export async function songeval(apiEvent: APIGatewayEvent) {
   console.log({ apiEvent });

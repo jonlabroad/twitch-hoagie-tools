@@ -9,6 +9,7 @@ const allowedStreamers = [
     "andrewcore",
     "hoagieman5000",
     "thesongery",
+    "joplaysviolin"
 ]
 
 interface EvaluatedSongQueueContainerProps {

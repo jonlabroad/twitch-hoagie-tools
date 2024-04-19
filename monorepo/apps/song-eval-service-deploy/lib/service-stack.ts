@@ -9,7 +9,7 @@ import {
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
-import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
+import { ApiCloudFrontDistribution, ApiGatewayLambdaAuthorizer, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 
 const serviceName = 'SongEval';
 const appName = 'song-eval-service-app';
@@ -111,16 +111,11 @@ export class ServiceStack extends cdk.Stack {
       },
     });
 
-    /*
-    const auth = new authorizers.HttpLambdaAuthorizer(
-      'TwitchAuthorizer',
-      songEvalFunction, // this is not correct
-      {
-        authorizerName: 'twitchAuthenticator',
-        identitySource: ['$request.header.Authorization'],
-      }
-    );
-*/
+    const authorizerConstruct = new ApiGatewayLambdaAuthorizer(this, `${serviceName}-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
+    });
 
     httpApi.addRoutes({
       path: route,
@@ -129,7 +124,7 @@ export class ServiceStack extends cdk.Stack {
         'api-get-v1',
         lambdaFunction
       ),
-      //authorizer: auth,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -139,6 +134,7 @@ export class ServiceStack extends cdk.Stack {
         'api-config-v1',
         getConfigFunction
       ),
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -148,6 +144,7 @@ export class ServiceStack extends cdk.Stack {
         'api-allowlist-add-v1',
         addAllowListWordFunction
       ),
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -157,6 +154,7 @@ export class ServiceStack extends cdk.Stack {
         'api-allowlist-remove-v1',
         removeAllowListWordFunction
       ),
+      authorizer: authorizerConstruct.authorizer,
     });
 
     const distribution = new ApiCloudFrontDistribution(

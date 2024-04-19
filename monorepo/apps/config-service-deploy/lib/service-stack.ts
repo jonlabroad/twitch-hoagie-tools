@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs/lib/construct';
 import * as logs from 'aws-cdk-lib/aws-logs';
-import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
+import { ApiCloudFrontDistribution, ApiGatewayLambdaAuthorizer, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 import * as awsEvents from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
@@ -139,22 +139,6 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
-    const lambdaAuthFunction = new lambda.Function(
-      this,
-      `Auth`,
-      {
-        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
-        handler: "handlers.authenticator",
-        runtime: lambda.Runtime.NODEJS_18_X,
-        environment: {
-          TABLENAME: context.tableName,
-        },
-        role: lambdaExecutionRole,
-        timeout: cdk.Duration.seconds(30),
-        memorySize: 1024,
-      }
-    );
-
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
@@ -164,10 +148,10 @@ export class ServiceStack extends cdk.Stack {
       },
     });
 
-    const authorizer = new aws_apigatewayv2_authorizers.HttpLambdaAuthorizer(`${serviceName}-TwitchAuthorizer`, lambdaAuthFunction, {
-      identitySource: ['$request.header.Authorization'],
-      resultsCacheTtl: cdk.Duration.seconds(0),
-      responseTypes: [aws_apigatewayv2_authorizers.HttpLambdaResponseType.SIMPLE],
+    const authorizerConstruct = new ApiGatewayLambdaAuthorizer(this, `${serviceName}-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
     });
 
     httpApi.addRoutes({
@@ -177,7 +161,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-get-v1',
         getModsFunction,
       ),
-      authorizer,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -187,7 +171,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-add-v1',
         addModFunction,
       ),
-      authorizer,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -197,7 +181,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-delete-v1',
         removeModFunction,
       ),
-      authorizer,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -207,7 +191,7 @@ export class ServiceStack extends cdk.Stack {
         'userdata-get-v1',
         getUserDataFunction,
       ),
-      authorizer,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
@@ -217,7 +201,7 @@ export class ServiceStack extends cdk.Stack {
         'systemstatus-get-v1',
         systemStatusFunction,
       ),
-      authorizer,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     const distribution = new ApiCloudFrontDistribution(

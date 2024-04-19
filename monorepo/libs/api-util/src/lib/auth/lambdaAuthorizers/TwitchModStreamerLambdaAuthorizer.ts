@@ -18,7 +18,7 @@ export async function twitchModStreamerLamdbaAuthorizer(
       callback(authenticationResult.message, null);
     }
 
-    const streamerId = event.pathParameters?.['streamerId'];
+    const streamerId = event.pathParameters?.['streamerId'] ?? event.queryStringParameters?.['streamerid'] ?? event.queryStringParameters?.['streamerid'];
     if (streamerId) {
       // User must be on the mod list
       console.log({ streamerId });
