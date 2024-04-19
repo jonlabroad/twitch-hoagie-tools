@@ -2,7 +2,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/config-service';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader, TwitchLambdaAuthenticator, ModLambdaRequestAuthorizer } from '@hoagie/api-util';
+import { BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, TwitchLambdaAuthenticator, ModLambdaRequestAuthorizer } from '@hoagie/api-util';
 import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClient';
 
 const version = "1.0.0";
@@ -99,11 +99,6 @@ export async function addmod (event: APIGatewayEvent) {
     throw new Error("modId not defined");
   }
 
-  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-  if (auth) {
-    return auth;
-  }
-
   const client = new ModsDbClientV2(process.env.TABLENAME, {
     broadcasterId: streamerId
 });
@@ -136,11 +131,6 @@ export async function removemod (event: APIGatewayEvent) {
     throw new Error("modId not defined");
   }
 
-  const auth = await ModRequestAuthorizer.auth(userId, streamerId);
-  if (auth) {
-    return auth;
-  }
-
   const client = new ModsDbClientV2(process.env.TABLENAME, {
     broadcasterId: streamerId
   });
@@ -170,16 +160,6 @@ export async function getUserData (event: APIGatewayEvent) {
   }
 
   const { username: userId } = BasicAuth.decode(event.headers.authorization ?? "");
-
-  const authenticationError = await TwitchRequestAuthenticator.authFromRequest(event);
-  if (authenticationError) {
-    console.log(`Unauthorized user: ${userId}`);
-    return authenticationError;
-  }
-
-  // TODO authenticator should return the userId on success instead of parsing this twice
-  console.log(`User ${userId} authenticated with Twitch`);
-
   const client = new ConfigDBClient(process.env.TABLENAME);
   const userData = await client.getUserData(userId);
   if (!userData) {
