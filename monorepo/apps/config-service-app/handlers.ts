@@ -3,10 +3,15 @@ import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService } 
 import { TwitchClient } from '@hoagie/service-clients';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader } from '@hoagie/api-util';
+import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader, TwitchLambdaAuthenticator } from '@hoagie/api-util';
 import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClient';
 
 const version = "1.0.0";
+
+export async function authenticator(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
+  const authenticator = new TwitchLambdaAuthenticator();
+  const auth = await authenticator.authenticate(event, context, callback);
+}
 
 export async function periodicConfigUpdate(apiEvent: APIGatewayEvent) {
   if (!process.env.TABLENAME) {

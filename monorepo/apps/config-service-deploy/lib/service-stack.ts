@@ -7,7 +7,7 @@ import * as awsEvents from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import { get } from 'http';
+import * as aws_apigatewayv2_authorizers from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 
 const serviceName = 'ConfigService';
 const appName = 'config-service-app';
@@ -139,14 +139,48 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const lambdaAuthFunction = new lambda.Function(
+      this,
+      `Auth`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.authenticator",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
-    const httpApi = new HttpApi(this, `ModApi`, {
+    const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
         allowOrigins: ['*'],
         allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE],
         allowHeaders: ['*'],
       },
     });
+
+    const authorizer = new aws_apigatewayv2_authorizers.HttpLambdaAuthorizer(`${serviceName}-TwitchAuthorizer`, lambdaAuthFunction, {
+      identitySource: ['$request.header.Authorization'],
+      resultsCacheTtl: cdk.Duration.minutes(5),
+      responseTypes: [aws_apigatewayv2_authorizers.HttpLambdaResponseType.SIMPLE],
+    });
+
+    //const lambdaIntegration = new apigwIntegrations.HttpLambdaIntegration("authIntegration", lambdaAuthFunction);
+/*
+    const authRoute = httpApi.addRoutes({
+      path: "/api/v1/auth",
+      methods: [HttpMethod.POST],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'auth-v1',
+        lambdaAuthFunction,
+      ),
+    });
+*/
 
     httpApi.addRoutes({
       path: "/api/v1/{streamerId}/mods",
@@ -155,7 +189,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-get-v1',
         getModsFunction,
       ),
-      //authorizer: auth,
+      authorizer,
     });
 
     httpApi.addRoutes({
@@ -165,7 +199,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-add-v1',
         addModFunction,
       ),
-      //authorizer: auth,
+      //authorizer,
     });
 
     httpApi.addRoutes({
@@ -185,7 +219,7 @@ export class ServiceStack extends cdk.Stack {
         'userdata-get-v1',
         getUserDataFunction,
       ),
-      //authorizer: auth,
+      authorizer,
     });
 
     httpApi.addRoutes({
@@ -195,7 +229,7 @@ export class ServiceStack extends cdk.Stack {
         'systemstatus-get-v1',
         systemStatusFunction,
       ),
-      //authorizer: auth,
+      authorizer,
     });
 
     const distribution = new ApiCloudFrontDistribution(

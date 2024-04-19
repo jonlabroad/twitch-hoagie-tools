@@ -182,7 +182,7 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   ) {
     try {
       console.log('https://id.twitch.tv/oauth2/validate');
-      const response = await axios.get<any>(
+      const response = await axios.get<ValidatedSession>(
         'https://id.twitch.tv/oauth2/validate',
         {
           headers: {

@@ -13,3 +13,4 @@ export * from './lib/auth/AuthConfig';
 export * from './lib/auth/ModRequestAuthorizer';
 export * from './lib/auth/AuthHeaderUtil';
 export * from './lib/auth/TwitchAuthenticator';
+export * from './lib/auth/TwitchLambdaAuthenticator';
