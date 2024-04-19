@@ -1,5 +1,4 @@
 import { ModsDbClientV2, corsHeaders } from '@hoagie/api-util';
-import ModsDbClient from '../db/ModsDbClient';
 import AdminAuthorizer from './AdminAuthorizer';
 
 export class ModRequestAuthorizer {

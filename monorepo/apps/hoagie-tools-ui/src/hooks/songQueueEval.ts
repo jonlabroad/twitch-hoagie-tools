@@ -69,7 +69,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
 
     useEffect(() => {
         async function evalSongs() {
-            if (state.streamerId && loginState.userId && loginState.accessToken && songQueue && (streamer?.toLowerCase() === "andrewcore" || streamer?.toLowerCase() === "hoagieman5000" || streamer?.toLowerCase() === "thesongery")) {
+            if (state.streamerId && loginState.userId && loginState.accessToken && songQueue) {
                 setIsLoading(true);
                 const client = new SongEvalClient(Config.environment, loginState.userId, loginState.accessToken);
                 await Promise.all(songQueue.list.map(async (el) => {

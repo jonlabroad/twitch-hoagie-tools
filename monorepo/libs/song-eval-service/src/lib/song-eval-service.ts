@@ -19,25 +19,7 @@ export async function songEvalService(query: string, event: APIGatewayEvent, con
       headers: corsHeaders,
     };
   }
-/*
-  const { username } = BasicAuth.decode(event.headers["authorization"] ?? event.headers["Authorization"] ?? "");
-  const streamerName = event.queryStringParameters?.["streamername"] ?? "";
-  if (!streamerName) {
-    return {
-      statusCode: 400,
-      body: 'Missing streamername',
-      headers: corsHeaders,
-    };
-  }
 
-  const authenticationResponse = await ModRequestAuthorizer.auth(
-    username,
-    streamerName
-  );
-  if (authenticationResponse) {
-    return authenticationResponse;
-  }
-*/
   await SecretsProvider.init();
   const secrets = SecretsProvider.getInstance().secrets;
   const evaluator = new SongEvaluator(secrets["geniusClientSecret"], secrets["badWordsSecret"]);

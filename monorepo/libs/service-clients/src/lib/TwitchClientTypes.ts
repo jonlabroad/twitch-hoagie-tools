@@ -92,9 +92,11 @@ export interface UsersFollows {
 }
 
 export interface ValidatedSession {
+  client_id: string;
   expires_in: number;
   login: string;
   user_id: string;
+  scopes: string[];
 }
 
 export interface TwitchSubscription {

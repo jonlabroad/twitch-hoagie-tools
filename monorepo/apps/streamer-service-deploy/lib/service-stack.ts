@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs/lib/construct';
-import { ApiCloudFrontDistribution, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
+import { ApiCloudFrontDistribution, ApiGatewayLambdaAuthorizer, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 
@@ -51,6 +51,12 @@ export class ServiceStack extends cdk.Stack {
       },
     });
 
+    const authorizerConstruct = new ApiGatewayLambdaAuthorizer(this, `${appName}-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
+    });
+
     httpApi.addRoutes({
       path: "/api/v1/{streamerId}/streamhistory",
       methods: [HttpMethod.GET],
@@ -58,7 +64,7 @@ export class ServiceStack extends cdk.Stack {
         'streamhistory-get-v1',
         getStreamHistory,
       ),
-      //authorizer: auth,
+      authorizer: authorizerConstruct.authorizer,
     });
 
     const distribution = new ApiCloudFrontDistribution(
