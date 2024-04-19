@@ -166,21 +166,9 @@ export class ServiceStack extends cdk.Stack {
 
     const authorizer = new aws_apigatewayv2_authorizers.HttpLambdaAuthorizer(`${serviceName}-TwitchAuthorizer`, lambdaAuthFunction, {
       identitySource: ['$request.header.Authorization'],
-      resultsCacheTtl: cdk.Duration.minutes(5),
+      resultsCacheTtl: cdk.Duration.seconds(0),
       responseTypes: [aws_apigatewayv2_authorizers.HttpLambdaResponseType.SIMPLE],
     });
-
-    //const lambdaIntegration = new apigwIntegrations.HttpLambdaIntegration("authIntegration", lambdaAuthFunction);
-/*
-    const authRoute = httpApi.addRoutes({
-      path: "/api/v1/auth",
-      methods: [HttpMethod.POST],
-      integration: new apigwIntegrations.HttpLambdaIntegration(
-        'auth-v1',
-        lambdaAuthFunction,
-      ),
-    });
-*/
 
     httpApi.addRoutes({
       path: "/api/v1/{streamerId}/mods",
@@ -199,7 +187,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-add-v1',
         addModFunction,
       ),
-      //authorizer,
+      authorizer,
     });
 
     httpApi.addRoutes({
@@ -209,7 +197,7 @@ export class ServiceStack extends cdk.Stack {
         'mods-delete-v1',
         removeModFunction,
       ),
-      //authorizer: auth,
+      authorizer,
     });
 
     httpApi.addRoutes({

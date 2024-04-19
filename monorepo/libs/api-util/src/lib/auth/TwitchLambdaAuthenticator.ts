@@ -8,18 +8,28 @@ interface CachedAuthenticationType {
   expiry: Date;
 }
 
+interface AuthenticationResult {
+  userId: string;
+  isAuthenticated: boolean;
+  message: string | null;
+}
+
 const authCache = new NodeCache({ stdTTL: 60 * 60, checkperiod: 120 });
 
 export class TwitchLambdaAuthenticator {
   public async authenticate(
     event: APIGatewayProxyEvent,
     context: any,
-    callback: (message: string | null, policy: any) => any
-  ) {
+  ): Promise<AuthenticationResult> {
+    console.log(event);
     try {
       const authHeader = event.headers['authorization'] ?? event.headers['Authorization'];
       if (!authHeader) {
-        return callback('Unauthorized (no Authorization header found)', null);
+        return {
+          userId: '',
+          isAuthenticated: false,
+          message: 'Unauthorized (no Authorization header found)',
+        };
       }
 
       const { username: userId, token } = BasicAuth.decode(authHeader);
@@ -29,21 +39,28 @@ export class TwitchLambdaAuthenticator {
         console.log("Validating with Twitch");
         validatedSession = await TwitchLambdaAuthenticator.authenticateWithTwitch(userId, token);
         if (!validatedSession) {
-          return callback('Unauthorized (invalid Twitch credentials)', null);
+          return {
+            userId,
+            isAuthenticated: false,
+            message: 'Unauthorized (invalid Twitch credentials)',
+          };
         }
         this.setCachedAuthentication(userId, token, validatedSession);
       } else {
         console.log("Using cached authentication");
       }
-      callback(null, {
-        isAuthorized: true,
-        context: {
-          userId,
-        },
-      })
+      return {
+        userId,
+        isAuthenticated: true,
+        message: null,
+      };
     } catch (err: any) {
       console.error(err.message, err);
-      return callback('Unauthorized (error)', null);
+      return {
+        userId: '',
+        isAuthenticated: false,
+        message: 'Unauthorized (error)',
+      };
     }
   }
 

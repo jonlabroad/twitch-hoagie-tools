@@ -1,16 +1,44 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/config-service';
-import { TwitchClient } from '@hoagie/service-clients';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader, TwitchLambdaAuthenticator } from '@hoagie/api-util';
+import { BasicAuth, ModRequestAuthorizer, ModsDbClientV2, TwitchRequestAuthenticator, corsHeaders, createCacheHeader, TwitchLambdaAuthenticator, ModLambdaRequestAuthorizer } from '@hoagie/api-util';
 import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClient';
 
 const version = "1.0.0";
 
 export async function authenticator(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
   const authenticator = new TwitchLambdaAuthenticator();
-  const auth = await authenticator.authenticate(event, context, callback);
+  const authenticationResult = await authenticator.authenticate(event, context);
+  if (!authenticationResult.isAuthenticated) {
+    console.log(`Unauthorized user: ${authenticationResult.userId}`);
+    callback(authenticationResult.message, null);
+  }
+
+  const streamerId = event.pathParameters?.streamerId;
+  if (streamerId) {
+    // User must be on the mod list
+    console.log({ streamerId });
+    console.log("Checking if user is authorized for this streamer")
+    const auth = await ModLambdaRequestAuthorizer.auth(authenticationResult.userId, streamerId);
+    if (!auth || !auth.isAuthorized) {
+      callback(auth.message, null);
+    } else {
+      callback(null, {
+        isAuthorized: auth.isAuthorized,
+        context: {
+          userId: authenticationResult.userId,
+        },
+      });
+    }
+  } else {
+    callback(null, {
+      isAuthorized: true,
+      context: {
+        userId: authenticationResult.userId,
+      },
+    })
+  }
 }
 
 export async function periodicConfigUpdate(apiEvent: APIGatewayEvent) {
