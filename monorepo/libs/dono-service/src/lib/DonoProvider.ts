@@ -1,13 +1,10 @@
 import { DonoData, UserDonoSummary } from '../lib/DonoTypes';
 import DonoDbClient from './DonoDbClient';
-import { TwitchClient } from '@hoagie/service-clients';
 
 export class DonoProvider {
-  private twitchClient: TwitchClient;
   private tableName: string;
 
-  constructor(twitchClient: TwitchClient, tableName: string) {
-    this.twitchClient = twitchClient;
+  constructor(tableName: string) {
     this.tableName = tableName;
   }
 

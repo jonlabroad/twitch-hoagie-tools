@@ -6,7 +6,7 @@ import { Duration } from 'aws-cdk-lib/core'; // Import the 'Duration' class from
 export interface ApiGatewayLambdaAuthorizerProps {
   appName: string;
   tableName: string;
-  lambdaExecutionRole: aws_iam.Role;
+  lambdaExecutionRole: aws_iam.IRole;
   handler?: string;
 }
 

@@ -3,7 +3,7 @@ import { DonoDataResponse } from './DonoTypes';
 import { getAuthHeaders } from '@hoagie/api-util';
 
 const BASE_URL = 'https://dono.hoagieman.net/api/v1/';
-const BASE_URL_DEV = 'https://dono-dev.hoagieman.net/api/v1/';
+const BASE_URL_DEV = 'https://dono-new-dev.hoagieman.net/api/v1/';
 
 export class DonoClient {
   environment: "prod" | "dev"

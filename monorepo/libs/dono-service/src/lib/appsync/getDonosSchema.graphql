@@ -1,0 +1,22 @@
+type Dono {
+	CategoryKey: String!
+	SubKey: String!
+	username: String!
+	twitchUserId: String
+	streamId: String!
+	broadcasterId: String!
+	amount: Int!
+	subTier: String
+	subRecipient: String
+	type: String!
+	timestamp: String!
+	ExpirationTTL: Int!
+}
+
+type DonoList {
+	items: [Dono]
+}
+
+type Query {
+	listDonos(streamerId: String!, streamId: String!): DonoList
+}

@@ -1,0 +1,50 @@
+{
+  "name": "dono-service-deploy",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/dono-service-deploy/src",
+  "projectType": "application",
+  "targets": {
+    "synth": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/dono-service-deploy",
+        "command": "cdk synth --context env=dev"
+      },
+      "dependsOn": [{
+        "projects": ["cdk-lib"],
+        "target": "install-deps"
+      }],
+      "configurations": {
+        "prod": {
+          "command": "cdk synth --context env=prod"
+        },
+        "dev": {
+          "command": "cdk synth --context env=dev"
+        }
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/dono-service-deploy",
+        "command": "cdk deploy --require-approval never --context env=dev"
+      },
+      "dependsOn": [
+        {
+          "projects": ["dono-service-app-cdk"],
+          "target": "install-deps"
+        },
+        "synth"
+      ],
+      "configurations": {
+        "prod": {
+          "command": "cdk deploy --require-approval never --context env=prod"
+        },
+        "dev": {
+          "command": "cdk deploy --require-approval never --context env=dev"
+        }
+      }
+    }
+  },
+  "tags": []
+}

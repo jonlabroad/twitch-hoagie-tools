@@ -86,5 +86,8 @@ export class ApiCloudFrontDistribution extends Construct {
     new cdk.CfnOutput(this, `${id}-DistributionDomainName`, {
       value: distribution.distributionDomainName,
     });
+    new cdk.CfnOutput(this, `${id}-DistributionId`, {
+      value: distribution.distributionId,
+    });
   }
 }

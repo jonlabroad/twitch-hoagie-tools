@@ -6,7 +6,6 @@ import {
 import { SecretsProvider } from '@hoagie/secrets-provider';
 import { DonoDataResponse, DonoProvider } from '@hoagie/dono-service';
 import { Config } from './Config';
-import { createTwitchClient } from './createTwitchClient';
 
 export class GetDonos {
   public static async run(streamerId: string | undefined, event: APIGatewayEvent) {
@@ -25,7 +24,6 @@ export class GetDonos {
     await SecretsProvider.init();
     const streamIds = streamId.split(',');
     const donoProvider = new DonoProvider(
-      createTwitchClient(),
       Config.tableName
     );
     const donos = await donoProvider.get(streamerId, streamIds);

@@ -1,0 +1,61 @@
+{
+  "name": "dono-service-app-cdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/dono-service-app-cdk/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/dono-service-app-cdk",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/dono-service-app-cdk/handlers.ts",
+        "tsConfig": "apps/dono-service-app-cdk/tsconfig.app.json",
+        "generatePackageJson": true,
+        "ignore": ["cdk/**/*"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "install-deps": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{
+        "target": "build"
+      }],
+      "options": {
+        "command": "npm install",
+        "cwd": "dist/apps/dono-service-app-cdk"
+      }
+    },
+    "run-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/dono-service-app-cdk/cdk",
+        "command": "npm run local"
+      },
+      "dependsOn": [{
+        "target": "synth-local"
+      }]
+    }
+  },
+  "tags": []
+}
