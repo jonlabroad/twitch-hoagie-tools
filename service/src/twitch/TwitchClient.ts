@@ -78,32 +78,40 @@ export default class TwitchClient {
         };
     }
 
-    public async createSubscription(type: string, condition: Record<string, string>) {
-        const authToken = await this.getAuthToken();
+    public async createSubscription(type: string, condition: Record<string, string>): Promise<any | null> {
+        try {
+            const authToken = await this.getAuthToken();
 
-        const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
-        console.log({ url });
-        const data = {
-            type,
-            version: "1",
-            condition,
-            transport: {
-                method: "webhook",
-                callback: `${subscriptionCallbackHost}/api/twitchcallback`,
-                secret: Config.subscriptionSecret
+            const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
+            console.log({ url });
+            const data = {
+                type,
+                version: "1",
+                condition,
+                transport: {
+                    method: "webhook",
+                    callback: `${subscriptionCallbackHost}/api/twitchcallback`,
+                    secret: Config.subscriptionSecret
+                }
+            };
+            const config = {
+                headers:
+                {
+                    "Authorization": `Bearer ${authToken?.access_token}`,
+                    "Client-ID": Config.twitchClientId,
+                    "Content-Type": "application/json"
+                }
+            };
+            const response = await axios.post(url, data, config);
+            console.log({ subscriptionResponse: response.data});
+            return response.data;
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 409) {
+                return null;
+            } else {
+                throw err;
             }
-        };
-        const config = {
-            headers:
-            {
-                "Authorization": `Bearer ${authToken?.access_token}`,
-                "Client-ID": Config.twitchClientId,
-                "Content-Type": "application/json"
-            }
-        };
-        const response = await axios.post(url, data, config);
-        console.log("SUBSCRIPTIONS");
-        return response.data;
+        }
     }
 
     async deleteSubscription(id: string): Promise<any> {

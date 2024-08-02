@@ -203,6 +203,7 @@ functions:
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
       SUBSCRIPTION_SECRET: ${file(secrets.yml):twitchWebhookSecret}
+      TABLENAME: ${self:custom.myTableName}
 
   createselfsubscriptions:
     handler: twitch.createselfsubscriptions
@@ -222,6 +223,7 @@ functions:
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
       SUBSCRIPTION_SECRET: ${file(secrets.yml):twitchWebhookSecret}
+      TABLENAME: ${self:custom.myTableName}
 
   deletesubscription:
     handler: twitch.deletesubscription
@@ -240,6 +242,7 @@ functions:
       TWITCH_CLIENT_ID: ${file(secrets.yml):twitchClientId_${opt:stage, 'dev'}}
       TWITCH_CLIENT_SECRET: ${file(secrets.yml):twitchClientSecret_${opt:stage, 'dev'}}
       STAGE: ${self:custom.myStage}
+      TABLENAME: ${self:custom.myTableName}
 
   setStreamerSongListToken:
     handler: streamersonglist.settoken

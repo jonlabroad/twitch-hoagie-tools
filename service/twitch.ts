@@ -219,8 +219,7 @@ module.exports.deletesubscription = async (event: APIGatewayProxyEvent) => {
     Config.validate();
 
     const { username: userId } = BasicAuth.decode(event.headers.Authorization ?? "");
-    const streamerId = event.queryStringParameters?.["streamerid"] ?? "";
-    const authenticationResponse = await ModRequestAuthorizer.auth(userId, streamerId);
+    const authenticationResponse = await ModRequestAuthorizer.auth(userId, "adminonly");
     if (authenticationResponse) {
       return authenticationResponse;
     }
