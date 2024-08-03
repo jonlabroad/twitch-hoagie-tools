@@ -19,7 +19,7 @@ export const StreamerConfigPage = (props: StreamerConfigProps) => {
   return (
     <>
       <ModsModule streamerId={streamerId ?? ""} />
-      <RaidConfigModule streamer={streamer ?? ""}/>
+      <RaidConfigModule />
     </>
   );
 };

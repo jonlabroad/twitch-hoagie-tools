@@ -10,7 +10,7 @@ import { StateContext } from "./context/StateContextProvider";
 import { StreamerInfo } from "./menu/StreamerInfo";
 import { useNavigate } from "react-router";
 
-const getStreamerScopes = false;
+const getStreamerScopes = true;
 
 export const PageHeader = (props: { scopes: string; clientId: string }) => {
   const { scopes } = props;
@@ -23,7 +23,9 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
   const navigate = useNavigate();
 
   // HACK!!!
-  const additionalScopes = getStreamerScopes ? "channel:read:subscriptions bits:read" : [];
+  //const additionalScopes = getStreamerScopes ? "channel:read:subscriptions bits:read user:read:chat user:bot channel:bot" : [];
+  // TODO perform a "login" when connecting strearer's event (not for the usual everyday login, though)
+  const additionalScopes = getStreamerScopes ? "user:read:chat user:bot" : []; // For all streamers, but only when connecting
 
   const [] = useLogin(
     (
@@ -90,7 +92,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
             <Button
               variant="contained"
               color="secondary"
-              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes}${additionalScopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
+              href={`https://id.twitch.tv/oauth2/authorize?scope=${scopes} ${additionalScopes}&client_id=${props.clientId}&redirect_uri=${Config.redirectUri}&response_type=token`}
             >
               Login
             </Button>

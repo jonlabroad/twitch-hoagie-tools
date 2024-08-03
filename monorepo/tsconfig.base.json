@@ -25,6 +25,7 @@
       "@hoagie/streamersonglist-service": ["libs/streamersonglist-service/src/index.ts"],
       "@hoagie/config-service": ["libs/config-service/src/index.ts"],
       "@hoagie/streamer-service": ["libs/streamer-service/src/index.ts"],
+      "@hoagie/stream-rewards": ["libs/stream-rewards/src/index.ts"],
       "@hoagie/test": ["libs/test/src/index.ts"]
     }
   },

@@ -46,8 +46,8 @@ export default class HoagieClient {
         return response.data;
     }
 
-    async createSelfSubscriptions(username: string, channelName: string, accessToken: string) {
-      const response = await axios.get(`${this.LEGACY_BASE_URL}createselfsubscriptions?streamername=${channelName}`, {
+    async createSelfSubscriptions(username: string, streamerId: string, accessToken: string) {
+      const response = await axios.get(`${this.LEGACY_BASE_URL}createselfsubscriptions?streamerid=${streamerId}`, {
             headers: this.getHeaders(username, accessToken)
         });
         return response.data;

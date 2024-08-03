@@ -1,0 +1,69 @@
+    {
+      Source: 'hoagie.twitch-eventsub',
+      DetailType: 'Event',
+      Detail: {
+        "subscription": {
+          "id": "ec035392-b6bd-42d8-b3f9-5b2eda47b907",
+          "status": "enabled",
+          "type": "channel.chat.notification",
+          "version": "1",
+          "condition": {
+            "broadcaster_user_id": "823562323",
+            "user_id": "408982109"
+          },
+          "transport": {
+            "method": "webhook",
+            "callback": "https://hoagietools-svc-prod.hoagieman.net/api/twitchcallback"
+          },
+          "created_at": "2024-08-03T00:54:33.470103005Z",
+          "cost": 0
+        },
+        "event": {
+          "broadcaster_user_id": "823562323",
+          "broadcaster_user_login": "andrewcore2",
+          "broadcaster_user_name": "andrewcore2",
+          "chatter_user_id": "71528632",
+          "chatter_user_login": "xeri_star",
+          "chatter_user_name": "xeri_star",
+          "chatter_is_anonymous": false,
+          "color": "#0000FF",
+          "badges": [
+            {
+              "set_id": "subscriber",
+              "id": "9",
+              "info": "9"
+            }
+          ],
+          "system_message": "xeri_star subscribed at Tier 1. They've subscribed for 9 months!",
+          "message_id": "c424f596-7ff5-4d66-802b-78e4cda9ff97",
+          "message": {
+            "text": "",
+            "fragments": []
+          },
+          "notice_type": "resub",
+          "sub": null,
+          "resub": {
+            "cumulative_months": 9,
+            "duration_months": 3,
+            "streak_months": null,
+            "sub_tier": "1000",
+            "is_prime": false,
+            "is_gift": false,
+            "gifter_is_anonymous": null,
+            "gifter_user_id": null,
+            "gifter_user_name": null,
+            "gifter_user_login": null
+          },
+          "sub_gift": null,
+          "community_sub_gift": null,
+          "gift_paid_upgrade": null,
+          "prime_paid_upgrade": null,
+          "pay_it_forward": null,
+          "raid": null,
+          "unraid": null,
+          "announcement": null,
+          "bits_badge_tier": null,
+          "charity_donation": null
+        }
+      }
+    }

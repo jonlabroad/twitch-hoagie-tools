@@ -1,0 +1,112 @@
+2024-07-26T19: 15: 18.612Z	98cf0934-c2ea-4fb4-ab03-69e2e7603393	INFO	{
+  publishingEvents: [
+    {
+      Source: 'hoagie.twitch-eventsub',
+      DetailType: 'Event',
+      Detail: '{
+        "subscription": {
+          "id": "659004c6-3833-4122-96a9-2ff6dc9e7e67",
+          "status": "enabled",
+          "type": "channel.chat.message",
+          "version": "1",
+          "condition": {
+            "broadcaster_user_id": "118391771",
+            "user_id": "408982109"
+          },
+          "transport": {
+            "method": "webhook",
+            "callback": "https://hoagietools-svc-prod.hoagieman.net/api/twitchcallback"
+          },
+          "created_at": "2024-07-26T19:01:36.081119531Z",
+          "cost": 0
+        },
+        "event": {
+          "broadcaster_user_id": "118391771",
+          "broadcaster_user_login": "thesongery",
+          "broadcaster_user_name": "TheSongery",
+          "chatter_user_id": "408982109",
+          "chatter_user_login": "hoagieman5000",
+          "chatter_user_name": "HoagieMan5000",
+          "message_id": "4a9ee839-72b7-47f9-94a2-e6b208bdb2bb",
+          "message": {
+            "text": "showlove100 ShowLove100 ShowLove22",
+            "fragments": [
+              {
+                "type": "cheermote",
+                "text": "showlove100",
+                "cheermote": {
+                  "prefix": "showlove",
+                  "bits": 100,
+                  "tier": 100
+                },
+                "emote": null,
+                "mention": null
+              },
+              {
+                "type": "text",
+                "text": " ",
+                "cheermote": null,
+                "emote": null,
+                "mention": null
+              },
+              {
+                "type": "cheermote",
+                "text": "ShowLove100",
+                "cheermote": {
+                  "prefix": "showlove",
+                  "bits": 100,
+                  "tier": 100
+                },
+                "emote": null,
+                "mention": null
+              },
+              {
+                "type": "text",
+                "text": " ",
+                "cheermote": null,
+                "emote": null,
+                "mention": null
+              },
+              {
+                "type": "cheermote",
+                "text": "ShowLove22",
+                "cheermote": {
+                  "prefix": "showlove",
+                  "bits": 22,
+                  "tier": 1
+                },
+                "emote": null,
+                "mention": null
+              }
+            ]
+          },
+          "color": "#FF7512",
+          "badges": [
+            {
+              "set_id": "moderator",
+              "id": "1",
+              "info": ""
+            },
+            {
+              "set_id": "subscriber",
+              "id": "3012",
+              "info": "43"
+            },
+            {
+              "set_id": "bits-leader",
+              "id": "2",
+              "info": ""
+            }
+          ],
+          "message_type": "text",
+          "cheer": {
+            "bits": 222
+          },
+          "reply": null,
+          "channel_points_custom_reward_id": null,
+          "channel_points_animation_id": null
+        }
+      }'
+    }
+  ]
+}

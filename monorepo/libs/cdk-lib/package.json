@@ -9,8 +9,8 @@
   "main": "./src/index.js",
   "typings": "./src/index.d.ts",
   "devDependencies": {
-    "aws-cdk": "^2.132.0",
-    "aws-cdk-lib": "^2.132.0",
+    "aws-cdk": "2.132.0",
+    "aws-cdk-lib": "2.132.0",
     "constructs": "^10.3.0"
   }
 }
