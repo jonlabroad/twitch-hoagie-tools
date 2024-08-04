@@ -25,6 +25,7 @@ export function GenerateExpiryTimestamp(type: string): Date | null {
       return null;
     }
 
+    console.log({ now });
     if (expiryType.unit === "month") {
       return new Date(now.setMonth(now.getMonth() + expiryType.value));
     } else if (expiryType.unit === "hours") {

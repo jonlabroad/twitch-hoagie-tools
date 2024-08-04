@@ -12,3 +12,9 @@ export interface RewardToken {
   grantTimestamp: Date;
   expiryTimestamp: Date | null;
 }
+
+export interface IRedemptionInfo {
+  redemptionTimestamp: Date;
+  broadcasterId: string;
+  ownerId: string;
+}

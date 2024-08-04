@@ -1,6 +1,6 @@
 import { APIGatewayEvent, EventBridgeEvent } from 'aws-lambda';
 import { corsHeaders, createCacheHeader, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
-import { TwitchChatNotificationEvent, TwitchChatNotificationEventHandler } from '@hoagie/stream-rewards';
+import { TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
 
 const version = "1.0.0";
 
@@ -36,14 +36,22 @@ export async function twitchChatNotificationEventHandler (event: EventBridgeEven
   }
 
   const handler = new TwitchChatNotificationEventHandler();
-  handler.handle(event.detail);
+  const result = await handler.handle(event.detail.event);
 
   return {
-    statusCode: 200,
-    body: JSON.stringify({ status: "OK" }, null, 2),
-    headers: {
-      ...corsHeaders,
-      ...createCacheHeader(5),
-    },
+    result,
+  };
+}
+
+export async function twitchRewardRedemptionEventHandler (event: EventBridgeEvent<string, TwitchCustomRewardRedemptionAddEvent>) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  const handler = new TwitchRewardRedemptionHandler();
+  const result = await handler.handle(event.detail.event);
+
+  return {
+    result,
   };
 }

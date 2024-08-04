@@ -1,42 +1,13 @@
-type Condition = {
-  broadcaster_user_id: string;
-  user_id: string;
-};
+import { EventBridgeEvent } from "aws-lambda";
+import { Badge, MessageFragment, TwitchWebhookEvent } from "./TwitchEvents";
 
-type Transport = {
-  method: string;
-  callback: string;
-};
-
-type AWSSubscription = {
-  id: string;
-  status: string;
-  type: string;
-  version: string;
-  condition: Condition;
-  transport: Transport;
-  created_at: string;
-  cost: number;
-};
-
-type Badge = {
-  set_id: string;
-  id: string;
-  info: string;
-};
-
-type MessageFragment = {
-  text: string;
-  fragments: any[];
-};
-
-interface Sub {
+export interface Sub {
   sub_tier: '1000' | '2000' | '3000';
   is_prime: boolean;
   duration_months?: number;
 }
 
-interface Resub {
+export interface Resub {
   cumulative_months: number;
   duration_months: number;
   streak_months: number | null;
@@ -59,7 +30,7 @@ interface SubGift {
   community_gift_id: string | null;
 }
 
-interface TwitchNotificationEvent {
+export interface TwitchNotificationEvent {
   broadcaster_user_id: string;
   broadcaster_user_login: string;
   broadcaster_user_name: string;
@@ -87,19 +58,7 @@ interface TwitchNotificationEvent {
   charity_donation: any | null;
 }
 
-interface TwitchWebhookEvent<T> {
-  subscription: AWSSubscription;
-  event: T;
-}
-
-interface EventBridgeEvent<T> {
-  Source: string;
-  DetailType: string;
-  Detail: TwitchWebhookEvent<T>;
-}
-
-export type TwitchChatNotificationEvent =
-  EventBridgeEvent<TwitchNotificationEvent>;
+export type TwitchChatNotificationEvent = TwitchWebhookEvent<TwitchNotificationEvent>;
 
 export type NoticeType =
   | 'sub'

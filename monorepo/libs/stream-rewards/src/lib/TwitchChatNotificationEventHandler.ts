@@ -1,13 +1,13 @@
 import { SubHandler } from "./EventHandlers/SubHandler";
-import { TwitchChatNotificationEvent } from "./Events/ChannelChatNotificationEvent";
+import { TwitchNotificationEvent } from "./Events/ChannelChatNotificationEvent";
 
 export class TwitchChatNotificationEventHandler {
-  public async handle(ev: TwitchChatNotificationEvent): Promise<void> {
+  public async handle(ev: TwitchNotificationEvent): Promise<void> {
     console.log(ev);
 
     const subHandler = new SubHandler();
 
-    switch (ev.Detail.event.notice_type) {
+    switch (ev.notice_type) {
       case "sub":
         console.log("Sub Event");
         await subHandler.handle(ev);

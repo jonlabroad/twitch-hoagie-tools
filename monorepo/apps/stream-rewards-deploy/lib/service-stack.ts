@@ -33,12 +33,12 @@ export class ServiceStack extends cdk.Stack {
         'ecs:DescribeServices',
       ]).role;
 
-    const rewardRedeemHandler = new lambda.Function(
+    const twitchRewardRedemptionEventHandler = new lambda.Function(
       this,
-      `rewardRedeemHandler`,
+      `twitchRewardRedemptionEventHandler`,
       {
         code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
-        handler: "handlers.rewardRedeemHandler",
+        handler: "handlers.twitchRewardRedemptionEventHandler",
         runtime: lambda.Runtime.NODEJS_18_X,
         environment: {
           TABLENAME: context.tableName,
@@ -67,28 +67,31 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
-/*
-Source: 'hoagie.twitch-eventsub',
-DetailType: 'Event',
-Detail: `{
-  "event": {
-   "notice_type": "resub",
-*/
-
-const rule = new events.Rule(this, 'TwitchEventSubRule', {
-  eventPattern: {
-    source: ['hoagie.twitch-eventsub'],
-    detailType: ['Event'],
-    detail: {
-      subscription: {
-        type: ["channel.chat.notification"],
+    const twitchChatNotificationRule = new events.Rule(this, 'twitchChatNotificationRule', {
+      eventPattern: {
+        source: ['hoagie.twitch-eventsub'],
+        detailType: ['Event'],
+        detail: {
+          subscription: {
+            type: ["channel.chat.notification"],
+          },
+        }
       },
-    }
-  },
-});
+    });
+    twitchChatNotificationRule.addTarget(new targets.LambdaFunction(twitchChatNotificationEventHandler));
 
-// Add the Lambda function as the target of the rule
-rule.addTarget(new targets.LambdaFunction(twitchChatNotificationEventHandler));
+    const twitchRewardRedemptionRule = new events.Rule(this, 'twitchRewardRedemptionRule', {
+      eventPattern: {
+        source: ['hoagie.twitch-eventsub'],
+        detailType: ['Event'],
+        detail: {
+          subscription: {
+            type: ["channel.channel_points_custom_reward_redemption.add"],
+          },
+        }
+      },
+    });
+    twitchRewardRedemptionRule.addTarget(new targets.LambdaFunction(twitchRewardRedemptionEventHandler));
 
 /*
     // HTTP API Gateway

@@ -17,6 +17,12 @@
     ]
   },
   "context": {
+    "local": {
+      "dynamoDbEndpoint": "http://localhost:8000",
+      "env": "local",
+      "tableName": "HoagieTools-local",
+      "tokenTableName": "HoagieRewardTokens-local"
+    },
     "dev": {
       "env": "dev",
       "tableName": "HoagieTools-development",
