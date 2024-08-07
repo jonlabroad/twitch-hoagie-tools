@@ -2,6 +2,9 @@ import { TwitchRewardRedemptionHandler } from "./TwitchRewardRedemptionHandler";
 import { ChannelPointRedemptionEvent } from "./Events/ChannelPointRedemptionEvent";
 
 import { createDocClient } from "@hoagie/api-util";
+import { ChatBot } from "./Chat/ChatBot";
+import { ChatClient } from "./Chat/ChatClient";
+import { ConfigDBClient } from "@hoagie/config-service";
 // Mock the dependencies
 jest.mock("@aws-sdk/lib-dynamodb", () => ({
   PutCommand: jest.fn(),
@@ -21,6 +24,12 @@ const mockDocClient = {
   }),
 };
 (createDocClient as jest.Mock).mockReturnValue(mockDocClient);
+
+jest.mock("./Chat/ChatBot", () => ({
+  ChatBot: jest.fn().mockImplementation(() => ({
+    sendMessage: jest.fn(),
+  })),
+}));
 
 const mockRedemptionEvent: ChannelPointRedemptionEvent = {
   broadcaster_user_id: "11111",
@@ -44,7 +53,10 @@ describe("TwitchRewardRedemptionHandler", () => {
   let handler: TwitchRewardRedemptionHandler;
 
   beforeEach(() => {
-    handler = new TwitchRewardRedemptionHandler();
+    const chatClient = new ChatClient("");
+    const configClient = new ConfigDBClient("");
+    const chatBot = new ChatBot("", chatClient, configClient);
+    handler = new TwitchRewardRedemptionHandler(chatBot);
   });
 
   afterEach(() => {

@@ -4,9 +4,9 @@ export const mockRewardRedemptionEvent = {
   broadcaster_user_login: 'cool_user',
   broadcaster_user_name: 'Cool_User',
   user_id: '9001',
-  user_login: 'cooler_user',
-  user_name: 'Cooler_User',
-  user_input: 'pogchamp',
+  user_login: 'HoagieMan5000',
+  user_name: 'HoagieMan5000',
+  user_input: 'want it back amanda palmer',
   status: 'unfulfilled',
   reward: {
     id: '92af127c-7326-4483-a52b-b0da0be61c01',

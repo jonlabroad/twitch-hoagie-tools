@@ -4,7 +4,7 @@ export const mockReSubEvent: TwitchNotificationEvent = {
   broadcaster_user_id: '118391771',
   broadcaster_user_login: 'thesongery',
   broadcaster_user_name: 'TheSongery',
-  chatter_user_id: '408982109',
+  chatter_user_id: '631768238',
   chatter_user_login: 'hoagieman5000',
   chatter_user_name: 'HoagieMan5000',
   chatter_is_anonymous: false,

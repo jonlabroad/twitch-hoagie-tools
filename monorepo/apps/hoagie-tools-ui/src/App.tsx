@@ -42,6 +42,9 @@ import { HoagieUserDataContextProvider } from "./components/context/HoagieUserDa
 import { LandingPage } from "./components/pages/LandingPage";
 import { NotFound } from "./components/pages/NotFound";
 import { LandingPageContainer } from "./components/pages/LandingPageContainer";
+import ConnectionPage from "./components/connection/ConnectionPage";
+import { botAccountConnectionConfig } from "./components/connection/ConnectionConfig";
+import { ConnectionRedirect } from "./components/connection/ConnectionRedirect";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -114,6 +117,14 @@ function App() {
                           <Route
                             path="/loginRedirect"
                             element={<LoginRedirect />}
+                          />
+                          <Route
+                            path="/connectionBot"
+                            element={<ConnectionPage connectionConfig={botAccountConnectionConfig} />}
+                          />
+                          <Route
+                            path="/connectionRedirectBot"
+                            element={<ConnectionRedirect  connectionConfig={botAccountConnectionConfig} />}
                           />
                           <Route
                             path="/config/:streamer"

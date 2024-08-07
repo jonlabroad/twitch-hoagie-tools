@@ -1,3 +1,4 @@
+import { ChatBot } from '../Chat/ChatBot';
 import { ChannelPointRedemptionEvent } from '../Events/ChannelPointRedemptionEvent';
 import TokenDbClient from '../Persistance/TokenDBClient';
 import { IRedemptionInfo, RewardTokenType } from '../Tokens/RewardToken';
@@ -23,10 +24,12 @@ export interface SongListRequest {
 }
 
 export class SongListRequestHandler implements IStreamRewardEventHandler {
-  public typeText: string;
+  private typeText: string;
+  private chatBot: ChatBot;
 
-  constructor(typeText: string) {
+  constructor(typeText: string, chatBot: ChatBot) {
     this.typeText = typeText;
+    this.chatBot = chatBot;
   }
 
   public async handle(ev: ChannelPointRedemptionEvent): Promise<HandlerResult> {
@@ -50,6 +53,8 @@ export class SongListRequestHandler implements IStreamRewardEventHandler {
       // Future: Attempt to use the API, if token is invalid, resort to chat commands
       const songListRequest = this.createSongListRequest(ev);
       // TODO execute the song list request
+
+      await this.chatBot.sendMessage(`!ll ${songListRequest.text}`);
 
       return {
         success: true,

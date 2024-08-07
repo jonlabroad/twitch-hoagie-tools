@@ -1,3 +1,4 @@
+import { ChatBot } from "./Chat/ChatBot";
 import { HandlerResult } from "./EventHandlers/HandlerResult";
 import { SongListRequestHandler } from "./EventHandlers/SongListRequestHandler";
 import { SubHandler } from "./EventHandlers/SubHandler";
@@ -24,17 +25,33 @@ const config: Record<RewardType, RewardConfig | null> = {
 }
 
 export class TwitchRewardRedemptionHandler {
+  private chatBot: ChatBot;
+
+  constructor(chatBot: ChatBot) {
+    this.chatBot = chatBot;
+  }
+
   public async handle(ev: ChannelPointRedemptionEvent): Promise<boolean> {
     console.log(ev);
 
-    const improvRequestHandler = new SongListRequestHandler("Improv");
-    const liveLearnRequestHandler = new SongListRequestHandler("Live Learn");
+    //await this.chatBot.sendMessage(`Redeeming reward for ${ev.user_name}: ${ev.reward.title}`);
+    const improvRequestHandler = new SongListRequestHandler("Improv", this.chatBot);
+    const liveLearnRequestHandler = new SongListRequestHandler("Live Learn", this.chatBot);
 
     let result: HandlerResult | undefined = undefined;
     if (this.isRewardType(ev, "improvRequest")) {
       result = await improvRequestHandler.handle(ev);
     } else if (this.isRewardType(ev, "liveLearnRequest")) {
       result = await liveLearnRequestHandler.handle(ev);
+    }
+
+    if (!result?.success && this.chatBot) {
+      //await this.chatBot.sendMessage(`Failed to redeem reward for ${ev.user_name}`);
+      await this.chatBot.sendMessage(`${ev.user_name}, T3 sub is required, limit 1 per monthly sub`);
+    }
+
+    if (result?.chatMessage && this.chatBot) {
+      await this.chatBot.sendMessage(result.chatMessage);
     }
 
     return result?.success ?? false;

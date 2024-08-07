@@ -67,6 +67,23 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const twitchChatMessageEventHandler = new lambda.Function(
+      this,
+      `twitchChatMessageEventHandler`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.twitchChatMessageEventHandler",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     const twitchChatNotificationRule = new events.Rule(this, 'twitchChatNotificationRule', {
       eventPattern: {
         source: ['hoagie.twitch-eventsub'],
@@ -93,6 +110,18 @@ export class ServiceStack extends cdk.Stack {
     });
     twitchRewardRedemptionRule.addTarget(new targets.LambdaFunction(twitchRewardRedemptionEventHandler));
 
+    const twitchChatMessageRule = new events.Rule(this, 'twitchChatMessageRule', {
+      eventPattern: {
+        source: ['hoagie.twitch-eventsub'],
+        detailType: ['Event'],
+        detail: {
+          subscription: {
+            type: ["channel.chat.message"],
+          },
+        }
+      },
+    });
+    twitchChatMessageRule.addTarget(new targets.LambdaFunction(twitchChatMessageEventHandler));
 /*
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {

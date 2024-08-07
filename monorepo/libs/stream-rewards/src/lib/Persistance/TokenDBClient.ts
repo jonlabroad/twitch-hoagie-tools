@@ -1,4 +1,3 @@
-import { createDocClient } from '@hoagie/api-util';
 import { IRedemptionInfo, RewardToken } from '../Tokens/RewardToken';
 import { ITokenDbClient, RedemptionResult } from './ITokenDBClient';
 import {
@@ -11,11 +10,12 @@ import {
   QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { createDocClient } from '../util/DBUtil';
 
 export default class TokenDbClient implements ITokenDbClient {
   public static readonly CATEGORY = 'TOKENS';
 
-  private serviceUrl: string = process.env['DYNAMODB_ENDPOINT'] ?? '';
+  private serviceUrl: string | undefined = process.env['DYNAMODB_ENDPOINT'] ?? undefined;
   private tableName: string = process.env['TOKENTABLENAME'] ?? '';
 
   public async upsertToken(token: RewardToken): Promise<boolean> {
@@ -60,11 +60,11 @@ export default class TokenDbClient implements ITokenDbClient {
                 CategoryKey: {
                   S: this.getKey(broadcasterId, ownerId),
                 },
-                SubKey: {
-                  S: key,
+                SortKey: {
+                  S: key.toUpperCase(),
                 },
               },
-              ConditionExpression: 'attribute_exists(CategoryKey) AND attribute_exists(SubKey)',
+              ConditionExpression: 'attribute_exists(CategoryKey) AND attribute_exists(SortKey)',
             },
           },
           {
@@ -74,7 +74,7 @@ export default class TokenDbClient implements ITokenDbClient {
                 CategoryKey: {
                   S: this.getRedemptionKey(broadcasterId, ownerId),
                 },
-                SubKey: {
+                SortKey: {
                   S: this.getRedemptionSort(redemptionInfo.redemptionTimestamp),
                 },
                 ...marshall(redemptionItemData),
@@ -83,6 +83,7 @@ export default class TokenDbClient implements ITokenDbClient {
           },
         ],
       };
+      console.log(JSON.stringify(transactInput, null, 2));
       const command = new TransactWriteItemsCommand(transactInput);
 
       // If token exists, delete the token and add the redemption info
@@ -96,7 +97,7 @@ export default class TokenDbClient implements ITokenDbClient {
       console.error(err);
       return {
         success: false,
-        error: `Failed to redeem token: ${err.message}`,
+        error: `Failed to redeem token: ${err.message}. ${err.stack}`,
       };
     }
   }
@@ -120,7 +121,7 @@ export default class TokenDbClient implements ITokenDbClient {
   private createItem(broadcasterId: string, token: RewardToken) {
     const key = {
       CategoryKey: this.getKey(broadcasterId, token.ownerId),
-      SubKey: this.getSort(token.key),
+      SortKey: this.getSort(token.key),
     };
 
     return {
@@ -142,15 +143,15 @@ export default class TokenDbClient implements ITokenDbClient {
   }
 
   getKey(broadcasterId: string, ownerId: string) {
-    return `${TokenDbClient.CATEGORY}_${broadcasterId}_${ownerId}`;
+    return `${TokenDbClient.CATEGORY}_${broadcasterId}_${ownerId}`.toUpperCase();
   }
 
   getSort(tokenKey: string) {
-    return `${tokenKey}`;
+    return `${tokenKey}`.toUpperCase();
   }
 
   getRedemptionKey(broadcasterId: string, ownerId: string) {
-    return `${TokenDbClient.CATEGORY}_REDEMPTION_${broadcasterId}_${ownerId}`;
+    return `${TokenDbClient.CATEGORY}_REDEMPTION_${broadcasterId}_${ownerId}`.toUpperCase();
   }
 
   getRedemptionSort(redemptionDate: Date) {

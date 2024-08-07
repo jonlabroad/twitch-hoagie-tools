@@ -1,6 +1,8 @@
 import { ModsDbClientV2 } from "@hoagie/api-util";
 import { ConfigDBClient } from "./client/ConfigDBClient";
-import { TwitchClient } from "@hoagie/service-clients";
+import { TwitchAccessToken, TwitchClient } from "@hoagie/service-clients";
+import { createTwitchClient } from "./createTwitchClient";
+import { SecretsProvider } from "@hoagie/secrets-provider";
 
 export interface PeriodicConfigUpdateProps {
   tableName: string;
@@ -45,6 +47,29 @@ export async function periodicConfigUpdate(props: PeriodicConfigUpdateProps) {
   for (const userId of Object.keys(moddedChannelsByUserId)) {
     await configClient.setUserStreamerIds(userId, moddedChannelsByUserId[userId]);
   }
+
+  return "OK";
+}
+
+export async function saveAccessToken(tableName: string, authorizationToken: string) {
+  await SecretsProvider.init();
+  if (!authorizationToken) {
+    throw new Error('Authorization token must be provided');
+  }
+
+  const twitchClient = createTwitchClient();
+  const accessToken = await twitchClient.getTokenFromAuthorizationCode(authorizationToken);
+  if (!accessToken) {
+    throw new Error('Failed to get access token');
+  }
+
+  const userData = await twitchClient.getUserDataByToken(accessToken.access_token);
+  if (!userData) {
+    throw new Error('Failed to get user data');
+  }
+
+  const configClient = new ConfigDBClient(tableName);
+  await configClient.saveAccessToken(userData.id, accessToken, "USER");
 
   return "OK";
 }
