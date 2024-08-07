@@ -1,13 +1,12 @@
 import { TwitchClient } from '@hoagie/service-clients';
-import { createTwitchClient } from '../createTwitchClient';
-import * as Secrets from '../../Secrets';
 
 export class ChatClient {
   private senderId: string;
-  private twitchClient: TwitchClient = createTwitchClient();
+  private twitchClient: TwitchClient;
 
-  constructor(senderId: string) {
+  constructor(senderId: string, twitchClient: TwitchClient) {
     this.senderId = senderId;
+    this.twitchClient = twitchClient
   }
 
   public async sendMessage(

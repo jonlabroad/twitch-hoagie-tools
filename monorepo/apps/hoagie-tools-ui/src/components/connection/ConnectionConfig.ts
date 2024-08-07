@@ -4,6 +4,6 @@ export interface ConnectionConfig {
 }
 
 export const botAccountConnectionConfig: ConnectionConfig = {
-  type: "bot",
+  type: "BOT",
   scopes: ["user:write:chat"]
 };

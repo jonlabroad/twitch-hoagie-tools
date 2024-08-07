@@ -9,3 +9,4 @@ export * from "./lib/TwitchRewardRedemptionHandler";
 export * from "./lib/Events/ChannelPointRedemptionEvent";
 export * from "./lib/Chat/ChatBot";
 export * from "./lib/Chat/ChatClient";
+export * from "./lib/Auth/AccessTokenProvider";

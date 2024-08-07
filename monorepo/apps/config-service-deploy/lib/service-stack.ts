@@ -221,7 +221,7 @@ export class ServiceStack extends cdk.Stack {
     });
 
     httpApi.addRoutes({
-      path: "/api/v1/access/twitchtoken",
+      path: "/api/v1/access/twitchtoken/{category}",
       methods: [HttpMethod.GET],
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'twitchtoken-get-v1',

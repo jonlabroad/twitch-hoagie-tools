@@ -1,23 +1,22 @@
-import { TwitchClient } from "@hoagie/service-clients";
 import { ChatClient } from "./ChatClient";
-import { ConfigDBClient } from "@hoagie/config-service";
+import { AccessTokenProvider } from "../Auth/AccessTokenProvider";
 
 export class ChatBot {
   private botId: string;
   private channelId: string;
   private chatClient: ChatClient;
-  private tokenDbClient: ConfigDBClient;
+  private accessTokenProvider: AccessTokenProvider;
 
-  constructor(botId: string, channelId: string, chatClient: ChatClient, tokenDbClient: ConfigDBClient) {
+  constructor(botId: string, channelId: string, chatClient: ChatClient, accessTokenProvider: AccessTokenProvider) {
     this.botId = botId;
     this.channelId = channelId;
     this.chatClient = chatClient;
-    this.tokenDbClient = tokenDbClient;
+    this.accessTokenProvider = accessTokenProvider;
   }
 
   public async sendTestMessage() {
     const accessToken = await this.readAccessToken(this.botId);
-    await this.chatClient.sendMessage(this.channelId, "Hoagie Bot is connected and ready to go!", accessToken);
+    await this.chatClient.sendMessage(this.channelId, "Hoagie Bot is here!", accessToken);
   }
 
   public async sendMessage(message: string) {
@@ -26,9 +25,7 @@ export class ChatBot {
   }
 
   private async readAccessToken(userId: string): Promise<string> {
-    // TODO cache the token
-    // *** TODO create a token provider that can automatically refresh the token and save back to the DB if necessary ***
-    const tokenData = await this.tokenDbClient.getAccessToken(userId, "USER"); // TODO use the BOT category
-    return tokenData.access_token;
+    const tokenData = await this.accessTokenProvider.readToken(userId, "BOT");
+    return tokenData;
   }
 }

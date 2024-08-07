@@ -7,10 +7,11 @@ export interface ConnectionPageProps {
   connectionConfig: ConnectionConfig;
 }
 
-const redirectUri = "https://config.hoagieman.net/api/v1/access/twitchtoken";
-
 const ConnectionPage = (props: ConnectionPageProps) => {
   const { connectionConfig } = props;
+
+  const redirectUri = `https://config.hoagieman.net/api/v1/access/twitchtoken/${connectionConfig.type.toLowerCase()}`;
+
   return (
     <div>
       <Button

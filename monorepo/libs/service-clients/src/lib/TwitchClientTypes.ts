@@ -121,6 +121,8 @@ export interface ValidatedSession {
   expires_in: number;
   login: string;
   user_id: string;
+  client_id: string
+  scopes: string[]
 }
 
 export interface UserFollows {

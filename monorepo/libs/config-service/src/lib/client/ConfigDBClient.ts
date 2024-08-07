@@ -15,7 +15,7 @@ export interface UserData {
   streamerIds: string[]
 }
 
-export type TokenCategory = "USER"; // | "BOT";
+export type TokenCategory = "USER" | "BOT";
 
 export class ConfigDBClient {
   private tableName: string;

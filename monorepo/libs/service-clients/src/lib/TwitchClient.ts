@@ -183,7 +183,12 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   public static async validateUserIdAndToken(
     userId: string,
     userToken: string
-  ) {
+  ): Promise<{
+    validated: boolean;
+    validatedSession: ValidatedSession | null
+    statusCode: number | undefined
+    message: string | undefined
+  }> {
     try {
       console.log('https://id.twitch.tv/oauth2/validate');
       const response = await axios.get<ValidatedSession>(
@@ -197,15 +202,32 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
       return {
         validated: response.status === 200 && userId === response.data.user_id,
         validatedSession: response.data,
+        statusCode: response.status,
+        message: "OK"
       };
     } catch (err: any) {
       console.error(err.message, err);
       return {
+        statusCode: err.response?.status,
         validated: false,
         validatedSession: null,
+        message: err.response?.message,
       };
     }
   }
+
+  public async refreshToken(refreshToken: string): Promise<TwitchAccessToken | undefined> {
+    try {
+      const response = await axios.post<TwitchAccessToken>(
+        `https://id.twitch.tv/oauth2/token?client_id=${this.options.clientId}&client_secret=${this.options.serviceAuth?.clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
+      );
+      return response.data;
+    } catch (err: any) {
+      console.error(err.message);
+      return undefined;
+    }
+  }
+
 
   // Validate a session given only a token
   public static async validateSession(token: string): Promise<{
@@ -280,11 +302,10 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return this.authToken;
   }
 
-  public async getTokenFromAuthorizationCode(authorizationCode: string): Promise<TwitchAccessToken | null> {
+  public async getTokenFromAuthorizationCode(authorizationCode: string, redirectUri: string): Promise<TwitchAccessToken | null> {
     try {
       if (this.options.serviceAuth) {
-        const redirectUrl = encodeURI('https://config.hoagieman.net/api/v1/access/twitchtoken');
-        const url = `https://id.twitch.tv/oauth2/token?client_id=${this.options.clientId}&client_secret=${this.options.serviceAuth?.clientSecret}&code=${authorizationCode}&grant_type=authorization_code&redirect_uri=${redirectUrl}`;
+        const url = `https://id.twitch.tv/oauth2/token?client_id=${this.options.clientId}&client_secret=${this.options.serviceAuth?.clientSecret}&code=${authorizationCode}&grant_type=authorization_code&redirect_uri=${redirectUri}`;
         const response = await axios.post(url);
 
         if (response.status === 200 && response.data) {
