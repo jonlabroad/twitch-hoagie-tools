@@ -122,7 +122,43 @@ export class ServiceStack extends cdk.Stack {
       },
     });
     twitchChatMessageRule.addTarget(new targets.LambdaFunction(twitchChatMessageEventHandler));
-/*
+
+    // Rewards API
+    const getTokensFunction = new lambda.Function(
+      this,
+      `getTokensFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getTokens",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    // Rewards API
+    const getRedemptionsFunction = new lambda.Function(
+      this,
+      `getRedemptionsFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getRedemptions",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
@@ -136,14 +172,25 @@ export class ServiceStack extends cdk.Stack {
       appName,
       tableName: context.tableName,
       lambdaExecutionRole,
+      handler: "handlers.authorizer",
     });
 
     httpApi.addRoutes({
-      path: "/api/v1/{streamerId}/mods",
+      path: "/api/v1/{streamerId}/tokens",
       methods: [HttpMethod.GET],
       integration: new apigwIntegrations.HttpLambdaIntegration(
-        'mods-get-v1',
-        getModsFunction,
+        'tokens-get-v1',
+        getTokensFunction,
+      ),
+      authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/redemptions",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'redemptions-get-v1',
+        getRedemptionsFunction,
       ),
       authorizer: authorizerConstruct.authorizer,
     });
@@ -157,6 +204,5 @@ export class ServiceStack extends cdk.Stack {
         httpApiId: httpApi.httpApiId,
       }
     );
-*/
   }
 }

@@ -107,9 +107,11 @@ export class ConfigDBClient {
       TableName: this.tableName,
       Key: this.getAccessTokenKey(userId, tokenCategory),
     }
+    console.log(JSON.stringify(input));
     const command = new GetCommand(input);
 
     const { Item } = await this.client.send(command);
+    console.log({ Item });
     return Item as TwitchAccessToken;
   }
 

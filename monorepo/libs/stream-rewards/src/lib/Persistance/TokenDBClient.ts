@@ -26,7 +26,6 @@ export default class TokenDbClient implements ITokenDbClient {
 
   public async readTokens(
     broadcasterId: string,
-    ownerId: string
   ): Promise<RewardToken[]> {
     const client = createDocClient(this.serviceUrl);
 
@@ -34,13 +33,31 @@ export default class TokenDbClient implements ITokenDbClient {
       TableName: this.tableName,
       KeyConditionExpression: 'CategoryKey = :ck',
       ExpressionAttributeValues: {
-        ':ck': this.getKey(broadcasterId, ownerId),
+        ':ck': this.getKey(broadcasterId),
       },
     };
     const request = new QueryCommand(queryInput);
     console.log({ request });
     const response = await client.send(request);
     return (response?.Items ?? []) as RewardToken[];
+  }
+
+  public async readRedemptions(
+    broadcasterId: string,
+  ): Promise<IRedemptionInfo[]> {
+    const client = createDocClient(this.serviceUrl);
+
+    const queryInput: QueryCommandInput = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'CategoryKey = :ck',
+      ExpressionAttributeValues: {
+        ':ck': this.getRedemptionKey(broadcasterId),
+      },
+    };
+    const request = new QueryCommand(queryInput);
+    console.log({ request });
+    const response = await client.send(request);
+    return (response?.Items ?? []) as IRedemptionInfo[];
   }
 
   public async redeemToken(
@@ -58,10 +75,10 @@ export default class TokenDbClient implements ITokenDbClient {
               TableName: this.tableName,
               Key: {
                 CategoryKey: {
-                  S: this.getKey(broadcasterId, ownerId),
+                  S: this.getKey(broadcasterId),
                 },
                 SortKey: {
-                  S: key.toUpperCase(),
+                  S: this.getSort(ownerId, key.toUpperCase()),
                 },
               },
               ConditionExpression: 'attribute_exists(CategoryKey) AND attribute_exists(SortKey)',
@@ -72,10 +89,10 @@ export default class TokenDbClient implements ITokenDbClient {
               TableName: this.tableName,
               Item: {
                 CategoryKey: {
-                  S: this.getRedemptionKey(broadcasterId, ownerId),
+                  S: this.getRedemptionKey(broadcasterId),
                 },
                 SortKey: {
-                  S: this.getRedemptionSort(redemptionInfo.redemptionTimestamp),
+                  S: this.getRedemptionSort(redemptionInfo.redemptionTimestamp, ownerId),
                 },
                 ...marshall(redemptionItemData),
               },
@@ -120,8 +137,8 @@ export default class TokenDbClient implements ITokenDbClient {
 
   private createItem(broadcasterId: string, token: RewardToken) {
     const key = {
-      CategoryKey: this.getKey(broadcasterId, token.ownerId),
-      SortKey: this.getSort(token.key),
+      CategoryKey: this.getKey(broadcasterId),
+      SortKey: this.getSort(token.ownerId, token.key),
     };
 
     return {
@@ -142,19 +159,19 @@ export default class TokenDbClient implements ITokenDbClient {
     };
   }
 
-  getKey(broadcasterId: string, ownerId: string) {
-    return `${TokenDbClient.CATEGORY}_${broadcasterId}_${ownerId}`.toUpperCase();
+  getKey(broadcasterId: string) {
+    return `${TokenDbClient.CATEGORY}_${broadcasterId}`.toUpperCase();
   }
 
-  getSort(tokenKey: string) {
-    return `${tokenKey}`.toUpperCase();
+  getSort(ownerId: string, tokenKey: string) {
+    return `${ownerId}_${tokenKey}`.toUpperCase();
   }
 
-  getRedemptionKey(broadcasterId: string, ownerId: string) {
-    return `${TokenDbClient.CATEGORY}_REDEMPTION_${broadcasterId}_${ownerId}`.toUpperCase();
+  getRedemptionKey(broadcasterId: string) {
+    return `${TokenDbClient.CATEGORY}_REDEMPTION_${broadcasterId}`.toUpperCase();
   }
 
-  getRedemptionSort(redemptionDate: Date) {
-    return redemptionDate.toISOString();
+  getRedemptionSort(redemptionDate: Date, ownerId: string) {
+    return `${redemptionDate.toISOString()}_${ownerId}`.toUpperCase();
   }
 }

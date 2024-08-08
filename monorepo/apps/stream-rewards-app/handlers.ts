@@ -1,6 +1,6 @@
-import { EventBridgeEvent } from 'aws-lambda';
-import { corsHeaders, createCacheHeader } from '@hoagie/api-util';
-import { AccessTokenProvider, ChatClient, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
+import { APIGatewayEvent, EventBridgeEvent } from 'aws-lambda';
+import { corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
+import { AccessTokenProvider, ChatClient, GetRedemptionsHandler, GetTokensHandler, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
 import { ChatBot } from '@hoagie/stream-rewards';
 import { ConfigDBClient } from '@hoagie/config-service';
 import TokenDbClient from 'libs/stream-rewards/src/lib/Persistance/TokenDBClient';
@@ -11,11 +11,6 @@ import { SecretsProvider } from '@hoagie/secrets-provider';
 const version = "1.0.0";
 
 const botUserId = "631768238"; // TODO
-
-export async function rewardRedeemHandler(event: EventBridgeEvent<string, any>) {
-  console.log(`Reward Redeem Handler: ${JSON.stringify(event, null, 2)}`);
-  return;
-}
 
 export async function systemStatus (event: EventBridgeEvent<string, any>) {
   if (!process.env.TABLENAME) {
@@ -90,3 +85,73 @@ export async function twitchChatMessageEventHandler (event: EventBridgeEvent<str
   return {
     result,
   };}
+
+
+  // API
+  export async function authorizer(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
+    return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
+  }
+
+  export async function getTokens (event: APIGatewayEvent) {
+    const tableName = process.env.TABLENAME;
+    if (!tableName) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const streamerId = event.pathParameters?.streamerId;
+    if (!streamerId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "streamerId is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const tokenDbClient = new TokenDbClient();
+    const handler = new GetTokensHandler(tokenDbClient);
+    const result = await handler.handle(streamerId);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(2),
+      },
+    };
+  }
+
+  export async function getRedemptions (event: APIGatewayEvent) {
+    const tableName = process.env.TABLENAME;
+    if (!tableName) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const streamerId = event.pathParameters?.streamerId;
+    if (!streamerId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "streamerId is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const tokenDbClient = new TokenDbClient();
+    const handler = new GetRedemptionsHandler(tokenDbClient);
+    const result = await handler.handle(streamerId);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(2),
+      },
+    };
+  }

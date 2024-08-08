@@ -13,7 +13,7 @@ export class SecretsProvider {
   private constructor() {}
 
   public static async init() {
-    const instance = SecretsProvider.getInstance();
+    const instance = SecretsProvider.getInstanceNoCheck();
     const dbClient = new DynamoDBClient({ region: 'us-east-1' });
     const docClient = DynamoDBDocumentClient.from(dbClient);
 
@@ -42,6 +42,11 @@ export class SecretsProvider {
       );
     }
 
+    return SecretsProvider.getInstanceNoCheck();
+
+  }
+
+  private static getInstanceNoCheck(): SecretsProvider {
     if (!SecretsProvider.instance) {
       SecretsProvider.instance = new SecretsProvider();
     }
