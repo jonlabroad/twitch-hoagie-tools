@@ -172,14 +172,14 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
                   color="primary"
                   variant="contained"
                   onClick={async () => {
-                    if (loginState.username && loginState.accessToken) {
+                    if (loginState.userId && loginState.accessToken) {
                       const client = new HoagieClient();
                       await Promise.all(
                         subscriptionsToDisplay?.map((sub) =>
                           client.deleteSubscription(
                             sub.id,
-                            loginState.username!,
-                            loginState.accessToken!
+                            loginState.userId,
+                            loginState.accessToken
                           )
                         ) ?? []
                       );
@@ -227,11 +227,11 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
                           variant="contained"
                           className="sub-delete-button"
                           onClick={async () => {
-                            if (loginState.username && loginState.accessToken) {
+                            if (loginState.userId && loginState.accessToken) {
                               const client = new HoagieClient();
                               await client.deleteSubscription(
                                 sub.id,
-                                loginState.username,
+                                loginState.userId,
                                 loginState.accessToken
                               );
                               getSubscriptions();

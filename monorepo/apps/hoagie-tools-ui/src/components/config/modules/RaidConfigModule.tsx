@@ -16,9 +16,7 @@ const chipColors: Record<string, any> = {
     webhook_callback_verification_failed: "error",
 };
 
-export interface RaidConfigModuleProps {
-    streamer: string
-}
+export interface RaidConfigModuleProps {}
 
 export const RaidConfigModule = (props: RaidConfigModuleProps) => {
     const { state: appState } = useContext(StateContext);
@@ -115,7 +113,7 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
                     color="primary"
                     variant="contained"
                     onClick={async () => {
-                      if (loginState.username && loginState.accessToken) {
+                      if (loginState.userId && loginState.accessToken) {
                         const client = new HoagieClient();
                         await Promise.all(
                           subscriptionsToDisplay?.map((sub) =>
@@ -152,11 +150,11 @@ export const RaidConfigModule = (props: RaidConfigModuleProps) => {
                             variant="contained"
                             className="sub-delete-button"
                             onClick={async () => {
-                              if (loginState.username && loginState.accessToken) {
+                              if (loginState.userId && loginState.accessToken) {
                                 const client = new HoagieClient();
                                 await client.deleteSubscription(
                                   sub.id,
-                                  loginState.username,
+                                  loginState.userId,
                                   loginState.accessToken
                                 );
                                 getSubscriptions();

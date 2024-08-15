@@ -24,6 +24,9 @@ export default class CreateSelfSubscriptions {
                 broadcaster_user_id: broadcasterId,
                 user_id: broadcasterId,
             });
+            const response7 = await client.createSubscription("channel.channel_points_custom_reward_redemption.add", {
+                broadcaster_user_id: broadcasterId,
+            });
 
             return response ?? {};
         }

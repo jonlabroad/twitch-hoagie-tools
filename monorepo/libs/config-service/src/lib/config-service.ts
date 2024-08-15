@@ -1,6 +1,8 @@
 import { ModsDbClientV2 } from "@hoagie/api-util";
-import { ConfigDBClient } from "./client/ConfigDBClient";
-import { TwitchClient } from "@hoagie/service-clients";
+import { ConfigDBClient, TokenCategory } from "./client/ConfigDBClient";
+import { TwitchAccessToken, TwitchClient } from "@hoagie/service-clients";
+import { createTwitchClient } from "./createTwitchClient";
+import { SecretsProvider } from "@hoagie/secrets-provider";
 
 export interface PeriodicConfigUpdateProps {
   tableName: string;
@@ -47,4 +49,28 @@ export async function periodicConfigUpdate(props: PeriodicConfigUpdateProps) {
   }
 
   return "OK";
+}
+
+export async function saveAccessToken(tableName: string, authorizationToken: string, category: TokenCategory): Promise<boolean> {
+  await SecretsProvider.init();
+  if (!authorizationToken) {
+    throw new Error('Authorization token must be provided');
+  }
+
+  const twitchClient = createTwitchClient();
+  const redirectUrl = encodeURI(`https://config.hoagieman.net/api/v1/access/twitchtoken/${category}`);
+  const accessToken = await twitchClient.getTokenFromAuthorizationCode(authorizationToken, redirectUrl);
+  if (!accessToken) {
+    throw new Error('Failed to get access token');
+  }
+
+  const userData = await twitchClient.getUserDataByToken(accessToken.access_token);
+  if (!userData) {
+    throw new Error('Failed to get user data');
+  }
+
+  const configClient = new ConfigDBClient(tableName);
+  await configClient.saveAccessToken(userData.id, accessToken, category.toUpperCase() as TokenCategory);
+
+  return true;
 }

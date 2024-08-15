@@ -22,16 +22,20 @@ export interface TwitchClientOptions {
   };
 }
 
+export interface TwitchAccessToken {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string[];
+  token_type: string;
+}
+
 export class TwitchClient {
   private options: TwitchClientOptions;
 
   private userIdCache: Record<string, Promise<any> | undefined> = {};
 
-  authToken?: {
-    access_token: string;
-    expires_in: number;
-    token_type: string;
-  };
+  authToken?: TwitchAccessToken;
 
   constructor(options: TwitchClientOptions) {
     this.options = options;
@@ -179,7 +183,12 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   public static async validateUserIdAndToken(
     userId: string,
     userToken: string
-  ) {
+  ): Promise<{
+    validated: boolean;
+    validatedSession: ValidatedSession | null
+    statusCode: number | undefined
+    message: string | undefined
+  }> {
     try {
       console.log('https://id.twitch.tv/oauth2/validate');
       const response = await axios.get<ValidatedSession>(
@@ -193,15 +202,32 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
       return {
         validated: response.status === 200 && userId === response.data.user_id,
         validatedSession: response.data,
+        statusCode: response.status,
+        message: "OK"
       };
     } catch (err: any) {
       console.error(err.message, err);
       return {
+        statusCode: err.response?.status,
         validated: false,
         validatedSession: null,
+        message: err.response?.message,
       };
     }
   }
+
+  public async refreshToken(refreshToken: string): Promise<TwitchAccessToken | undefined> {
+    try {
+      const response = await axios.post<TwitchAccessToken>(
+        `https://id.twitch.tv/oauth2/token?client_id=${this.options.clientId}&client_secret=${this.options.serviceAuth?.clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
+      );
+      return response.data;
+    } catch (err: any) {
+      console.error(err.message);
+      return undefined;
+    }
+  }
+
 
   // Validate a session given only a token
   public static async validateSession(token: string): Promise<{
@@ -227,6 +253,12 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return response?.data ?? [];
   }
 
+  async getUserDataByToken(accessToken: string): Promise<UserData | null> {
+    const url = 'https://api.twitch.tv/helix/users';
+    const response = await this.get<{ data: UserData[] }>(url, accessToken);
+    return response?.data[0] ?? null;
+  }
+
   async getUsersData(userLogins: string[], userIds: string[] = []) {
     let url = `https://api.twitch.tv/helix/users?${userLogins
       .map((u) => `login=${u}`)
@@ -239,6 +271,31 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   async getUserData(userLogin: string) {
     const datas = await this.getUsersData([userLogin]);
     return datas?.[0];
+  }
+
+  public async sendChatMessage(channelId: string, message: string, senderId: string, accessToken: string) {
+    const url = `https://api.twitch.tv/helix/chat/messages`;
+    const response = await this.post(url, {
+      broadcaster_id: channelId,
+      sender_id: senderId,
+      message
+    }, accessToken);
+    console.log({ sendMessageResponse: response });
+    return response;
+  }
+
+  public async sendWhisperMessage(recipientId: string, message: string, senderId: string) {
+    const url = `https://api.twitch.tv/helix/whispers`;
+    const response = await axios.post(url, {
+      message,
+      to_user_id: recipientId,
+      from_user_id: senderId
+    },
+    {
+      headers: await this.getAuthHeaders(),
+    });
+    console.log({ sendWhisperResponse: response });
+    return response;
   }
 
   private async getServiceAuthToken() {
@@ -259,10 +316,36 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return this.authToken;
   }
 
-  private async getAuthHeaders(): Promise<Record<string, string>> {
+  public async getTokenFromAuthorizationCode(authorizationCode: string, redirectUri: string): Promise<TwitchAccessToken | null> {
+    try {
+      if (this.options.serviceAuth) {
+        const url = `https://id.twitch.tv/oauth2/token?client_id=${this.options.clientId}&client_secret=${this.options.serviceAuth?.clientSecret}&code=${authorizationCode}&grant_type=authorization_code&redirect_uri=${redirectUri}`;
+        const response = await axios.post(url);
+
+        if (response.status === 200 && response.data) {
+          const token = response.data;
+          return token;
+        } else {
+          console.error(
+            'Failed to get token from auth code',
+            response.status,
+            response.data
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error(err.message);
+      return null;
+    }
+    return null;
+  }
+
+  private async getAuthHeaders(accessToken?: string): Promise<Record<string, string>> {
     const headers: Record<string, string> = {};
     headers['Client-ID'] = this.options.clientId;
-    if (this.options.serviceAuth) {
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    } else if (this.options.serviceAuth) {
       await this.getServiceAuthToken();
       headers['Authorization'] = `Bearer ${this.authToken?.access_token}`;
     } else if (this.options.clientAuth) {
@@ -273,10 +356,10 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return headers;
   }
 
-  private async get<T>(url: string): Promise<T | null | undefined> {
+  private async get<T>(url: string, accessToken?: string): Promise<T | null | undefined> {
     try {
       const response = await axios.get<any>(url, {
-        headers: await this.getAuthHeaders(),
+        headers: await this.getAuthHeaders(accessToken),
       });
       return response.data ?? null;
     } catch (err: any) {
@@ -285,13 +368,13 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     }
   }
 
-  private async post(url: string, data?: Object) {
+  private async post(url: string, data?: Object, accessToken?: string) {
     try {
       const response = await axios.post<any>(
         url,
         data ?? JSON.stringify(data, null, 2),
         {
-          headers: await this.getAuthHeaders(),
+          headers: await this.getAuthHeaders(accessToken),
         }
       );
       return response.data ?? null;

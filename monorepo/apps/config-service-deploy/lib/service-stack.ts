@@ -139,6 +139,22 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const setAccessTokenCallbackFunction = new lambda.Function(
+      this,
+      `SetAccessTokenCallback`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.setAccessTokenCallback",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
@@ -202,6 +218,15 @@ export class ServiceStack extends cdk.Stack {
         systemStatusFunction,
       ),
       authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/access/twitchtoken/{category}",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'twitchtoken-get-v1',
+        setAccessTokenCallbackFunction,
+      ),
     });
 
     const distribution = new ApiCloudFrontDistribution(

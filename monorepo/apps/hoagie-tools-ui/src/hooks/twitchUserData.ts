@@ -22,7 +22,7 @@ export const useTwitchUserData = (props: {
   const usersLoading = useRef(new Set<string>());
 
   const fetchUsers = useCallback(async () => {
-    if (loginState.username && loginState.accessToken) {
+    if (loginState.accessToken) {
       const client = createTwitchClient(loginState.accessToken);
       const toFetchLogins = userLoginsToFetch.filter((u) => !userData[u.toLowerCase()] && !usersLoading.current.has(u.toLowerCase()));
       const toFetchIds = userIdsToFetch.filter((u) => !userData[u.toLowerCase()] && !usersLoading.current.has(u.toLowerCase()));
@@ -32,7 +32,6 @@ export const useTwitchUserData = (props: {
           toFetchLogins,
           toFetchIds
         );
-        console.log({ users });
         if (!users) {
           throw new Error("Couldn't get users, use backup method.");
         }
@@ -69,14 +68,13 @@ export const useTwitchUserData = (props: {
         toFetchLogins.forEach((u) => usersLoading.current.delete(u.toLowerCase()));
       }
     }
-  }, [userLoginsToFetch, userIdsToFetch, usersLoading, userData, loginState.username, loginState.accessToken]);
+  }, [userLoginsToFetch, userIdsToFetch, usersLoading, userData, loginState.accessToken]);
 
   useEffect(() => {
-    console.log({ userIdsToFetch });
     if (userLoginsToFetch.length > 0 || userIdsToFetch.length > 0) {
       fetchUsers();
     }
-  }, [userLoginsToFetch, userIdsToFetch]);
+  }, [userLoginsToFetch, userIdsToFetch, loginState.accessToken]);
 
   const addUsers = async (users: AddUsersInput) => {
     let changed = false;
@@ -94,6 +92,7 @@ export const useTwitchUserData = (props: {
         newUserIdsToFetch.push(userId.toLowerCase());
       }
     });
+
     if (changed) {
       setUserLoginsToFetch(newUserLoginsToFetch);
       setUserIdsToFetch(newUserIdsToFetch);

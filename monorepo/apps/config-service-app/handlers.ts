@@ -1,9 +1,9 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService } from '@hoagie/config-service';
+import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService, saveAccessToken } from '@hoagie/config-service';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
-import { ConfigDBClient } from 'libs/config-service/src/lib/client/ConfigDBClient';
+import { BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
+import { ConfigDBClient, TokenCategory } from 'libs/config-service/src/lib/client/ConfigDBClient';
 
 const version = "1.0.0";
 
@@ -149,6 +149,48 @@ export async function getUserData (event: APIGatewayEvent) {
     },
   };
 };
+
+export async function setAccessTokenCallback (event: APIGatewayEvent) {
+  try {
+    console.log({ event });
+    if (!process.env.TABLENAME) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const { category } = event.pathParameters ?? {};
+    if (!category) {
+      throw new Error("category not defined");
+    }
+
+    const result = await saveAccessToken(process.env.TABLENAME, event.queryStringParameters?.code ?? "", category as TokenCategory);
+    if (!result) {
+      return {
+        statusCode: 500,
+        body: "Error saving access token",
+        headers: corsHeaders,
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: "Successfully connected to HoagieTools!",
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      statusCode: 500,
+      body: "Error connecting to HoagieTools :(",
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  }
+}
 
 export async function systemStatus (event: APIGatewayEvent) {
   if (!process.env.TABLENAME) {

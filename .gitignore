@@ -7,5 +7,7 @@
 **/.serverless
 **/.build
 **/.esbuild
+**/cdk.out
+**/Secrets.ts
 monorepo/.nx/**/*
 monorepo/apps/song-eval-service-app/template.yml

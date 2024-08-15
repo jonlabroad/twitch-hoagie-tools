@@ -39,9 +39,13 @@ import { StreamerAdminPage } from "./components/config/StreamerAdminPage";
 import { ModListContextProvider } from "./components/context/ModListContextProvider";
 import { SystemStatusContextProvider } from "./components/context/SystemStatusContextProvider";
 import { HoagieUserDataContextProvider } from "./components/context/HoagieUserDataContextProvider";
-import { LandingPage } from "./components/pages/LandingPage";
 import { NotFound } from "./components/pages/NotFound";
 import { LandingPageContainer } from "./components/pages/LandingPageContainer";
+import ConnectionPage from "./components/connection/ConnectionPage";
+import { botAccountConnectionConfig } from "./components/connection/ConnectionConfig";
+import { ConnectionRedirect } from "./components/connection/ConnectionRedirect";
+import { BulkWhisperPageContainer } from "./specialevent/BulkWhisperPageContainer";
+import { RewardMonitoring } from "./components/pages/RewardMonitoring";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -116,6 +120,14 @@ function App() {
                             element={<LoginRedirect />}
                           />
                           <Route
+                            path="/connectionBot"
+                            element={<ConnectionPage connectionConfig={botAccountConnectionConfig} />}
+                          />
+                          <Route
+                            path="/connectionRedirectBot"
+                            element={<ConnectionRedirect  connectionConfig={botAccountConnectionConfig} />}
+                          />
+                          <Route
                             path="/config/:streamer"
                             element={<StreamerConfigPage />}
                           />
@@ -147,6 +159,18 @@ function App() {
                             path="/"
                             element={
                               <Navigate to="/landing" replace={true} />
+                            }
+                          />
+                          <Route
+                            path="/s/:streamer/streamrewards"
+                            element={
+                              <RewardMonitoring />
+                            }
+                          />
+                          <Route
+                            path="/s/:streamer/bulkwhisper"
+                            element={
+                              <BulkWhisperPageContainer />
                             }
                           />
                           <Route

@@ -1,6 +1,7 @@
 import { DynamoDBDocumentClient, GetCommandInput, PutCommand, PutCommandInput, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
-import { createDocClient } from '@hoagie/api-util';
 import { GetCommand } from '@aws-sdk/lib-dynamodb';
+import { TwitchAccessToken } from '@hoagie/service-clients';
+import { createDocClient } from '../util/DBUtil';
 
 export interface AdminData {
   CategoryKey: string
@@ -14,12 +15,14 @@ export interface UserData {
   streamerIds: string[]
 }
 
+export type TokenCategory = "USER" | "BOT";
+
 export class ConfigDBClient {
   private tableName: string;
   private client: DynamoDBDocumentClient;
 
-  constructor(tableName: string) {
-    this.client = createDocClient();
+  constructor(tableName: string, dbClient?: DynamoDBDocumentClient) {
+    this.client = dbClient ?? createDocClient();
     this.tableName = tableName;
   }
   public async getAdminData(): Promise<AdminData> {
@@ -84,10 +87,45 @@ export class ConfigDBClient {
     return response;
   }
 
+  public async saveAccessToken(userId: string, accessToken: TwitchAccessToken, tokenCategory: TokenCategory) {
+    const input: PutCommandInput = {
+      TableName: this.tableName,
+      Item: {
+        ...this.getAccessTokenKey(userId, tokenCategory),
+        ...accessToken,
+      }
+    }
+    const command = new PutCommand(input);
+
+    console.log({ input });
+    const response = await this.client.send(command);
+    return response;
+  }
+
+  public async getAccessToken(userId: string, tokenCategory: string): Promise<TwitchAccessToken> {
+    const input: GetCommandInput = {
+      TableName: this.tableName,
+      Key: this.getAccessTokenKey(userId, tokenCategory),
+    }
+    console.log(JSON.stringify(input));
+    const command = new GetCommand(input);
+
+    const { Item } = await this.client.send(command);
+    console.log({ Item });
+    return Item as TwitchAccessToken;
+  }
+
   private getUserDataKey(userId: string, field: string) {
     return {
       CategoryKey: `USERDATA_${userId}`,
       SubKey: field,
     }
+  }
+
+  private getAccessTokenKey(userId: string, accessCategory: string) {
+    return {
+      CategoryKey: `USERACCESS_${userId}`.toUpperCase(),
+      SubKey: `TOKEN_${accessCategory}`.toUpperCase(),
+    };
   }
 }

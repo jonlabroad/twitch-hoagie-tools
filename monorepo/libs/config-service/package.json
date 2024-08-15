@@ -2,6 +2,8 @@
   "name": "@hoagie/config-service",
   "version": "0.0.1",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.623.0",
+    "@aws-sdk/lib-dynamodb": "^3.623.0",
     "tslib": "^2.3.0"
   },
   "type": "commonjs",
