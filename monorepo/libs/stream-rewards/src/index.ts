@@ -12,3 +12,5 @@ export * from "./lib/Chat/ChatClient";
 export * from "./lib/Auth/AccessTokenProvider";
 export * from "./lib/ApiHandlers/GetTokensHandler";
 export * from "./lib/ApiHandlers/GetRedemptionsHandler";
+export * from "./lib/Client/StreamRewardsClient";
+export * from "./lib/Client/StreamRewardsTypes";

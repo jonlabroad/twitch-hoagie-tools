@@ -49,7 +49,6 @@
     "rewards:deploy": "nx run stream-rewards-deploy:deploy --configuration=prod --output-style=stream",
     "rewards:deploy-dev": "nx run stream-rewards-deploy:deploy --configuration=dev --output-style=stream",
     "rewards:test": "nx run stream-rewards:test --skip-nx-cache --configuration=local --output-style=stream",
-
     "all:deploy": "nx run-many --target=deploy --all --configuration=prod --output-style=stream",
     "all:deploy-dev": "nx run-many --target=deploy --configuration=dev --all --output-style=stream"
   },
@@ -74,7 +73,7 @@
     "format-duration": "^2.0.0",
     "googleapis": "^71.0.0",
     "html-entities": "^2.4.0",
-    "javascript-time-ago": "^2.5.9",
+    "javascript-time-ago": "^2.5.10",
     "jssoup": "^0.0.15",
     "node-cache": "^5.1.2",
     "perspective-api-client": "^3.1.0",

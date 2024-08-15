@@ -25,6 +25,7 @@ export const useTwitchChatClient = () => {
                     });
                 }
             );
+            console.log("Connecting chat client");
             chatClient.current.connect();
         }
 

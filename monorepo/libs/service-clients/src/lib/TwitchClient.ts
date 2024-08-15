@@ -284,6 +284,20 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return response;
   }
 
+  public async sendWhisperMessage(recipientId: string, message: string, senderId: string) {
+    const url = `https://api.twitch.tv/helix/whispers`;
+    const response = await axios.post(url, {
+      message,
+      to_user_id: recipientId,
+      from_user_id: senderId
+    },
+    {
+      headers: await this.getAuthHeaders(),
+    });
+    console.log({ sendWhisperResponse: response });
+    return response;
+  }
+
   private async getServiceAuthToken() {
     if (!this.authToken && this.options.serviceAuth) {
       const response = await axios.post(
