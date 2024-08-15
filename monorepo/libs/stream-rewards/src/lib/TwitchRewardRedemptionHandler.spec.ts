@@ -1,10 +1,10 @@
 import { TwitchRewardRedemptionHandler } from "./TwitchRewardRedemptionHandler";
 import { ChannelPointRedemptionEvent } from "./Events/ChannelPointRedemptionEvent";
 
-import { createDocClient } from "@hoagie/api-util";
 import { ChatBot } from "./Chat/ChatBot";
 import { ChatClient } from "./Chat/ChatClient";
 import { ConfigDBClient } from "@hoagie/config-service";
+import { createDocClient } from "./util/DBUtil";
 // Mock the dependencies
 jest.mock("@aws-sdk/lib-dynamodb", () => ({
   PutCommand: jest.fn(),

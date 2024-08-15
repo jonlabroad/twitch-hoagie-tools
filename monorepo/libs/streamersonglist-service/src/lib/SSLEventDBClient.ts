@@ -1,7 +1,7 @@
 import { GetCommand, PutCommand, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import { EventBridgeEvent } from "aws-lambda";
-import { createDocClient } from "@hoagie/api-util";
 import { SongListEvent } from "./client/StreamerSongListEventTypes";
+import { createDocClient } from "./util/DBUtil";
 
 const defaultExpirySec = 10 * 365 * 24 * 60 * 60;
 

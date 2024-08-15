@@ -1,5 +1,5 @@
 import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { createDocClient } from "./DBUtil";
+import { createDocClient } from "../util/DBUtil";
 
 export interface ModsData {
     mods: string[]

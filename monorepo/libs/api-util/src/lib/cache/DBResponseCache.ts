@@ -1,5 +1,5 @@
 import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { createDocClient } from '../db/DBUtil';
+import { createDocClient } from '../util/DBUtil';
 
 const defaultExpirySec = 48 * 60 * 60;
 

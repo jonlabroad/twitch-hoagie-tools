@@ -1,7 +1,5 @@
 import { TwitchChatNotificationEventHandler } from "./TwitchChatNotificationEventHandler";
 import { mockReSubEvent } from "./Mock/ReSubEvent";
-import { mockSubEvent } from "./Mock/SubEvent";
-import { createDocClient } from "@hoagie/api-util";
 import TokenDBClient from "./Persistance/TokenDBClient";
 import { RewardToken, RewardTokenType, TokenSubType } from "./Tokens/RewardToken";
 
