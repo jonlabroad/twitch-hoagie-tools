@@ -1,6 +1,6 @@
 import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { createDocClient } from '@hoagie/api-util';
 import { GetCommand } from '@aws-sdk/lib-dynamodb';
+import { createDocClient } from '../util/DBUtil';
 
 export interface SongEvalConfigData {
   whitelist: string[] | undefined;

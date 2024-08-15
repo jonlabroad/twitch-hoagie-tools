@@ -1,7 +1,5 @@
-import { createDocClient } from '@hoagie/api-util';
 import { TwitchClient } from '@hoagie/service-clients';
 import { SSLEventDBClient } from './SSLEventDBClient';
-import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { EventBridgeEvent } from 'aws-lambda';
 
 export class SSLEventDBWriter {

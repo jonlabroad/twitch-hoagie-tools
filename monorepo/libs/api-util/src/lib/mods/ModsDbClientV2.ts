@@ -3,7 +3,7 @@ import {
   PutCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { createDocClient } from '../db/DBUtil';
+import { createDocClient } from '../util/DBUtil';
 
 export interface ModsDataV2 {
   mods: string[];

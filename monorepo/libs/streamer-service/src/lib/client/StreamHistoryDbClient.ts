@@ -1,6 +1,6 @@
-import { createDocClient } from "@hoagie/api-util";
 import { PutCommand, PutCommandInput, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import { StreamData } from "@hoagie/service-clients";
+import { createDocClient } from "../util/DBUtil";
 
 export class StreamsDbClient {
     public static readonly CATEGORY = "STREAMS";

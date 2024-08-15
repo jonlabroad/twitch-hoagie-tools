@@ -1,6 +1,6 @@
 import { DonoData } from "../lib/DonoTypes";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { createDocClient } from "@hoagie/api-util";
+import { createDocClient } from "./util/DBUtil";
 
 const defaultExpirySec = 60 * 24 * 60 * 60;
 

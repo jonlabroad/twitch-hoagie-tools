@@ -178,8 +178,8 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
                         subscriptionsToDisplay?.map((sub) =>
                           client.deleteSubscription(
                             sub.id,
-                            loginState.userId,
-                            loginState.accessToken
+                            loginState.userId!,
+                            loginState.accessToken!
                           )
                         ) ?? []
                       );

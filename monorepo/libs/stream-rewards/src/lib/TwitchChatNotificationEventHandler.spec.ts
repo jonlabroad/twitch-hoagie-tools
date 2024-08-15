@@ -1,8 +1,7 @@
 import { TwitchChatNotificationEventHandler } from "./TwitchChatNotificationEventHandler";
-import { TwitchChatNotificationEvent } from "./Events/ChannelChatNotificationEvent";
 import { mockReSubEvent } from "./Mock/ReSubEvent";
 import { mockSubEvent } from "./Mock/SubEvent";
-import { createDocClient } from "@hoagie/api-util";
+import { createDocClient } from "./util/DBUtil";
 
 // Mock the dependencies
 jest.mock("@aws-sdk/lib-dynamodb", () => ({
