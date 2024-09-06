@@ -18,7 +18,7 @@ function getStreamGroups(streamHistory: StreamInfo[]) {
                 return false
             }
             const otherStreamTime = new Date(s.timestamp).getTime()
-            return Math.abs(currentStreamTime - otherStreamTime) < 8 * 60 * 60 * 1e3
+            return Math.abs(currentStreamTime - otherStreamTime) < 9 * 60 * 60 * 1e3
         })
         newGroup.push(...closeStreams)
         remainingHistory = remainingHistory.slice(newGroup.length)
@@ -42,7 +42,7 @@ export function useStreamSelection(streamHistory: StreamInfo[] | undefined): [St
         async function getStreamHistory() {
             if (loginState.username && loginState.accessToken && state.streamer) {
                 if (streamHistory) {
-                    const groups = getStreamGroups(streamHistory ?? []) 
+                    const groups = getStreamGroups(streamHistory ?? [])
                     setCurrentStreams(groups[0])
                 }
             }

@@ -20,5 +20,5 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../../libs/dono-service/src/lib/util/TwitchUserIdProvider.ts"]
 }

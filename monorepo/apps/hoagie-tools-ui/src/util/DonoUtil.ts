@@ -12,4 +12,8 @@ export class DonoUtil {
     allDonos?.filter((dono) => dono.value < valueThreshold) ?? [];
     return { eligible, notEligible };
   }
+
+  public static formatMoney(amount: number): string {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  }
 }
