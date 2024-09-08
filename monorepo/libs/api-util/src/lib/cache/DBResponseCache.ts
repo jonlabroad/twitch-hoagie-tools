@@ -1,20 +1,20 @@
-import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { createDocClient } from '../util/DBUtil';
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const defaultExpirySec = 48 * 60 * 60;
 
-export class DBResponseCache<T> {
+export class DBResponseCache {
+  private client: DynamoDBDocumentClient;
   private tableName: string;
   private cacheName: string;
 
-  constructor(cacheName: string, tableName: string) {
+  constructor(documentClient: DynamoDBDocumentClient, cacheName: string, tableName: string) {
+    this.client = documentClient;
     this.cacheName = cacheName;
     this.tableName = tableName;
   }
 
   public async get<T>(key: string, version: string): Promise<T | null> {
     try {
-      const client = createDocClient();
       const request: GetCommand = new GetCommand({
         TableName: this.tableName,
         Key: {
@@ -22,7 +22,7 @@ export class DBResponseCache<T> {
           SubKey: this.createCacheSortKey(version),
         },
       });
-      const response = await client.send(request);
+      const response = await this.client.send(request);
       const item = response?.Item;
       return item?.['Value'] as T;
     } catch (err) {
@@ -33,7 +33,6 @@ export class DBResponseCache<T> {
 
   public async set<T>(key: string, value: T, version: string, expirySec?: number) {
     try {
-      const client = createDocClient();
       const input = new PutCommand({
         TableName: this.tableName,
         Item: {
@@ -44,7 +43,7 @@ export class DBResponseCache<T> {
         },
       });
       //console.log(input);
-      return await client.send(input);
+      return await this.client.send(input);
     } catch (err) {
       console.error(err);
     }

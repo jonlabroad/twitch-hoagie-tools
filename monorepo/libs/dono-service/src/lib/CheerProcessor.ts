@@ -1,21 +1,23 @@
 import { TwitchClient } from "@hoagie/service-clients";
 import { CheerEvent, getChannelName } from "./ChatEventProcessor";
 import DonoDbClient from "./DonoDbClient";
+import { TwitchUserIdProvider } from "./util/TwitchUserIdProvider";
+import { TwitchBroadcasterLiveStreamProvider } from "./util/TwitchBroadcasterLiveStreamProvider";
 import { HoagieEventPublisher } from "@hoagie/api-util";
 
 export class CheerProcessor {
   public static async process(event: CheerEvent, twitchClient: TwitchClient, tableName: string) {
     console.log("CheerProcessor.process", event);
+    const userIdProvider = new TwitchUserIdProvider(twitchClient, tableName);
+
     const broadcasterLogin = getChannelName(event.detail.channel);
-    const [broadcasterId, userId] = await Promise.all([
-      twitchClient.getUserId(broadcasterLogin),
-      (async () => { try { return event.detail.userstate.username && twitchClient.getUserId(event.detail.userstate.username) } catch (e) { return undefined } })(),
-    ]);
+    const broadcasterId = await userIdProvider.getUserId(broadcasterLogin);
     if (broadcasterId) {
-      const stream = await twitchClient.getBroadcasterIdLiveStream(
+      const liveStreamProvider = new TwitchBroadcasterLiveStreamProvider(twitchClient, tableName);
+      const stream = await liveStreamProvider.getLiveStream(
         broadcasterId
       );
-            if (stream) {
+      if (stream) {
         const dbWriter = new DonoDbClient(broadcasterId, tableName);
         const detail = event.detail;
         await dbWriter.addCheer(
@@ -23,7 +25,7 @@ export class CheerProcessor {
           detail.userstate.username!,
           stream.id,
           parseInt(detail.userstate.bits ?? "0"),
-          userId
+          detail.userstate["user-id"],
         );
         await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, {});
       }

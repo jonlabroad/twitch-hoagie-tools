@@ -1,5 +1,6 @@
 import { DBResponseCache } from '@hoagie/api-util';
 import { SpotifyClient } from '@hoagie/service-clients';
+import { createDocClient } from './util/DBUtil';
 
 export interface SongInfo {
   songKey?: string;
@@ -24,7 +25,8 @@ export default class SpotifyGetSongs {
     version: string
   ) {
     const client = new SpotifyClient(this.clientId, this.clientSecret);
-    const cacheClient = new DBResponseCache("songlookup", this.tableName);
+    const dbClient = createDocClient();
+    const cacheClient = new DBResponseCache(dbClient, "songlookup", this.tableName);
 
     const songInfos = await Promise.all(
       songs.map(async (song) => {

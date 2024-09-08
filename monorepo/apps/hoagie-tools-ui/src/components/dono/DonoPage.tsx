@@ -7,6 +7,9 @@ import { DonoContextProvider } from "./DonoContextProvider";
 import { DonoPageContainer } from "./DonoPageContainer";
 import { useStreamerName } from "../../hooks/useStreamerName";
 import { SSLEventProvider } from "../context/SSLEventProvider";
+import { StateContext } from "../context/StateContextProvider";
+import { useContext } from "react";
+import { SubathonPageContainer } from "../subathon/SubathonPageContainer";
 
 export interface DonoPageProps {}
 
@@ -14,11 +17,15 @@ export const DonoPage = (props: DonoPageProps) => {
   useSaveLastPath();
   useStreamerName();
 
+  const stateContext = useContext(StateContext);
+  const isSubathon = false;
+
   return (
     <>
         <DonoContextProvider>
           <SSLEventProvider>
-            <DonoPageContainer />
+            {!isSubathon && <DonoPageContainer />}
+            {isSubathon && <SubathonPageContainer />}
           </SSLEventProvider>
         </DonoContextProvider>
     </>

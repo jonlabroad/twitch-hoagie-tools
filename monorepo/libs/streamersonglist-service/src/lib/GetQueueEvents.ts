@@ -13,6 +13,7 @@ import {
   NewPlayHistoryEvent,
   SongQueueEvent,
 } from './client/StreamerSongListEventTypes';
+import { createDocClient } from './util/DBUtil';
 
 export interface SSLEventListItem {
   id: string
@@ -66,12 +67,13 @@ export interface GetQueueEventsRequest {
 export class GetQueueEvents {
   config: GetQueueEventsConfig;
   streamerSongListClient: StreamerSongListClient;
-  sslSongApiCache: DBResponseCache<string>;
+  sslSongApiCache: DBResponseCache;
 
   constructor(config: GetQueueEventsConfig) {
     this.config = config;
     this.streamerSongListClient = new StreamerSongListClient();
-    this.sslSongApiCache = new DBResponseCache<string>(
+    this.sslSongApiCache = new DBResponseCache(
+      createDocClient(),
       'SSLSONGAPI',
       config.tableName
     );

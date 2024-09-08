@@ -1,7 +1,10 @@
 import { TwitchClient } from "@hoagie/service-clients";
 import { SubGiftEvent, getChannelName } from "./ChatEventProcessor";
-import { HoagieEventPublisher } from "@hoagie/api-util";
+import { DBResponseCache, HoagieEventPublisher } from "@hoagie/api-util";
 import DonoDbClient from "./DonoDbClient";
+import { createDocClient } from "./util/DBUtil";
+import { TwitchUserIdProvider } from "./util/TwitchUserIdProvider";
+import { TwitchBroadcasterLiveStreamProvider } from "./util/TwitchBroadcasterLiveStreamProvider";
 
 export class SubGiftProcessor {
   twitchClient: TwitchClient
@@ -14,16 +17,16 @@ export class SubGiftProcessor {
 
   public async process(event: SubGiftEvent) {
     console.log("SubGiftProcessor.process", event);
+    const userIdProvider = new TwitchUserIdProvider(this.twitchClient, this.tableName);
+
     const broadcasterLogin = getChannelName(event.detail.channel);
-    const [broadcasterId, userId] = await Promise.all([
-      this.twitchClient.getUserId(broadcasterLogin),
-      (async () => { try { return this.twitchClient.getUserId(event.detail.username) } catch (e) { return undefined } })(),
-    ]);
+    const broadcasterId = await userIdProvider.getUserId(broadcasterLogin);
     if (broadcasterId) {
-      const stream = await this.twitchClient.getBroadcasterIdLiveStream(
+      const liveStreamProvider = new TwitchBroadcasterLiveStreamProvider(this.twitchClient, this.tableName);
+      const stream = await liveStreamProvider.getLiveStream(
         broadcasterId
       );
-            if (stream) {
+      if (stream) {
         const dbWriter = new DonoDbClient(broadcasterId, this.tableName);
         const detail = event.detail;
         await dbWriter.addGiftSubs(
@@ -32,7 +35,7 @@ export class SubGiftProcessor {
           stream.id,
           detail.methods.plan!,
           detail.recipient,
-          userId,
+          detail.userstate["user-id"],
         );
         await HoagieEventPublisher.publishToTopic(`dono.${broadcasterId}`, {});
       }
