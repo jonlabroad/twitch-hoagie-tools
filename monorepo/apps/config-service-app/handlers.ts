@@ -1,11 +1,20 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService, saveAccessToken } from '@hoagie/config-service';
+import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService, saveAccessToken, getAccessTokenInfo as getAccessTokenInfoImpl, TwitchEventSub, TwitchTokenValidationParams, TwitchTokenValidator } from '@hoagie/config-service';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
-import { BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
+import { AuthTokenDBClient, BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, noCacheHeaders, twitchAuthenticateOnlyAuthorizer, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
 import { ConfigDBClient, TokenCategory } from 'libs/config-service/src/lib/client/ConfigDBClient';
+import { CreateSubscriptionInput } from '@hoagie/service-clients';
 
 const version = "1.0.0";
+
+export async function authenticateOnlyAuthorizer(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
+  return await twitchAuthenticateOnlyAuthorizer(event, context, callback);
+}
+
+export async function adminOnlyAuthorizer(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
+  return await twitchModStreamerLamdbaAuthorizer(event, context, callback, true);
+}
 
 export async function authorizer(event: APIGatewayEvent, context: any, callback: (message: string | null, policy: any) => any) {
   return await twitchModStreamerLamdbaAuthorizer(event, context, callback);
@@ -192,6 +201,49 @@ export async function setAccessTokenCallback (event: APIGatewayEvent) {
   }
 }
 
+export async function twitchAuthTokenValidation(event: APIGatewayEvent) {
+  ///api/v1/access/twitchtoken/validate
+
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  let validationParams: TwitchTokenValidationParams | undefined;
+  try {
+    validationParams = event.body ? JSON.parse(event.body) : undefined;
+    console.log({ validationParams });
+    if (!validationParams) {
+      throw new Error("Invalid request body");
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      body: "Invalid request body",
+      headers: corsHeaders,
+    };
+  }
+
+  try {
+    await SecretsProvider.init();
+    const handler = new TwitchTokenValidator(createTwitchClient(), new AuthTokenDBClient(process.env.TABLENAME));
+    const result = await handler.validate(validationParams);
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
+}
+
 export async function systemStatus (event: APIGatewayEvent) {
   if (!process.env.TABLENAME) {
     throw new Error('TABLENAME environment variable is required');
@@ -214,4 +266,126 @@ export async function systemStatus (event: APIGatewayEvent) {
       ...createCacheHeader(5),
     },
   };
+}
+
+export async function getSubscriptions (event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  await SecretsProvider.init()
+
+  const handler = new TwitchEventSub();
+  try {
+    const subscriptions = await handler.getSubscriptions();
+    if (!subscriptions) {
+      throw new Error("No subscriptions found");
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(subscriptions, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(1),
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
+}
+
+export async function createSubscriptions (event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  const handler = new TwitchEventSub();
+  try {
+    const subscriptionInput = event.body ? JSON.parse(event.body) as CreateSubscriptionInput[] : undefined;
+    if (!subscriptionInput) {
+      throw new Error("Invalid request body");
+    }
+
+    const subscriptionInfo = await handler.createSubscriptions(subscriptionInput);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(subscriptionInfo, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
+}
+
+export async function deleteSubscription (event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  const handler = new TwitchEventSub();
+  try {
+    const subscriptionId = event.pathParameters?.id;
+    if (!subscriptionId) {
+      throw new Error("Subscription ID path parameter required");
+    }
+
+    await handler.deleteSubscription(subscriptionId);
+
+    return {
+      statusCode: 204,
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
+}
+
+export async function getAccessTokenInfo ( event: APIGatewayEvent) {
+  if (!process.env.TABLENAME) {
+    throw new Error('TABLENAME environment variable is required');
+  }
+
+  await SecretsProvider.init()
+
+  try {
+    const subscriptions = await getAccessTokenInfoImpl(process.env.TABLENAME, event.pathParameters?.userId ?? "");
+    if (!subscriptions) {
+      throw new Error("No subscriptions found");
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(subscriptions, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(1),
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
 }

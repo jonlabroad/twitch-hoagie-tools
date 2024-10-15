@@ -8,6 +8,7 @@ export interface ApiGatewayLambdaAuthorizerProps {
   tableName: string;
   lambdaExecutionRole: aws_iam.Role;
   handler?: string;
+  suffix?: string;
 }
 
 export class ApiGatewayLambdaAuthorizer extends Construct {
@@ -20,7 +21,7 @@ export class ApiGatewayLambdaAuthorizer extends Construct {
   ) {
     super(scope, id);
 
-    const lambdaAuthFunction = new lambda.Function(this, `Auth`, {
+    const lambdaAuthFunction = new lambda.Function(this, `Auth${props.suffix}`, {
       code: lambda.Code.fromAsset(`../../dist/apps/${props.appName}`),
       handler: props.handler ?? 'handlers.authorizer',
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -33,7 +34,7 @@ export class ApiGatewayLambdaAuthorizer extends Construct {
     });
 
     this.authorizer = new aws_apigatewayv2_authorizers.HttpLambdaAuthorizer(
-      `${props.appName}-TwitchAuthorizer`,
+      `${props.appName}-TwitchAuthorizer${props.suffix}`,
       lambdaAuthFunction,
       {
         identitySource: ['$request.header.Authorization'],

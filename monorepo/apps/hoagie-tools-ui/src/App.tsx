@@ -46,6 +46,7 @@ import { botAccountConnectionConfig } from "./components/connection/ConnectionCo
 import { ConnectionRedirect } from "./components/connection/ConnectionRedirect";
 import { BulkWhisperPageContainer } from "./specialevent/BulkWhisperPageContainer";
 import { RewardMonitoring } from "./components/pages/RewardMonitoring";
+import { RewardConfigPageContainer } from "./components/rewards/config/RewardConfigPageContainer";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -165,6 +166,12 @@ function App() {
                             path="/s/:streamer/streamrewards"
                             element={
                               <RewardMonitoring />
+                            }
+                          />
+                          <Route
+                            path="/s/:streamer/streamrewards/config"
+                            element={
+                              <RewardConfigPageContainer />
                             }
                           />
                           <Route

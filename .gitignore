@@ -11,3 +11,4 @@
 **/Secrets.ts
 monorepo/.nx/**/*
 monorepo/apps/song-eval-service-app/template.yml
+**/*/node_modules

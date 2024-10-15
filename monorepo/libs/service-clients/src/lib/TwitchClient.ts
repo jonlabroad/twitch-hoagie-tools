@@ -1,5 +1,7 @@
 import axios from 'axios';
 import {
+  ChannelScheduleResponse,
+  CreateSubscriptionInput,
     Game,
     Paginated,
   StreamData,
@@ -72,13 +74,11 @@ export class TwitchClient {
   }
 
   public async createSubscription(
-    username: string,
-    type: string,
-    condition: Record<string, string>,
-    subscriptionCallbackHost: string,
-    subscriptionSecret: string
+    subscription: CreateSubscriptionInput,
+    callbackHost: string,
+    secret: string,
   ) {
-    const userId = await this.getUserId(username);
+    const userId = subscription.userId || await this.getUserId(subscription.username ?? "");
     if (!userId) {
       return;
     }
@@ -86,13 +86,13 @@ export class TwitchClient {
     const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
     console.log({ url });
     const data = {
-      type,
+      type: subscription.type,
       version: '1',
-      condition,
+      condition: subscription.condition,
       transport: {
         method: 'webhook',
-        callback: `${subscriptionCallbackHost}/api/twitchcallback`,
-        secret: subscriptionSecret,
+        callback: `${callbackHost}/api/twitchcallback`,
+        secret,
       },
     };
     const config = {
@@ -246,11 +246,14 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
   }
 
   async getUserDataById(userIds: string[]): Promise<UserData[]> {
-    const url = `https://api.twitch.tv/helix/users?${userIds
-      .map((u) => `id=${u}`)
-      .join('&')}`;
-    const response = await this.get<{ data: UserData[] }>(url);
-    return response?.data ?? [];
+    if (userIds?.length > 0) {
+      const url = `https://api.twitch.tv/helix/users?${userIds
+        .map((u) => `id=${u}`)
+        .join('&')}`;
+      const response = await this.get<{ data: UserData[] }>(url);
+      return response?.data ?? [];
+    }
+    return [];
   }
 
   async getUserDataByToken(accessToken: string): Promise<UserData | null> {
@@ -338,6 +341,11 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
       return null;
     }
     return null;
+  }
+
+  public async getSchedule(broadcasterId: string): Promise<ChannelScheduleResponse | null | undefined> {
+    const url = `https://api.twitch.tv/helix/schedule?broadcaster_id=${broadcasterId}`;
+    return this.get(url);
   }
 
   private async getAuthHeaders(accessToken?: string): Promise<Record<string, string>> {
