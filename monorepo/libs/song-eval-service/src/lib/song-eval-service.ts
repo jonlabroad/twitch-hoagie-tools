@@ -3,6 +3,7 @@ import { SecretsProvider } from "@hoagie/secrets-provider";
 import { APIGatewayEvent } from "aws-lambda";
 import { SongEvaluator } from "./SongEvaluator";
 import { SongEvalDbClient } from "./client/SongEvalDBClient";
+import { createDocClient } from "./util/DBUtil";
 
 export interface SongEvalConfig {
   tableName: string
@@ -24,7 +25,8 @@ export async function songEvalService(query: string, event: APIGatewayEvent, con
   const secrets = SecretsProvider.getInstance().secrets;
   const evaluator = new SongEvaluator(secrets["geniusClientSecret"], secrets["badWordsSecret"]);
 
-  const cache = new DBResponseCache("songeval", config.tableName);
+  const dbClient = createDocClient();
+  const cache = new DBResponseCache(dbClient, "songeval", config.tableName);
   const cachedValue = await cache.get(query, config.version);
   let result: any;
   if (cachedValue) {

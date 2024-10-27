@@ -12,3 +12,6 @@
 monorepo/.nx/**/*
 monorepo/apps/song-eval-service-app/template.yml
 **/*/node_modules
+**/node_modules
+**/donoData.csv
+**/donoData.json

@@ -77,7 +77,7 @@ export class DonoProvider {
       case 'prime':
         return 5;
       case '1000':
-        return 5;
+        return 6;
       case '2000':
         return 10;
       case '3000':
