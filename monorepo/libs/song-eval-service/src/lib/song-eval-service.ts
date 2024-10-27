@@ -69,7 +69,7 @@ export async function getSongEvalConfig(tableName: string, channelId: string) {
     body: JSON.stringify({
       ...result,
       whitelist: Array.from(result.whitelist ?? []),
-     } ?? {}),
+     }),
     headers: {
       ...corsHeaders,
       ...createCacheHeader(1),

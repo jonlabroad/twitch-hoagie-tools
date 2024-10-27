@@ -1,6 +1,8 @@
-import { getAuthHeaders } from '@hoagie/api-util';
+import { getAuthHeaders, TokenCategory } from '@hoagie/api-util';
 import axios from 'axios';
 import { UserData } from './ConfigDBClient';
+import { AccessTokenInfo } from '../AccessTokenInfo';
+import { ValidationResult } from '@hoagie/config-service';
 
 const BASE_URL = 'https://config.hoagieman.net/api/v1/';
 const BASE_URL_DEV = 'https://config-dev.hoagieman.net/api/v1/';
@@ -63,7 +65,7 @@ export class ConfigClient {
     userId: string,
   ): Promise<UserData> {
     const response = await axios.get(
-      `${this.url}/userdata`,
+      `${this.url}userdata`,
       {
         headers: getAuthHeaders(this.userId, this.accessToken),
       }
@@ -74,7 +76,31 @@ export class ConfigClient {
   public async getSystemStatus(
   ): Promise<any> {
     const response = await axios.get(
-      `${this.url}/system/status`,
+      `${this.url}system/status`,
+      {
+        headers: getAuthHeaders(this.userId, this.accessToken),
+      }
+    );
+    return response.data;
+  }
+
+  public async getTwitchEventSubSubscriptions(): Promise<any> {
+    const response = await axios.get(
+      `${this.url}twitch/subscriptions`,
+      {
+        headers: getAuthHeaders(this.userId, this.accessToken),
+      }
+    );
+    return response.data;
+  }
+
+  public async validateAccessToken(userId: string, category: TokenCategory): Promise<ValidationResult> {
+    const response = await axios.post(
+      `${this.url}access/twitchtoken/validate`,
+      {
+        twitchUserId: userId,
+        type: category,
+      },
       {
         headers: getAuthHeaders(this.userId, this.accessToken),
       }

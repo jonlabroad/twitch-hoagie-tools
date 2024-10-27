@@ -1,8 +1,9 @@
-import { ModsDbClientV2 } from "@hoagie/api-util";
+import { AuthTokenDBClient, ModsDbClientV2 } from "@hoagie/api-util";
 import { ConfigDBClient, TokenCategory } from "./client/ConfigDBClient";
 import { TwitchAccessToken, TwitchClient } from "@hoagie/service-clients";
 import { createTwitchClient } from "./createTwitchClient";
 import { SecretsProvider } from "@hoagie/secrets-provider";
+import { AccessTokenInfo } from "./AccessTokenInfo";
 
 export interface PeriodicConfigUpdateProps {
   tableName: string;
@@ -69,8 +70,17 @@ export async function saveAccessToken(tableName: string, authorizationToken: str
     throw new Error('Failed to get user data');
   }
 
-  const configClient = new ConfigDBClient(tableName);
+  const configClient = new AuthTokenDBClient(tableName);
   await configClient.saveAccessToken(userData.id, accessToken, category.toUpperCase() as TokenCategory);
 
   return true;
+}
+
+export async function getAccessTokenInfo(tableName: string, userId: string): Promise<AccessTokenInfo[]> {
+  const configClient = new AuthTokenDBClient(tableName);
+  const accessTokens = await configClient.getAccessTokens(userId);
+  return accessTokens.map(token => ({
+    userId,
+    scopes: token.scope,
+  }));
 }

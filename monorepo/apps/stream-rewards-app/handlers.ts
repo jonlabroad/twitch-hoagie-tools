@@ -1,8 +1,7 @@
 import { APIGatewayEvent, EventBridgeEvent } from 'aws-lambda';
-import { corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
-import { AccessTokenProvider, ChatClient, GetRedemptionsHandler, GetTokensHandler, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
+import { AccessTokenProvider, AuthTokenDBClient, corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
+import { ChatClient, GetRedemptionsHandler, GetTokensHandler, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
 import { ChatBot } from '@hoagie/stream-rewards';
-import { ConfigDBClient } from '@hoagie/config-service';
 import TokenDbClient from 'libs/stream-rewards/src/lib/Persistance/TokenDBClient';
 import { TwitchChatMessageWebhookEvent } from 'libs/stream-rewards/src/lib/Events/ChannelChatMessageEvent';
 import { createTwitchClient } from './src/createTwitchClient';
@@ -51,7 +50,7 @@ export async function twitchRewardRedemptionEventHandler (event: EventBridgeEven
 
   const twitchClient = createTwitchClient();
   const chatClient = new ChatClient(botUserId, twitchClient);
-  const configClient = new ConfigDBClient(tableName);
+  const configClient = new AuthTokenDBClient(tableName);
   const accessTokenProvider = new AccessTokenProvider(configClient, twitchClient);
   const chatBot = new ChatBot(botUserId, broadcasterId, chatClient, accessTokenProvider);
 
@@ -74,7 +73,7 @@ export async function twitchChatMessageEventHandler (event: EventBridgeEvent<str
 
   const twitchClient = createTwitchClient();
   const chatClient = new ChatClient(botUserId, twitchClient);
-  const configClient = new ConfigDBClient(tableName);
+  const configClient = new AuthTokenDBClient(tableName);
   const accessTokenProvider = new AccessTokenProvider(configClient, twitchClient);
   const chatBot = new ChatBot(botUserId, broadcasterId, chatClient, accessTokenProvider);
   const tokenDbClient = new TokenDbClient();

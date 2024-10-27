@@ -34,7 +34,7 @@ export class ModLambdaRequestAuthorizer {
     }
 
     if (!userId && !streamerId) {
-      console.error(`streamerName or streamerId is required`);
+      console.error(`userId and streamerId are required`);
       return ModLambdaRequestAuthorizer.saveCachedAuth(streamerId, {
         userId,
         isAuthorized: false,

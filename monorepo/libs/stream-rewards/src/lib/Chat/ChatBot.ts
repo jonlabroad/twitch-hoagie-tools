@@ -1,5 +1,5 @@
+import { AccessTokenProvider } from "@hoagie/api-util";
 import { ChatClient } from "./ChatClient";
-import { AccessTokenProvider } from "../Auth/AccessTokenProvider";
 
 export class ChatBot {
   private botId: string;
@@ -26,6 +26,6 @@ export class ChatBot {
 
   private async readAccessToken(userId: string): Promise<string> {
     const tokenData = await this.accessTokenProvider.readToken(userId, "BOT");
-    return tokenData;
+    return tokenData?.access_token ?? "NO_TOKEN";
   }
 }

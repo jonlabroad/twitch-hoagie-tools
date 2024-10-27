@@ -155,11 +155,76 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    // Twitch subscriptions
+    const twitchEventSubGetFunction = new lambda.Function(
+      this,
+      `TwitchEventSubGet`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getSubscriptions",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    const twitchEventSubSubscribeFunction = new lambda.Function(
+      this,
+      `TwitchEventSubSubscribe`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.createSubscriptions",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(60),
+        memorySize: 1024,
+      }
+    );
+
+    const twitchEventSubDeleteFunction = new lambda.Function(
+      this,
+      `TwitchEventSubDelete`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.deleteSubscription",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(60),
+        memorySize: 1024,
+      }
+    );
+
+    const twitchAuthTokenValidationFunction = new lambda.Function(
+      this,
+      `TwitchAuthTokenValidation`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.twitchAuthTokenValidation",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.POST, CorsHttpMethod.DELETE],
         allowHeaders: ['*'],
       },
     });
@@ -168,6 +233,22 @@ export class ServiceStack extends cdk.Stack {
       appName,
       tableName: context.tableName,
       lambdaExecutionRole,
+    });
+
+    const adminAuthorizerConstruct = new ApiGatewayLambdaAuthorizer(this, `${serviceName}-admin-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
+      handler: 'handlers.adminOnlyAuthorizer',
+      suffix: "-admin",
+    });
+
+    const authenticateOnlyAuthorizer = new ApiGatewayLambdaAuthorizer(this, `${serviceName}-authenticate-authorizer`, {
+      appName,
+      tableName: context.tableName,
+      lambdaExecutionRole,
+      handler: 'handlers.authenticateOnlyAuthorizer',
+      suffix: "-authenticateonly",
     });
 
     httpApi.addRoutes({
@@ -207,7 +288,7 @@ export class ServiceStack extends cdk.Stack {
         'userdata-get-v1',
         getUserDataFunction,
       ),
-      authorizer: authorizerConstruct.authorizer,
+      authorizer: authenticateOnlyAuthorizer.authorizer,
     });
 
     httpApi.addRoutes({
@@ -217,7 +298,7 @@ export class ServiceStack extends cdk.Stack {
         'systemstatus-get-v1',
         systemStatusFunction,
       ),
-      authorizer: authorizerConstruct.authorizer,
+      authorizer: authenticateOnlyAuthorizer.authorizer,
     });
 
     httpApi.addRoutes({
@@ -226,6 +307,45 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'twitchtoken-get-v1',
         setAccessTokenCallbackFunction,
+      ),
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/twitch/subscriptions",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'twitch-subscriptions-get-v1',
+        twitchEventSubGetFunction,
+      ),
+      authorizer: adminAuthorizerConstruct.authorizer,
+    })
+
+    httpApi.addRoutes({
+      path: "/api/v1/twitch/subscriptions",
+      methods: [HttpMethod.POST],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'twitch-subscriptions-post-v1',
+        twitchEventSubSubscribeFunction,
+      ),
+      authorizer: adminAuthorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/twitch/subscriptions/{subscriptionId}",
+      methods: [HttpMethod.DELETE],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'twitch-subscriptions-delete-v1',
+        twitchEventSubDeleteFunction,
+      ),
+      authorizer: adminAuthorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/access/twitchtoken/validate",
+      methods: [HttpMethod.POST],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'twitchtoken-validate-v1',
+        twitchAuthTokenValidationFunction,
       ),
     });
 

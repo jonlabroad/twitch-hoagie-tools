@@ -1,9 +1,10 @@
 import { Card, Container, Grid } from '@mui/material';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { HoagieUserDataContext } from '../context/HoagieUserDataContextProvider';
 import { LoginContext } from '../context/LoginContextProvider';
 import { StreamerCard } from '../streamer/StreamerCard';
 import { TwitchUserInfoContext, TwitchUserInfoProvider } from '../context/TwitchUserInfoProvider';
+import { useTwitchChannelSchedule } from '../../hooks/twitchChannelScheduleHooks';
 
 export const LandingPage = () => {
   const { userData } = useContext(HoagieUserDataContext);
@@ -11,14 +12,23 @@ export const LandingPage = () => {
   const { userData: twitchUserData, addUsers } = useContext(
     TwitchUserInfoContext
   );
+
+  const streamerIds = useRef(userData?.streamerIds ?? []);
   useEffect(() => {
     if (addUsers && userData) {
       addUsers({
         userLogins: [],
         userIds: userData.streamerIds,
       });
+      streamerIds.current = userData.streamerIds;
     }
   }, [addUsers, userData]);
+
+  const [schedules, loading] = useTwitchChannelSchedule(
+    streamerIds.current,
+    5 * 60 * 1e3
+  );
+  console.log({ schedules, loading });
 
   if (!loginState.userId || !loginState.accessToken) {
     return <div></div>;
@@ -40,11 +50,15 @@ export const LandingPage = () => {
               if (!channelInfo) {
                 return null;
               }
+
+              const schedule = schedules[channelId];
+
               return (
                 <StreamerCard
                   streamerId={channelId}
                   key={channelId}
                   userData={channelInfo}
+                  schedule={schedule}
                 />
               );
             })

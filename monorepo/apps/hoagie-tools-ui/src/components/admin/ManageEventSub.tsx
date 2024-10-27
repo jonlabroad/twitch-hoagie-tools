@@ -17,6 +17,8 @@ import LocalStorage from '../../util/LocalStorage';
 import { LoginContext } from '../context/LoginContextProvider';
 import { StateContext } from '../context/StateContextProvider';
 import { FlexCol, FlexRow } from '../util/FlexBox';
+import { ConfigClient } from '@hoagie/config-service';
+import Config from '../../Config';
 
 const chipColors: Record<string, any> = {
   enabled: 'success',
@@ -86,12 +88,8 @@ export const ManageEventSub = (props: ManageEventSubProps) => {
 
   async function getSubscriptions() {
     if (loginState.userId && loginState.accessToken) {
-      const client = new HoagieClient();
-      const subs = await client.listSubscriptions(
-        loginState.userId,
-        appState.streamerId ?? 'hoagieman5000',
-        loginState.accessToken
-      );
+      const client = new ConfigClient(loginState.userId, loginState.accessToken, Config.environment);
+      const subs = await client.getTwitchEventSubSubscriptions();
       setSubscriptions(subs);
     }
   }

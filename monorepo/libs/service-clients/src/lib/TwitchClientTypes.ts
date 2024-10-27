@@ -1,3 +1,5 @@
+import { Channel } from "diagnostics_channel";
+
 export interface UserData {
   broadcaster_type: string;
   created_at: string;
@@ -41,6 +43,13 @@ export interface UserSubscriptions {
   broadcaster_login: string;
   is_gift: boolean;
   tier: string;
+}
+
+export interface CreateSubscriptionInput {
+  username?: string,
+  userId?: string,
+  type: string,
+  condition: Record<string, string>,
 }
 
 export interface UserFollows {
@@ -143,3 +152,26 @@ export interface Paginated<T> {
     cursor: string;
   };
 }
+
+export interface ChannelScheduleSegment {
+  id: string;
+  start_time: string;
+  end_time: string;
+  title: string;
+  canceled_until: string | null;
+  category: {
+    id: string;
+    name: string;
+  };
+  is_recurring: boolean;
+}
+
+export interface ChannelSchedule {
+  segments: ChannelScheduleSegment[];
+  broadcaster_id: string;
+  broadcaster_name: string;
+  broadcaster_login: string;
+  vacation: string | null;
+}
+
+export type ChannelScheduleResponse = Paginated<ChannelSchedule>;

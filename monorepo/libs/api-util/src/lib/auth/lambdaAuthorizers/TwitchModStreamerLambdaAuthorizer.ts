@@ -5,7 +5,8 @@ import { ModLambdaRequestAuthorizer } from '../ModLambdaRequestAuthorizer';
 export async function twitchModStreamerLamdbaAuthorizer(
   event: APIGatewayEvent,
   context: any,
-  callback: (message: string | null, policy: any) => any
+  callback: (message: string | null, policy: any) => any,
+  adminOnly: boolean = false
 ) {
   try {
     const authenticator = new TwitchLambdaAuthenticator();
@@ -16,6 +17,24 @@ export async function twitchModStreamerLamdbaAuthorizer(
     if (!authenticationResult.isAuthenticated) {
       console.log(`Unauthorized user: ${authenticationResult.userId}`);
       callback(authenticationResult.message, null);
+    }
+
+    if (adminOnly) {
+      const auth = await ModLambdaRequestAuthorizer.auth(
+        authenticationResult.userId,
+        "ADMINONLY"
+      );
+      if (!auth || !auth.isAuthorized) {
+        callback(auth.message, null);
+      } else {
+        callback(null, {
+          isAuthorized: auth.isAuthorized,
+          context: {
+            userId: authenticationResult.userId,
+          },
+        });
+      }
+      return;
     }
 
     const streamerId = event.pathParameters?.['streamerId'] ?? event.queryStringParameters?.['streamerid'] ?? event.queryStringParameters?.['streamerid'];
@@ -39,7 +58,7 @@ export async function twitchModStreamerLamdbaAuthorizer(
       }
     } else {
       callback(null, {
-        isAuthorized: true,
+        isAuthorized: false,
         context: {
           userId: authenticationResult.userId,
         },

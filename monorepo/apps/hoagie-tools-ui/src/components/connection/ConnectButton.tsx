@@ -1,24 +1,27 @@
 import { Button } from "@mui/material";
-import { ConnectionConfig } from "./ConnectionConfig";
+import { ConnectionConfig, createConnectUrl } from "./ConnectionConfig";
 import Config from "../../Config";
 
 interface Props {
   config: ConnectionConfig;
+  label?: string;
+  disabled?: boolean;
 }
 
 export const ConnectButton = (props: Props) => {
   const { config } = props;
 
-  const redirectUri = `https://config.hoagieman.net/api/v1/access/twitchtoken/${config.type.toLowerCase()}`;
+  const link = createConnectUrl(config);
 
   return (
     <div>
       <Button
+        disabled={props.disabled}
         variant="contained"
         color="primary"
-        href={`https://id.twitch.tv/oauth2/authorize?scope=${config.scopes.join(' ')}&client_id=${Config.clientId}&redirect_uri=${redirectUri}&response_type=code&force_verify=true`}
+        href={link}
       >
-        (Re)Connect
+        {props.label ?? "(Re)Connect"}
       </Button>
     </div>
   );
