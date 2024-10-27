@@ -368,14 +368,14 @@ export async function getAccessTokenInfo ( event: APIGatewayEvent) {
   await SecretsProvider.init()
 
   try {
-    const subscriptions = await getAccessTokenInfoImpl(process.env.TABLENAME, event.pathParameters?.userId ?? "");
-    if (!subscriptions) {
-      throw new Error("No subscriptions found");
+    const data = await getAccessTokenInfoImpl(process.env.TABLENAME, event.pathParameters?.userId ?? "");
+    if (!data) {
+      throw new Error("No access token data found");
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify(subscriptions, null, 2),
+      body: JSON.stringify(data, null, 2),
       headers: {
         ...corsHeaders,
         ...createCacheHeader(1),
