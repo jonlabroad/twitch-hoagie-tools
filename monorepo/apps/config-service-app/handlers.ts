@@ -1,5 +1,5 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService, saveAccessToken, getAccessTokenInfo as getAccessTokenInfoImpl, TwitchEventSub, TwitchTokenValidationParams, TwitchTokenValidator } from '@hoagie/config-service';
+import { GetSystemStatus, periodicConfigUpdate as periodicConfigUpdateService, saveAccessToken, getAccessTokenInfo as getAccessTokenInfoImpl, TwitchEventSub, TwitchTokenValidationParams, TwitchTokenValidator, StreamerSongListSetTokenHandler, StreamerSongListTokenRequest } from '@hoagie/config-service';
 import { createTwitchClient } from './src/createTwitchClient';
 import { SecretsProvider } from '@hoagie/secrets-provider';
 import { AuthTokenDBClient, BasicAuth, ModsDbClientV2, corsHeaders, createCacheHeader, noCacheHeaders, twitchAuthenticateOnlyAuthorizer, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
@@ -388,4 +388,66 @@ export async function getAccessTokenInfo ( event: APIGatewayEvent) {
       headers: corsHeaders,
     };
   }
+}
+
+export async function streamerSongListSetToken (event: APIGatewayEvent) {
+  const noAuthResponse = sslTokenAuthorizer(event);
+  if (noAuthResponse) {
+    return noAuthResponse;
+  }
+
+  try {
+    const request = event.body ? JSON.parse(event.body) as StreamerSongListTokenRequest : undefined;
+    if (!request) {
+      throw new Error("Invalid request body");
+    }
+
+    await StreamerSongListSetTokenHandler(request);
+
+    return {
+      statusCode: 200,
+      body: "OK",
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
+      },
+    };
+  } catch (err: any) {
+    return {
+      statusCode: 500,
+      body: err.message,
+      headers: corsHeaders,
+    };
+  }
+}
+
+function sslTokenAuthorizer(event: APIGatewayEvent) {
+  const ourToken = process.env.STREAMERSONGLIST_TAMPERMONKEY_AUTH_TOKEN;
+  if (!ourToken) {
+    return {
+      statusCode: 500,
+      body: "Authorizer not configured correctly",
+      headers: corsHeaders,
+    };
+  }
+
+  const authHeader = event.headers?.authorization;
+  const token = authHeader?.replace("Bearer ", "");
+  if (!token) {
+    return {
+      statusCode: 401,
+      body: "Unauthorized",
+      headers: corsHeaders,
+    };
+  }
+
+  if (token !== ourToken) {
+    return {
+      statusCode: 403,
+      body: "Forbidden",
+      headers: corsHeaders,
+    };
+  }
+
+  return null;
 }

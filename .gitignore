@@ -15,3 +15,5 @@ monorepo/apps/song-eval-service-app/template.yml
 **/node_modules
 **/donoData.csv
 **/donoData.json
+util/tampermonkey/streamerSongListTokenGrabberSecrets.ts
+**/.env.secrets

@@ -8,6 +8,12 @@ import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as aws_apigatewayv2_authorizers from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: ".env.secrets" });
+if (!process.env.STREAMERSONGLIST_TAMPERMONKEY_AUTH_TOKEN) {
+  throw new Error("STREAMERSONGLIST_TAMPERMONKEY_AUTH_TOKEN must be set in .env.secrets");
+}
 
 const serviceName = 'ConfigService';
 const appName = 'config-service-app';
@@ -220,6 +226,23 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const streamerSongListSetToken = new lambda.Function(
+      this,
+      `StreamerSongListSetToken`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.streamerSongListSetToken",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          STREAMERSONGLIST_TAMPERMONKEY_AUTH_TOKEN: process.env.STREAMERSONGLIST_TAMPERMONKEY_AUTH_TOKEN!,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(60),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
@@ -346,6 +369,15 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'twitchtoken-validate-v1',
         twitchAuthTokenValidationFunction,
+      ),
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/streamersonglist/token",
+      methods: [HttpMethod.PUT],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'streamersonglist-set-token-v1',
+        streamerSongListSetToken,
       ),
     });
 

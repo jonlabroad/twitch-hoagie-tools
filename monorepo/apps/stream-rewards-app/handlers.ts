@@ -1,6 +1,6 @@
 import { APIGatewayEvent, EventBridgeEvent } from 'aws-lambda';
 import { AccessTokenProvider, AuthTokenDBClient, corsHeaders, createCacheHeader, noCacheHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
-import { ChatClient, GetRedemptionsHandler, GetTokensHandler, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler } from '@hoagie/stream-rewards';
+import { ChatClient, GetBroadcasterRedemptionsHandler, GetRedemptionsHandler, GetStreamRewardConfigHandler, GetTokensHandler, IStreamRewardConfig, TwitchChatMessageHandler, TwitchChatNotificationEvent, TwitchChatNotificationEventHandler, TwitchCustomRewardRedemptionAddEvent, TwitchRewardRedemptionHandler, WriteStreamRewardConfigHandler } from '@hoagie/stream-rewards';
 import { ChatBot } from '@hoagie/stream-rewards';
 import TokenDbClient from 'libs/stream-rewards/src/lib/Persistance/TokenDBClient';
 import { TwitchChatMessageWebhookEvent } from 'libs/stream-rewards/src/lib/Events/ChannelChatMessageEvent';
@@ -151,6 +151,109 @@ export async function twitchChatMessageEventHandler (event: EventBridgeEvent<str
       headers: {
         ...corsHeaders,
         ...createCacheHeader(2),
+      },
+    };
+  }
+
+  export async function getBroadcasterRedemptions (event: APIGatewayEvent) {
+    const tableName = process.env.TABLENAME;
+    if (!tableName) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const broadcasterId = event.pathParameters?.streamerId;
+    if (!broadcasterId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "streamerId is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const handler = new GetBroadcasterRedemptionsHandler(tableName);
+    const result = await handler.handle(broadcasterId);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(10),
+      },
+    };
+  }
+
+  export async function getStreamRewardsConfig (event: APIGatewayEvent) {
+    const tableName = process.env.TABLENAME;
+    if (!tableName) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const broadcasterId = event.pathParameters?.streamerId;
+    if (!broadcasterId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "streamerId is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const result = await GetStreamRewardConfigHandler(broadcasterId);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...createCacheHeader(10),
+      },
+    };
+  }
+
+  export async function writeStreamRewardsConfig (event: APIGatewayEvent) {
+    const tableName = process.env.TABLENAME;
+    if (!tableName) {
+      throw new Error('TABLENAME environment variable is required');
+    }
+
+    const broadcasterId = event.pathParameters?.streamerId;
+    if (!broadcasterId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "streamerId is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const config = event.body ? JSON.parse(event.body) as IStreamRewardConfig : undefined;
+    if (!config) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Config is required" }, null, 2),
+        headers: {
+          ...corsHeaders,
+          ...noCacheHeaders,
+        },
+      };
+    }
+
+    const result = await WriteStreamRewardConfigHandler(config);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result, null, 2),
+      headers: {
+        ...corsHeaders,
+        ...noCacheHeaders,
       },
     };
   }

@@ -1,28 +1,9 @@
 import { ChatBot } from "./Chat/ChatBot";
 import { HandlerResult } from "./EventHandlers/HandlerResult";
 import { SongListRequestHandler } from "./EventHandlers/SongListRequestHandler";
-import { SubHandler } from "./EventHandlers/SubHandler";
-import { TwitchNotificationEvent } from "./Events/ChannelChatNotificationEvent";
 import { ChannelPointRedemptionEvent } from "./Events/ChannelPointRedemptionEvent";
-
-type RewardType = "improvRequest" | "liveLearnRequest";
-
-interface RewardConfig {
-  rewardId: string | null;
-  rewardTitle: string;
-}
-
-// TODO put this in db with UI configurator
-const config: Record<RewardType, RewardConfig | null> = {
-  improvRequest: {
-    rewardId: null,
-    rewardTitle: "Request: Improv",
-  },
-  liveLearnRequest: {
-    rewardId: null,
-    rewardTitle: "Request: Live Learn",
-  }
-}
+import { IRewardType } from "./IRewardType";
+import RewardConfigDBClient from "./Persistance/RewardConfigDBClient";
 
 export class TwitchRewardRedemptionHandler {
   private chatBot: ChatBot;
@@ -31,39 +12,48 @@ export class TwitchRewardRedemptionHandler {
     this.chatBot = chatBot;
   }
 
-  public async handle(ev: ChannelPointRedemptionEvent): Promise<boolean> {
+  public async handle(ev: ChannelPointRedemptionEvent): Promise<HandlerResult[]> {
     console.log(ev);
 
     //await this.chatBot.sendMessage(`Redeeming reward for ${ev.user_name}: ${ev.reward.title}`);
     const improvRequestHandler = new SongListRequestHandler("Improv", this.chatBot);
     const liveLearnRequestHandler = new SongListRequestHandler("Live Learn", this.chatBot);
 
-    let result: HandlerResult | undefined = undefined;
-    if (this.isRewardType(ev, "improvRequest")) {
-      result = await improvRequestHandler.handle(ev);
-    } else if (this.isRewardType(ev, "liveLearnRequest")) {
-      result = await liveLearnRequestHandler.handle(ev);
+    const rewardsDbClient = new RewardConfigDBClient();
+    const rewardsConfig = await rewardsDbClient.read(ev.broadcaster_user_id);
+
+    if (!rewardsConfig || rewardsConfig.rewards.length <= 0) {
+      console.warn(`No rewards config found for broadcaster ${ev.broadcaster_user_id}`);
+      return [];
     }
 
-    if (!result?.success && this.chatBot) {
-      //await this.chatBot.sendMessage(`Failed to redeem reward for ${ev.user_name}`);
-      await this.chatBot.sendMessage(`${ev.user_name}, T3 sub is required, limit 1 per monthly sub`);
+    const redeemedId = ev.reward.id;
+    const configsForRewardId = rewardsConfig.rewards.filter((r) => r.enabled && r.redemptionId === redeemedId);
+    if (configsForRewardId.length <= 0) {
+      console.log(`No reward config found for ${ev.reward.title}`);
+      return [];
     }
 
-    if (result?.chatMessage && this.chatBot) {
-      await this.chatBot.sendMessage(result.chatMessage);
-    }
+    const results = await Promise.all(configsForRewardId.map(async (config) => {
+      let result: HandlerResult | undefined = undefined;
+      if (config.handlerType === "improvRequest") {
+        result = await improvRequestHandler.handle(ev);
+      } else if (config.handlerType === "liveLearnRequest") {
+        result = await liveLearnRequestHandler.handle(ev);
+      }
 
-    return result?.success ?? false;
-  }
+      if (!result?.success && this.chatBot) {
+        //await this.chatBot.sendMessage(`Failed to redeem reward for ${ev.user_name}`);
+        await this.chatBot.sendMessage(`${ev.user_name}, T3 sub is required, limit 1 per monthly sub`);
+      }
 
-  private isRewardType(ev: ChannelPointRedemptionEvent, rewardType: RewardType): boolean {
-    const rewardConfig = config[rewardType];
-    if (!rewardConfig) {
-      return false;
-    }
+      if (result?.chatMessage && this.chatBot) {
+        await this.chatBot.sendMessage(result.chatMessage);
+      }
 
-    return (ev.reward.title.toLowerCase() === rewardConfig.rewardTitle.toLowerCase()) ||
-      (!!rewardConfig.rewardId && ev.reward.id === rewardConfig.rewardId);
+      return result;
+    }));
+
+    return results.filter((r) => !!r) as HandlerResult[];
   }
 }

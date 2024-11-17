@@ -74,7 +74,6 @@ export const RewardsStreamerDashboard = () => {
     <Container maxWidth={"xl"}>
       <div>
         <h1>Stream Rewards</h1>
-        <ConnectButton config={streamRewardsConnectionConfig} />
         <h2>Tokens</h2>
         {Object.keys(tokensByOwnerId).map(ownerId => {
           const tokens = tokensByOwnerId[ownerId];

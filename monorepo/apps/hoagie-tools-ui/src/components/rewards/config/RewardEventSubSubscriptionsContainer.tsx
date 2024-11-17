@@ -6,7 +6,8 @@ import { StateContext } from "../../context/StateContextProvider";
 import { LoginContext } from "../../context/LoginContextProvider";
 import Config from "../../../Config";
 import { CircularProgress } from "@mui/material";
-import { TokenType } from "@hoagie/stream-rewards";
+import { StreamRewardsClient, TokenType } from "@hoagie/stream-rewards";
+import { State } from "@aws-sdk/client-lambda";
 
 export const botId = "631768238"; // TODO configurable
 

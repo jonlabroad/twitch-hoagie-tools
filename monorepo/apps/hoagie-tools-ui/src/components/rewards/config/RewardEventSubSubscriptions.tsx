@@ -7,37 +7,18 @@ import { TokenCategory } from '@hoagie/api-util';
 import { AccessTokenInfo, ValidationResult } from '@hoagie/config-service';
 import { Button, Card, Modal } from '@mui/material';
 import {
+  botAccountConnectionConfig,
   ConnectionConfig,
   createConnectUrl,
+  streamRewardsConnectionConfig,
 } from '../../connection/ConnectionConfig';
 import { ConnectButton } from '../../connection/ConnectButton';
 import { CopyButton } from '../../util/CopyButton';
 import { TwitchAvatar } from '../../avatar/TwitchAvatar';
 import { useState } from 'react';
 import { botId } from './RewardEventSubSubscriptionsContainer';
-
-const requiredSubscriptions = [
-  {
-    type: 'channel.chat.notification',
-  },
-  {
-    type: 'channel.chat.message',
-  },
-  {
-    type: 'channel.channel_points_custom_reward_redemption.add',
-  },
-];
-
-const requiredAuthTokens = {
-  broadcaster: {
-    type: 'REWARDS',
-    scopes: ['channel:bot', 'channel:read:redemptions'],
-  },
-  bot: {
-    type: 'BOT',
-    scopes: ['user:bot'],
-  },
-};
+import { EventSubConnectButton } from './EventSubConnectButton';
+import { StreamRewardsStaticConfig } from '../StreamRewardsStaticConfig';
 
 interface IProps {
   broadcasterId: string;
@@ -54,14 +35,19 @@ interface IProps {
 }
 
 export const RewardEventSubSubscriptions = (props: IProps) => {
-  const requiredBroadcasterTokens = requiredAuthTokens.broadcaster;
-  const requiredBotTokens = requiredAuthTokens.bot;
+  const requiredBroadcasterTokens = streamRewardsConnectionConfig;
+  const requiredBotTokens = botAccountConnectionConfig;
 
   const sectionCardStyle = {
     maxWidth: 1024,
     marginBottom: 16,
     padding: 12,
   };
+
+  const requiredSubscriptions = (props.loggedInUserId && props.broadcasterId) ?
+    StreamRewardsStaticConfig.EventSubSubscriptionDefinitions(props.loggedInUserId, props.broadcasterId) :
+    undefined;
+  console.log({ subscriptions: props.subscriptions, requiredSubscriptions });
 
   return (
     <div>
@@ -109,14 +95,19 @@ export const RewardEventSubSubscriptions = (props: IProps) => {
       </Card>
       <Card style={sectionCardStyle}>
         <h2>Event Sub Subscriptions</h2>
-        {requiredSubscriptions.map((sub) => {
-          const subscription = props.subscriptions.find((s) =>
+        <EventSubConnectButton
+          disabled={!requiredSubscriptions}
+          subscriptions={requiredSubscriptions ?? []}
+        />
+        {requiredSubscriptions?.map((reqSub) => {
+          const subscription = props.subscriptions.find((sub) =>
             SubscriptionUtil.subscriptionMatches(
               {
-                type: sub.type,
+                type: reqSub.type,
+                user_id: reqSub.condition.user_id,
                 broadcaster_user_id: props.broadcasterId,
               },
-              s
+              sub
             )
           );
           return (
@@ -125,7 +116,7 @@ export const RewardEventSubSubscriptions = (props: IProps) => {
                 <div style={{ marginRight: 10 }}>
                   {subscription ? <VerifiedIcon /> : <div>-</div>}
                 </div>
-                <div>{sub.type}</div>
+                <div>{reqSub.type}</div>
               </FlexRow>
             </>
           );

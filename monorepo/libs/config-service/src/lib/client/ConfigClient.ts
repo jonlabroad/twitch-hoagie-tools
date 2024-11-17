@@ -3,6 +3,7 @@ import axios from 'axios';
 import { UserData } from './ConfigDBClient';
 import { AccessTokenInfo } from '../AccessTokenInfo';
 import { ValidationResult } from '@hoagie/config-service';
+import { CreateSubscriptionInput } from '@hoagie/service-clients';
 
 const BASE_URL = 'https://config.hoagieman.net/api/v1/';
 const BASE_URL_DEV = 'https://config-dev.hoagieman.net/api/v1/';
@@ -87,6 +88,17 @@ export class ConfigClient {
   public async getTwitchEventSubSubscriptions(): Promise<any> {
     const response = await axios.get(
       `${this.url}twitch/subscriptions`,
+      {
+        headers: getAuthHeaders(this.userId, this.accessToken),
+      }
+    );
+    return response.data;
+  }
+
+  public async createTwitchEventSubSubscriptions(subscriptions: CreateSubscriptionInput[]): Promise<any> {
+    const response = await axios.post(
+      `${this.url}twitch/subscriptions`,
+      subscriptions,
       {
         headers: getAuthHeaders(this.userId, this.accessToken),
       }

@@ -3,6 +3,7 @@ import {
   ChannelScheduleResponse,
   CreateSubscriptionInput,
     Game,
+    GetCustomRewardResponse,
     Paginated,
   StreamData,
   TwitchSubscription,
@@ -77,6 +78,7 @@ export class TwitchClient {
     subscription: CreateSubscriptionInput,
     callbackHost: string,
     secret: string,
+    throwErrors: boolean = false
   ) {
     const userId = subscription.userId || await this.getUserId(subscription.username ?? "");
     if (!userId) {
@@ -101,8 +103,8 @@ export class TwitchClient {
         'Content-Type': 'application/json',
       },
     };
-    const response = await this.post(url, data);
-    return response.data;
+    const response = await this.post(url, data, undefined, throwErrors);
+    return response?.data;
   }
 
   async deleteSubscription(id: string): Promise<any> {
@@ -348,6 +350,11 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     return this.get(url);
   }
 
+  public async getCustomRedemptions(broadcasterId: string, accessToken?: string): Promise<GetCustomRewardResponse | null | undefined> {
+    const url = `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${broadcasterId}`;
+    return this.get(url, accessToken);
+  }
+
   private async getAuthHeaders(accessToken?: string): Promise<Record<string, string>> {
     const headers: Record<string, string> = {};
     headers['Client-ID'] = this.options.clientId;
@@ -376,7 +383,7 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
     }
   }
 
-  private async post(url: string, data?: Object, accessToken?: string) {
+  private async post(url: string, data?: Object, accessToken?: string, throwErrors: boolean = false) {
     try {
       const response = await axios.post<any>(
         url,
@@ -388,6 +395,9 @@ async getStreamsByGame(gameId: string): Promise<StreamData[]> {
       return response.data ?? null;
     } catch (err: any) {
       console.error(err);
+      if (throwErrors) {
+        throw err;
+      }
       return null;
     }
   }

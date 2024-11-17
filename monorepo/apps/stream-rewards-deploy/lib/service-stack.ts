@@ -10,7 +10,6 @@ import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as aws_apigatewayv2_authorizers from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import * as events from 'aws-cdk-lib/aws-events';
 
-
 const serviceName = 'StreamRewardService';
 const appName = 'stream-rewards-app';
 const subdomain = 'rewards';
@@ -159,11 +158,62 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const getBroadcasterRedemptions = new lambda.Function(
+      this,
+      `getBroadcasterRedemptionsFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getBroadcasterRedemptions",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    const getStreamRewardConfig = new lambda.Function(
+      this,
+      `getStreamRewardConfigFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getStreamRewardsConfig",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    const writeStreamRewardConfig = new lambda.Function(
+      this,
+      `writeStreamRewardConfigFunction`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.writeStreamRewardsConfig",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          TOKENTABLENAME: context.tokenTableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     // HTTP API Gateway
     const httpApi = new HttpApi(this, `ConfigApi-${env}`, {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.PUT, CorsHttpMethod.DELETE, CorsHttpMethod.POST],
         allowHeaders: ['*'],
       },
     });
@@ -191,6 +241,36 @@ export class ServiceStack extends cdk.Stack {
       integration: new apigwIntegrations.HttpLambdaIntegration(
         'redemptions-get-v1',
         getRedemptionsFunction,
+      ),
+      authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/broadcasterredemptions",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'broadcaster-redemptions-get-v1',
+        getBroadcasterRedemptions,
+      ),
+      authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/config",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'config-get-v1',
+        getStreamRewardConfig,
+      ),
+      authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/config",
+      methods: [HttpMethod.POST],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'config-write-v1',
+        writeStreamRewardConfig,
       ),
       authorizer: authorizerConstruct.authorizer,
     });

@@ -1,6 +1,7 @@
 import { CreateSubscriptionInput, TwitchSubscription } from "@hoagie/service-clients";
 import { createTwitchClient } from "../createTwitchClient";
 import { SecretsProvider } from "@hoagie/secrets-provider";
+import axios from "axios";
 
 const subscriptionCallbackHost = "https://hoagietools-svc-prod.hoagieman.net";
 
@@ -27,7 +28,19 @@ export class TwitchEventSub {
     const client = createTwitchClient();
 
     const responses = await Promise.all(input.map(async (subInput) => {
-      return await client.createSubscription(subInput, subscriptionCallbackHost, subscriptionSecret);
+      try {
+        const response = await client.createSubscription(subInput, subscriptionCallbackHost, subscriptionSecret, true);
+        console.log({ response });
+        return "Subscription created";
+      } catch (e: any) {
+        if (axios.isAxiosError(e) && e.response?.status === 409) {
+          console.log(`Subscription already exists: ${subInput.type}`);
+          return "Subscription already exists"
+        } else {
+          console.error(e);
+          return e?.message ?? "Unknown error";
+        }
+      }
     }));
     return responses;
   }

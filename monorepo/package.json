@@ -122,6 +122,7 @@
     "@vitejs/plugin-react": "4.2.0",
     "@vitest/coverage-c8": "~0.32.0",
     "@vitest/ui": "0.34.7",
+    "dotenv": "^16.4.5",
     "esbuild": "0.19.2",
     "eslint": "8.48.0",
     "eslint-config-prettier": "9.0.0",

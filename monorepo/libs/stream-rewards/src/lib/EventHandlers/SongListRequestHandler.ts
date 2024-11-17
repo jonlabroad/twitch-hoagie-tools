@@ -1,9 +1,12 @@
+import { StreamerSongListClient } from '@hoagie/service-clients';
 import { ChatBot } from '../Chat/ChatBot';
 import { ChannelPointRedemptionEvent } from '../Events/ChannelPointRedemptionEvent';
 import TokenDbClient from '../Persistance/TokenDBClient';
 import { IRedemptionInfo, RewardTokenType } from '../Tokens/RewardToken';
 import { HandlerResult } from './HandlerResult';
 import { IStreamRewardEventHandler } from './IStreamRewardEventHandler';
+import { StreamerSongListTokenDBClient } from '@hoagie/config-service';
+import { createDocClient } from '../util/DBUtil';
 
 // TODO this can be part of the persisted configuration
 interface SongListRequestConfig {
@@ -50,11 +53,12 @@ export class SongListRequestHandler implements IStreamRewardEventHandler {
     );
 
     if (redemptionResult.success) {
-      // Future: Attempt to use the API, if token is invalid, resort to chat commands
       const songListRequest = this.createSongListRequest(ev);
-      // TODO execute the song list request
 
-      await this.chatBot.sendMessage(`!ll ${songListRequest.text}`);
+      const apiSuccess = await this.createSongListRequestUsingApi(songListRequest);
+      if (!apiSuccess) {
+        await this.chatBot.sendMessage(`!ll ${songListRequest.text}`);
+      }
 
       return {
         success: true,
@@ -77,5 +81,37 @@ export class SongListRequestHandler implements IStreamRewardEventHandler {
       broadcasterId: ev.broadcaster_user_id,
       broadcasterName: ev.broadcaster_user_name,
     };
+  }
+
+  private async createSongListRequestUsingApi(request: SongListRequest): Promise<boolean> {
+    try {
+      const tableName = process.env['TABLENAME'];
+      if (!tableName) {
+        console.error('TABLENAME not set');
+        return false;
+      }
+
+      const tokenDbClient = new StreamerSongListTokenDBClient(tableName);
+      const sslToken = await tokenDbClient.read();
+      if (!sslToken) {
+        console.error('No token found');
+        return false;
+      }
+
+      const client = new StreamerSongListClient(sslToken.token);
+      const sslStreamerId = await client.getSslUserId(request.broadcasterName);
+      if (!sslStreamerId) {
+        console.error('No streamer id found');
+        return false;
+      }
+
+      console.log({ sslStreamerId, text: request.text, userName: request.userName })
+      const success = await client.nonlistSongRequest(sslStreamerId, request.userName, request.text, );
+      return success;
+    } catch(err) {
+      console.error('Failed to create song list request using the API');
+      console.error(err);
+      return false;
+    }
   }
 }

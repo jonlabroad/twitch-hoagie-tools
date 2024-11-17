@@ -1,3 +1,5 @@
+import { CustomReward } from "@hoagie/service-clients";
+
 export interface TokenType {
   expiryTimestamp: number;
   Expiry: number;
@@ -14,3 +16,5 @@ export interface TokenType {
 }
 
 export type GetTokensResponse = TokenType[];
+
+export type GetBroadcasterRedemptionsResponse = CustomReward[];
