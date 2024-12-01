@@ -7,6 +7,7 @@ import {
 } from "../context/StateContextProvider";
 import { useStreamerName } from "../../hooks/useStreamerName";
 import { RaidConfigModule } from "./modules/RaidConfigModule";
+import { TwitchPlusModule } from "./modules/TwitchPlusConfigModule";
 
 export interface StreamerConfigProps {}
 
@@ -19,6 +20,7 @@ export const StreamerConfigPage = (props: StreamerConfigProps) => {
   return (
     <>
       <ModsModule streamerId={streamerId ?? ""} />
+      <TwitchPlusModule />
       <RaidConfigModule />
     </>
   );

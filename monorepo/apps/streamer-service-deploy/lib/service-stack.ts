@@ -4,6 +4,15 @@ import { Construct } from 'constructs/lib/construct';
 import { ApiCloudFrontDistribution, ApiGatewayLambdaAuthorizer, BasicLambdaExecutionRoleConstruct } from '@hoagie/cdk-lib';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import * as awsEvents from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: ".env.secrets" });
+if (!process.env.PLUSPOINTS_CLIENT_ID) {
+  throw new Error("PLUSPOINTS_CLIENT_ID must be set in .env.secrets");
+}
+
 
 const appName = 'streamer-service-app';
 const subdomain = 'streamer';
@@ -26,6 +35,38 @@ export class ServiceStack extends cdk.Stack {
         'ecs:DescribeServices',
       ]).role;
 
+    const getConfig = new lambda.Function(
+      this,
+      `GetConfig`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.getConfig",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    const setConfig = new lambda.Function(
+      this,
+      `SetConfig`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.setConfig",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
     const getStreamHistory = new lambda.Function(
       this,
       `GetStreamHistory`,
@@ -42,11 +83,35 @@ export class ServiceStack extends cdk.Stack {
       }
     );
 
+    const pollTwitchPlusStatusFunction = new lambda.Function(
+      this,
+      `PollTwitchPlusStatus`,
+      {
+        code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
+        handler: "handlers.pollTwitchPlusStatuses",
+        runtime: lambda.Runtime.NODEJS_18_X,
+        environment: {
+          TABLENAME: context.tableName,
+          PLUSPOINTS_CLIENT_ID: process.env.PLUSPOINTS_CLIENT_ID ?? "NO_CLIENT_ID",
+        },
+        role: lambdaExecutionRole,
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 1024,
+      }
+    );
+
+    // Trigger pollTwitchPlusStatus every 5 minutes
+    const twitchPlusPollRule = new awsEvents.Rule(this, 'twitchPlusPollRule', {
+      enabled: true,
+      schedule: awsEvents.Schedule.expression('rate(60 minutes)'),
+    });
+    twitchPlusPollRule.addTarget(new targets.LambdaFunction(pollTwitchPlusStatusFunction));
+
      // HTTP API Gateway
     const httpApi = new HttpApi(this, `StreamerApi`, {
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST],
         allowHeaders: ['*'],
       },
     });
@@ -55,6 +120,26 @@ export class ServiceStack extends cdk.Stack {
       appName,
       tableName: context.tableName,
       lambdaExecutionRole,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/config",
+      methods: [HttpMethod.GET],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'config-get-v1',
+        getConfig,
+      ),
+      authorizer: authorizerConstruct.authorizer,
+    });
+
+    httpApi.addRoutes({
+      path: "/api/v1/{streamerId}/config",
+      methods: [HttpMethod.POST],
+      integration: new apigwIntegrations.HttpLambdaIntegration(
+        'config-set-v1',
+        setConfig,
+      ),
+      authorizer: authorizerConstruct.authorizer,
     });
 
     httpApi.addRoutes({
