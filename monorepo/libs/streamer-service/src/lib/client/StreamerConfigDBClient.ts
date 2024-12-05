@@ -3,12 +3,14 @@ import { ISimpleObjectDBClient } from '../util/ISimpleObjectDBClient';
 export interface StreamerConfigData {
   broadcasterId?: string;
   twitchPlus: {
+    goal: number;
     trackingEnabled: boolean;
   };
 }
 
 export const defaultStreamerConfigData: StreamerConfigData = {
   twitchPlus: {
+    goal: 100,
     trackingEnabled: false,
   },
 };

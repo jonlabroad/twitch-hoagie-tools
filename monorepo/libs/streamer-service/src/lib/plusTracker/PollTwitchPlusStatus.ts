@@ -3,6 +3,8 @@ import { TwitchPlusClient } from './TwitchPlusClient';
 import { TwitchPlusStatusDBClient } from './TwitchPlusStatusDBClient';
 import { StreamerConfigDBClient } from '@hoagie/streamer-service';
 
+const doWritePreviousMonths = false;
+
 export const pollTwitchPlusStatus = async () => {
   await SecretsProvider.init();
 
@@ -52,6 +54,29 @@ export const pollTwitchPlusStatus = async () => {
         timestamp: new Date().toISOString(),
         value: currentMonthStatus.count,
       });
+
+      if (doWritePreviousMonths) {
+        await Promise.all(
+          body.data.plusStatus.partnerPlusProgram.subPoints
+            .filter(s => !(s.month === currentMonth + 1 && s.year === currentYear))
+            .map(async (status) => {
+              const endOfMonthTimestamp = getLastDateOfMonth(status.year, status.month).toISOString();
+              console.log(`Writing results for ${channelId} for month ${status.month} year ${status.year}`);
+              await dbClient.set({
+                broadcasterId: channelId,
+                month: status.month,
+                year: status.year,
+                timestamp: endOfMonthTimestamp,
+                value: status.count,
+              });
+            })
+        );
+      }
     })
   );
 };
+
+const getLastDateOfMonth = (year: number, monthStartingAt1: number) => {
+  const firstOfNextMonth = new Date(year, monthStartingAt1 % 12, 1, 0, 0, 0, 0);
+  return new Date(firstOfNextMonth.getTime() - 1e3);
+}

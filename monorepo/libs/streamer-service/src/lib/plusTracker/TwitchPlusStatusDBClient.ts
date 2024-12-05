@@ -1,4 +1,4 @@
-import { PutCommand, PutCommandInput } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, PutCommandInput, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { createDocClient } from '../util/DBUtil';
 
 export interface TwitchPlusStatusEntry {
@@ -44,24 +44,27 @@ export class TwitchPlusStatusDBClient {
     }
   }
 
-  /* TODO
-  public async getStreamHistory(limit = 20): Promise<TwitchPlusStatusEntry[]> {
-      const client = createDocClient();
-      const input: QueryCommandInput = {
-          TableName: this.tableName,
-          KeyConditionExpression: "CategoryKey = :ckey",
-          ExpressionAttributeValues: {
-              ":ckey": this.getKey(this.broadcasterId)
-          },
-          ScanIndexForward: false, // descending order?
-          Limit: limit,
-      }
-      console.log(JSON.stringify(input, null, 2));
-      const command = new QueryCommand(input);
-      const response = await client.send(command);
-      return response.Items?.map(s => s["stream"]) ?? []
+  public async query(broadcasterId: string): Promise<TwitchPlusStatusEntry[]> {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const startTime = sixMonthsAgo.toISOString();
+
+    const client = createDocClient();
+    const input = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'CategoryKey = :ckey AND SubKey >= :start',
+      ExpressionAttributeValues: {
+        ':ckey': this.getKey(broadcasterId),
+        ':start': startTime,
+      },
+    };
+
+    console.log(JSON.stringify(input, null, 2));
+    const command = new QueryCommand(input);
+    const response = await client.send(command);
+
+    return (response.Items ?? []) as TwitchPlusStatusEntry[];
   }
-*/
 
   getKey(broadcasterId: string) {
     return `${TwitchPlusStatusDBClient.CATEGORY}_${broadcasterId}`;

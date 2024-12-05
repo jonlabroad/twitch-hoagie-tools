@@ -47,6 +47,7 @@ import { ConnectionRedirect } from "./components/connection/ConnectionRedirect";
 import { BulkWhisperPageContainer } from "./specialevent/BulkWhisperPageContainer";
 import { RewardMonitoring } from "./components/pages/RewardMonitoring";
 import { RewardConfigPageContainer } from "./components/rewards/config/RewardConfigPageContainer";
+import { TwitchPlusStatusPage } from "./components/pages/TwitchPlusStatusPage";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -178,6 +179,12 @@ function App() {
                             path="/s/:streamer/bulkwhisper"
                             element={
                               <BulkWhisperPageContainer />
+                            }
+                          />
+                          <Route
+                            path="/s/:streamer/twitchplus"
+                            element={
+                              <TwitchPlusStatusPage />
                             }
                           />
                           <Route

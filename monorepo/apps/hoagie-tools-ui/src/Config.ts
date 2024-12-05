@@ -38,6 +38,11 @@ export default class Config {
             path: "/s/:streamer/dono",
             access: "mod"
         },
+        "twitchplus": {
+            title: "Twitch Plus",
+            path: "/s/:streamer/twitchplus",
+            access: "mod"
+        },
         "raid": {
             title: "Raid Candidates",
             path: "/s/:streamer/raid",

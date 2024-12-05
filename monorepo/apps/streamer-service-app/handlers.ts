@@ -1,7 +1,7 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { SecretsProvider } from '@hoagie/secrets-provider';
 import { corsHeaders, twitchModStreamerLamdbaAuthorizer } from '@hoagie/api-util';
-import { getStreamHistory as getStreamHistoryFunction, pollTwitchPlusStatus, StreamerConfigDBClient } from '@hoagie/streamer-service';
+import { getStreamHistory as getStreamHistoryFunction, pollTwitchPlusStatus, queryTwitchPlusStatus, StreamerConfigDBClient } from '@hoagie/streamer-service';
 import { createTwitchClient } from './src/createTwitchClient';
 
 const version = '1.0.0';
@@ -115,6 +115,10 @@ export async function getStreamHistory(apiEvent: APIGatewayEvent) {
 
 export async function pollTwitchPlusStatuses() {
   return await pollTwitchPlusStatus();
+}
+
+export async function queryTwitchPlusData(apiEvent: APIGatewayEvent) {
+  return await queryTwitchPlusStatus(apiEvent);
 }
 
 function validateCommon(apiEvent: APIGatewayEvent) {
