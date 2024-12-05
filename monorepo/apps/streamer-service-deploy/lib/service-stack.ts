@@ -42,6 +42,7 @@ export class ServiceStack extends cdk.Stack {
         'dynamodb:UpdateItem',
         'dynamodb:DeleteItem',
         'ecs:DescribeServices',
+        'sns:Publish',
       ]
     ).role;
 
