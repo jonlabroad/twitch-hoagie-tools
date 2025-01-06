@@ -47,7 +47,6 @@ export const RewardEventSubSubscriptions = (props: IProps) => {
   const requiredSubscriptions = (props.loggedInUserId && props.broadcasterId) ?
     StreamRewardsStaticConfig.EventSubSubscriptionDefinitions(props.loggedInUserId, props.broadcasterId) :
     undefined;
-  console.log({ subscriptions: props.subscriptions, requiredSubscriptions });
 
   return (
     <div>

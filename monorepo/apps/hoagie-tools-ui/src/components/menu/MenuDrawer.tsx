@@ -36,7 +36,6 @@ export const MenuDrawer = (props: MenuDrawerProps) => {
   const { state: loginState } = useContext(LoginContext);
 
   const { mods } = useContext(ModListContext);
-  console.log({ mods });
   const isMod = mods?.length > 0 &&
     loginState.userId &&
     loginState.isLoggedIn &&

@@ -126,11 +126,6 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
               <TableCell>
                 <Typography style={headerStyle}>Duration</Typography>
               </TableCell>
-              <Hidden mdDown>
-                <TableCell>
-                  <Typography style={headerStyle}>Time Signature</Typography>
-                </TableCell>
-              </Hidden>
               <TableCell>
                 <Typography style={headerStyle}>Genres</Typography>
               </TableCell>
@@ -144,7 +139,8 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
               const isSslListSong = !!queueSong?.song;
               const songKey = getSongKey(queueSong);
               const evaluation = evaluations[songKey] as any | undefined;
-              const badWordStatus = evaluation?.eval?.lyricsEval?.status;
+              const lyricsEvalPresent = !!evaluation?.eval?.lyricsEval;
+              const badWordStatus = lyricsEvalPresent ? evaluation?.eval?.lyricsEval?.status : { isError: true };
               const badWordCounts = getBadWordsCounts(
                 evaluation?.eval?.lyricsEval,
                 config?.whitelist ?? []
@@ -163,13 +159,6 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
               const durationFormatted = format(durationMs);
               const genres = (evaluation?.songInfo?.artist?.genres ??
                 []) as string[];
-              const timeSignature = songAnalysis?.track?.time_signature;
-              const timeSignatureText = timeSignature
-                ? `${timeSignature}/4`
-                : "";
-              const timeSignatureConfidenceText = timeSignature
-                ? `(${songAnalysis?.track?.time_signature_confidence})`
-                : "";
               const genreText = genres.join(", ");
               const userName =
                 evaluation?.user ?? queueSong.requests[0]?.name ?? "";
@@ -228,20 +217,6 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                           </Typography>
                         )}
                       </TableCell>
-                      <Hidden mdDown>
-                        <TableCell>
-                          {evaluationStatus?.isLoading ? (
-                            <LoadingPlaceholder width={40} />
-                          ) : (
-                            <FlexRow alignItems="center" mr={3}>
-                              <Typography>{timeSignatureText}&nbsp;</Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                {timeSignatureConfidenceText}
-                              </Typography>
-                            </FlexRow>
-                          )}
-                        </TableCell>
-                      </Hidden>
                       <TableCell>
                         {evaluationStatus?.isLoading ? (
                           <LoadingPlaceholder width={200} />

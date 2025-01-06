@@ -20,7 +20,6 @@ export function useStreamerConfig(
           loginState.accessToken
         );
         const data = await client.get(broadcasterId);
-        console.log({ data });
         if (data) {
           setData(data);
         }

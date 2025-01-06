@@ -10,7 +10,6 @@ export function useStreamerName() {
     const stateContext = useContext(StateContext)
     const loginContext = useContext(LoginContext)
     const { streamer } = useParams() as { streamer: string }
-    console.log({ streamer });
 
     useEffect(() => {
         if (streamer && streamer !== stateContext.state.streamer) {

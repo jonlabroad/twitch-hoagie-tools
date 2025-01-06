@@ -53,7 +53,6 @@ export class HoagieSocketEventListener {
   }
 
   private onMessage(event: { data: string }) {
-    console.log({ event });
     try {
       if (event.data !== "pong") {
         const parsed = JSON.parse(event.data);

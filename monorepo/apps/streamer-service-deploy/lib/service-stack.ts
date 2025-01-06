@@ -49,7 +49,7 @@ export class ServiceStack extends cdk.Stack {
     const getConfig = new lambda.Function(this, `GetConfig`, {
       code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
       handler: 'handlers.getConfig',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       environment: {
         TABLENAME: context.tableName,
       },
@@ -61,7 +61,7 @@ export class ServiceStack extends cdk.Stack {
     const setConfig = new lambda.Function(this, `SetConfig`, {
       code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
       handler: 'handlers.setConfig',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       environment: {
         TABLENAME: context.tableName,
       },
@@ -73,7 +73,7 @@ export class ServiceStack extends cdk.Stack {
     const getStreamHistory = new lambda.Function(this, `GetStreamHistory`, {
       code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
       handler: 'handlers.getStreamHistory',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       environment: {
         TABLENAME: context.tableName,
       },
@@ -88,7 +88,7 @@ export class ServiceStack extends cdk.Stack {
       {
         code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
         handler: 'handlers.pollTwitchPlusStatuses',
-        runtime: lambda.Runtime.NODEJS_18_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         environment: {
           TABLENAME: context.tableName,
           PLUSPOINTS_CLIENT_ID:
@@ -106,7 +106,7 @@ export class ServiceStack extends cdk.Stack {
       {
         code: lambda.Code.fromAsset(`../../dist/apps/${appName}`),
         handler: 'handlers.queryTwitchPlusData',
-        runtime: lambda.Runtime.NODEJS_18_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         environment: {
           TABLENAME: context.tableName,
         },
@@ -119,7 +119,7 @@ export class ServiceStack extends cdk.Stack {
     // Trigger pollTwitchPlusStatus every 5 minutes
     const twitchPlusPollRule = new awsEvents.Rule(this, 'twitchPlusPollRule', {
       enabled: true,
-      schedule: awsEvents.Schedule.expression('rate(60 minutes)'),
+      schedule: awsEvents.Schedule.expression('rate(15 minutes)'),
     });
     twitchPlusPollRule.addTarget(
       new targets.LambdaFunction(pollTwitchPlusStatusFunction)

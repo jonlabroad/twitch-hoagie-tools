@@ -24,7 +24,6 @@ export const HoagieUserDataContextProvider = (props: HoagieUserDataContextProvid
         // TODO this should be cached in memory until page reload
         const userData = await client.getUserData(userId);
         if (userData) {
-          console.log({ userData });
           setUserData(userData)
         }
     }

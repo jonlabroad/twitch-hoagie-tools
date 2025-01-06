@@ -13,7 +13,6 @@ export class SubscriptionUtil {
       (!query.user_id || sub.condition.user_id === query.user_id) &&
       sub.condition.broadcaster_user_id === query.broadcaster_user_id
     );
-    console.log({ type: query.type, query, sub, result });
     return result;
   }
 }

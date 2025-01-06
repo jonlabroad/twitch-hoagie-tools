@@ -13,9 +13,14 @@ export class SongEvaluator {
     console.log({ searchingForSong: query });
     const geniusClient = new GeniusClient(this.geniusSecret);
     const geniusSong = await geniusClient.getSong(query);
-    const lyrics = geniusSong
-      ? await geniusClient.getLyricsFromUrl(geniusSong.url)
-      : "";
+    let lyrics = "";
+    try {
+      lyrics = geniusSong
+        ? await geniusClient.getLyricsFromUrl(geniusSong.url)
+        : "";
+    } catch (err: any) {
+      console.error(`Unable to get Genius lyrics (${geniusSong.url}): ${err.message}`);
+    }
 
     //Evaluate the lyrics
     let lyricsEval: any = undefined;

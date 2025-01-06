@@ -49,7 +49,6 @@ const validateTokens = useCallback(async () => {
 useEffect(() => {
   validateTokens();
 }, [validateTokens]);
-  console.log({ subscriptions, appState });
 
   if (!appState.streamerId) {
     return <CircularProgress />

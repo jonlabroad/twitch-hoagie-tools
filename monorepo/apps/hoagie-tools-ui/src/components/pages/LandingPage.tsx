@@ -28,7 +28,6 @@ export const LandingPage = () => {
     streamerIds.current,
     5 * 60 * 1e3
   );
-  console.log({ schedules, loading });
 
   if (!loginState.userId || !loginState.accessToken) {
     return <div></div>;
@@ -38,8 +37,6 @@ export const LandingPage = () => {
   const channelIdsToDisplay = (userData?.streamerIds || []).filter(
     (channelId) => !!twitchUserDataValues.find(u => u.id === channelId)
   );
-
-  console.log({ twitchUserData });
 
   return (
     <TwitchUserInfoProvider>

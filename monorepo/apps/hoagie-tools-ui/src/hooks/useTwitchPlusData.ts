@@ -46,7 +46,6 @@ export function useTwitchPlusData(
   useEffect(() => {
     if (loginState.userId && loginState.accessToken && broadcasterId) {
       if (!pollHandle.current && intervalMin && intervalMin > 0) {
-        console.log({ scheduling: intervalMin});
         pollHandle.current = setInterval(() => {
           fetchData(loginState.userId, loginState.accessToken, broadcasterId);
         }, intervalMin * 60 * 1000);

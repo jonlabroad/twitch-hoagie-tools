@@ -48,7 +48,13 @@ export default class SpotifyGetSongs {
             if (songInfoRaw) {
               const songInfo = songInfoRaw.tracks.items[0];
               const artist = await client.getUrl(songInfo.artists[0].href);
-              const analysis = await client.getAudioAnalysis(songInfo.id);
+              let analysis = undefined;
+              try {
+                analysis = await client.getAudioAnalysis(songInfo.id);
+              } catch (err) {
+                console.warn(`Could not get analysis for song ${songInfo.id}`);
+                console.error(err);
+              }
               if (analysis) {
                 // @ts-ignore
                 delete analysis.meta;
