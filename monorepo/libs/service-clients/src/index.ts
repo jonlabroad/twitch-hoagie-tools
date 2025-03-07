@@ -5,3 +5,5 @@ export * from './lib/badwords/BadWordsClient';
 export * from './lib/badwords/HoagieBadWordsClient';
 export * from './lib/spotify/SpotifyClient';
 export * from './lib/streamersonglist/StreamerSongListClient';
+export * from './lib/deezer/DeezerClient';
+export * from './lib/lyricsOvh/LyricsOvh';

@@ -1,11 +1,10 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { SongEvalConfig } from "../components/ssl/SongEvalConfig";
 import HoagieClient from "../service/HoagieClient";
 import { AppState } from "../state/AppState";
 import { LoginContext } from "../components/context/LoginContextProvider";
 import { LoginState } from "../state/LoginState";
 import { SongLookupClient } from "@hoagie/song-lookup-service";
-import { SongEvalClient, SongEvalConfigData } from "@hoagie/song-eval-service";
+import { EvalResponse, SongEvalClient, SongEvalConfigData } from "@hoagie/song-eval-service";
 import Config from "../Config";
 
 export type Evaluations = Record<string, any>;
@@ -77,7 +76,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                     if (songName) {
                         const doEval = !(evaluations ?? {})[songName];
                         if (doEval) {
-                            let evaluation: any | undefined = undefined;
+                            let evaluation: EvalResponse | null = null;
                             try {
                                 setEvalLoading(songName, true, false)
                                 evaluation = await client.songEval(songName, state.streamerId!);
@@ -94,9 +93,9 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                             }
 
                             if (evaluation) {
-                                const artist = evaluation?.song?.artist_names;
+                                const artist = evaluation?.song?.artist.name;
                                 const title = evaluation?.song?.title;
-                                const doLookup = !evaluation?.songInfo;
+                                const doLookup = /* !evaluation?.songInfo; */ true; // Can't remember why this is here? Was it sometimes included?
                                 let spotifySong: any | undefined = undefined;
                                 if (doLookup && artist && title) {
                                   const lookupClient = new SongLookupClient(Config.environment, loginState.userId!, loginState.accessToken!);

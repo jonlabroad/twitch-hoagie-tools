@@ -26,6 +26,7 @@ import format from "format-duration";
 import { DonoContext } from "../dono/DonoContextProvider";
 import { DonoUtil } from "../../util/DonoUtil";
 import { SongEvalConfigData } from "@hoagie/song-eval-service";
+import { LyricsDrawer } from "./LyricsDrawer";
 
 const maxSongDurationMillis = 7 * 60 * 1e3;
 const defaultSongDurationMillis = 4 * 60 * 1e3;
@@ -140,6 +141,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
               const songKey = getSongKey(queueSong);
               const evaluation = evaluations[songKey] as any | undefined;
               const lyricsEvalPresent = !!evaluation?.eval?.lyricsEval;
+              const lyrics = evaluation?.eval?.lyrics;
               const badWordStatus = lyricsEvalPresent ? evaluation?.eval?.lyricsEval?.status : { isError: true };
               const badWordCounts = getBadWordsCounts(
                 evaluation?.eval?.lyricsEval,
@@ -182,7 +184,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                         </FlexRow>
                         <Typography style={{ fontSize: 14, color: "grey" }}>
                           {resolvedSong
-                            ? `${resolvedSong?.artist_names} - ${resolvedSong?.title}`
+                            ? `${resolvedSong?.artist.name} - ${resolvedSong?.title}`
                             : ""}
                         </Typography>
                       </FlexCol>
@@ -228,7 +230,8 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                         {evaluationStatus?.isLoading ? (
                           <LoadingPlaceholder width={120} />
                         ) : (
-                          <FlexRow>
+                          <FlexRow alignItems={"center"}>
+                            {<LyricsDrawer badWordsCounts={badWordCounts} lyrics={lyrics} />}
                             {lyricsLink && <GeniusLink href={lyricsLink} />}
                             {spotifyLink && <SpotifyLink href={spotifyLink} />}
                           </FlexRow>

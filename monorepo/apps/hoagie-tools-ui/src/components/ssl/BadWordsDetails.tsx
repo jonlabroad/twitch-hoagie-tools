@@ -41,7 +41,7 @@ export const BadWordsDetails = (props: BadWordsDetailsProps) => {
                     }}
                     showExpand={whitelisted.length > 0}
                     summary={
-                        <Typography style={{ fontWeight: 600 }} variant="body2">{`Whitelisted (${whitelisted.length})`}</Typography>
+                        <Typography style={{ fontWeight: 600 }} variant="body2">{`Allow List (${whitelisted.length})`}</Typography>
                     }
                 >
                     <Typography variant="body2">{whitelisted.map(word => (

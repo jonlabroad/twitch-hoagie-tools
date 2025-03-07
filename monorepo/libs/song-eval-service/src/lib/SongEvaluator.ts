@@ -1,4 +1,4 @@
-import { BadWordsClient, HoagieBadWordsClient, GeniusClient } from "@hoagie/service-clients";
+import { BadWordsClient, HoagieBadWordsClient, GeniusClient, DeezerClient, LyricsOvh, DeezerSong } from "@hoagie/service-clients";
 
 export class SongEvaluator {
   private geniusSecret: string;
@@ -11,31 +11,37 @@ export class SongEvaluator {
 
   public async evaluate(query: string) {
     console.log({ searchingForSong: query });
-    const geniusClient = new GeniusClient(this.geniusSecret);
-    const geniusSong = await geniusClient.getSong(query);
-    let lyrics = "";
-    try {
-      lyrics = geniusSong
-        ? await geniusClient.getLyricsFromUrl(geniusSong.url)
-        : "";
-    } catch (err: any) {
-      console.error(`Unable to get Genius lyrics (${geniusSong.url}): ${err.message}`);
-    }
 
     //Evaluate the lyrics
     let lyricsEval: any = undefined;
-    if (lyrics) {
-      const badWordsClient = new BadWordsClient(this.badWordsSecret);
-      lyricsEval = await badWordsClient.eval(geniusSong.full_title, lyrics);
-      if (lyricsEval.status.isError) {
-        try {
-          // Use the backup
-          console.log("Using bad words backup!");
-          const hoagieClient = new HoagieBadWordsClient();
-          const result = hoagieClient.eval(lyrics);
-          lyricsEval = result;
-        } catch (err) {
-          console.error(err);
+    let lyrics: string = "";
+    let song: DeezerSong | null = null;
+    const deezerSearch = await DeezerClient.search(query);
+    if (deezerSearch && deezerSearch?.data && deezerSearch.data.length > 0) {
+      const deezerSong = deezerSearch.data[0];
+      console.log({ deezerSong });
+      song = deezerSong;
+      const artist = deezerSong.artist.name;
+      const track = deezerSong.title;
+      console.log({ artist, track });
+      lyrics = await LyricsOvh.getLyrics(artist, track);
+      if (lyrics) {
+        const evalCacheKey = `${artist}-${track}`;
+        if (evalCacheKey) {
+          const badWordsClient = new BadWordsClient(this.badWordsSecret);
+          //lyricsEval = await badWordsClient.eval(geniusSong.full_title, lyrics);
+          lyricsEval = await badWordsClient.eval(evalCacheKey, lyrics);
+          if (lyricsEval.status.isError) {
+            try {
+              // Use the backup
+              console.log("Using bad words backup!");
+              const hoagieClient = new HoagieBadWordsClient();
+              const result = hoagieClient.eval(lyrics);
+              lyricsEval = result;
+            } catch (err) {
+              console.error(err);
+            }
+          }
         }
       }
     }
@@ -43,7 +49,7 @@ export class SongEvaluator {
     return {
       lyricsEval,
       lyrics,
-      song: geniusSong,
+      song,
     };
   }
 }

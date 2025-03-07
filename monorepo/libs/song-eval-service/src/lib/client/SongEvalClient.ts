@@ -5,6 +5,17 @@ import { SongEvalConfigData } from "./SongEvalDBClient";
 const BASE_URL = "https://songeval.hoagieman.net/api/v1/"
 const BASE_URL_DEV = 'https://songeval-dev.hoagieman.net/api/v1/';
 
+export interface EvalResponse {
+  lyrics: string;
+  lyricsEval: any;
+  song: {
+    artist: {
+      name: string;
+    };
+    title: string;
+  };
+}
+
 export class SongEvalClient {
   environment: "prod" | "dev"
   url: string
@@ -21,7 +32,7 @@ export class SongEvalClient {
   async songEval(
     song: string,
     streamerId: string
-  ) {
+  ): Promise<EvalResponse | null> {
     const response = await axios.get(
       `${this.url}eval?query=${song}&streamerid=${streamerId}`,
       {

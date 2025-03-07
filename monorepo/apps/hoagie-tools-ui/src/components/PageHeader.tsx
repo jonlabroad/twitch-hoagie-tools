@@ -23,7 +23,7 @@ export const PageHeader = (props: { scopes: string; clientId: string }) => {
   const navigate = useNavigate();
 
   // HACK!!!
-    // TODO perform a "login" when connecting strearer's event (not for the usual everyday login, though)
+    // TODO perform a "login" when connecting streamer's event (not for the usual everyday login, though)
   const additionalScopes = getStreamerScopes ? " user:read:chat user:bot channel:read:redemptions" : ""; // For all streamers, but only when connecting
 
   const [] = useLogin(
