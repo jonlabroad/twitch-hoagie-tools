@@ -165,6 +165,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
               const userName =
                 evaluation?.user ?? queueSong.requests[0]?.name ?? "";
               const evaluationStatus = props.evaluationsStatus[songKey];
+
               return (
                 <>
                   <TableRow
@@ -184,7 +185,7 @@ export const EvaluatedSongQueue = (props: EvaluatedSongQueueProps) => {
                         </FlexRow>
                         <Typography style={{ fontSize: 14, color: "grey" }}>
                           {resolvedSong
-                            ? `${resolvedSong?.artist.name} - ${resolvedSong?.title}`
+                            ? `${resolvedSong?.artist?.name} - ${resolvedSong?.title}`
                             : ""}
                         </Typography>
                       </FlexCol>

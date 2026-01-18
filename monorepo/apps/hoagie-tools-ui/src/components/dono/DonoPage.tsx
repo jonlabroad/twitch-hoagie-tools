@@ -18,7 +18,7 @@ export const DonoPage = (props: DonoPageProps) => {
   useStreamerName();
 
   const stateContext = useContext(StateContext);
-  const isSubathon = false;
+  const isSubathon = stateContext.state.streamer?.toLowerCase() === "thesongery";
 
   return (
     <>

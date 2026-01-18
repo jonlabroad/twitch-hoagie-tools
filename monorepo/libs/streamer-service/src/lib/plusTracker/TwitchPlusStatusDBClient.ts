@@ -45,9 +45,9 @@ export class TwitchPlusStatusDBClient {
   }
 
   public async query(broadcasterId: string): Promise<TwitchPlusStatusEntry[]> {
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    const startTime = sixMonthsAgo.toISOString();
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const startTime = twoMonthsAgo.toISOString();
 
     const client = createDocClient();
     const input = {

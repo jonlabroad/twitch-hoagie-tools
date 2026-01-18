@@ -93,7 +93,7 @@ export const useSongQueueEval = (state: AppState): [Record<string, any>, boolean
                             }
 
                             if (evaluation) {
-                                const artist = evaluation?.song?.artist.name;
+                                const artist = evaluation?.song?.artist?.name;
                                 const title = evaluation?.song?.title;
                                 const doLookup = /* !evaluation?.songInfo; */ true; // Can't remember why this is here? Was it sometimes included?
                                 let spotifySong: any | undefined = undefined;

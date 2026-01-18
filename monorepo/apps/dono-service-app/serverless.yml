@@ -5,7 +5,6 @@ plugins:
   - serverless-esbuild
   - serverless-offline
   - serverless-prune-plugin
-  - serverless-plugin-log-retention
 
 provider:
   name: aws
