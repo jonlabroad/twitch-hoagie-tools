@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch Multichat Integrator",
+  "version": "1.0.0",
+  "description": "Monitor Twitch DOM and communicate between tabs",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.twitch.tv/*"
+  ],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.twitch.tv/*"],
+      "js": ["dist/content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

@@ -48,6 +48,11 @@ import { BulkWhisperPageContainer } from "./specialevent/BulkWhisperPageContaine
 import { RewardMonitoring } from "./components/pages/RewardMonitoring";
 import { RewardConfigPageContainer } from "./components/rewards/config/RewardConfigPageContainer";
 import { TwitchPlusStatusPage } from "./components/pages/TwitchPlusStatusPage";
+import { MultiModPage } from "./components/pages/MultiModPage";
+import { LoginRedirectYoutube } from "./components/LoginRedirectYoutube";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const HoagieToolsStreamChatsClientId = "360294299808-qpddue75gnqun3p3pr5a0efq6pd45fbo.apps.googleusercontent.com";
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -122,6 +127,10 @@ function App() {
                             element={<LoginRedirect />}
                           />
                           <Route
+                            path="/loginRedirectYoutube"
+                            element={<LoginRedirect />}
+                          />
+                          <Route
                             path="/connectionBot"
                             element={<ConnectionPage connectionConfig={botAccountConnectionConfig} />}
                           />
@@ -185,6 +194,20 @@ function App() {
                             path="/s/:streamer/twitchplus"
                             element={
                               <TwitchPlusStatusPage />
+                            }
+                          />
+                          <Route
+                            path="/youtubetest"
+                            element={
+                              <GoogleOAuthProvider clientId={HoagieToolsStreamChatsClientId}>
+                                <MultiModPage />
+                              </GoogleOAuthProvider>
+                            }
+                          />
+                          <Route
+                            path="/loginRedirectYoutube"
+                            element={
+                              <LoginRedirectYoutube />
                             }
                           />
                           <Route

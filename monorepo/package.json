@@ -67,6 +67,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.14.11",
     "@ramonak/react-progress-bar": "^5.2.0",
+    "@react-oauth/google": "^0.13.4",
     "@react-spring/web": "^9.7.3",
     "@swc/helpers": "~0.5.2",
     "atob": "^2.1.2",

@@ -28,3 +28,22 @@ export function useLogin(setLogin: (username: string | undefined, userId: string
     return [];
 }
 
+export function useYoutubeLogin(setLogin: (username: string | undefined, userId: string | undefined, accessToken: string, loggedIn: boolean) => void) {
+    useEffect(() => {
+        async function login() {
+            const sessionData = LoginUtil.getSessionData();
+            if (window.location.hash) {
+                // User redirected from Youtube oauth
+                const parsed = qs.parse(window.location.hash.replace('#', ''));
+                console.log({ parsed });
+                // TODO validate Youtube session and save session data
+            } else if (sessionData && sessionData.accessToken) {
+                // Validate with the Youtube API, reset the session if it is no longer valid
+            }
+        }
+        login();
+    }, []);
+
+    return [];
+}
+
