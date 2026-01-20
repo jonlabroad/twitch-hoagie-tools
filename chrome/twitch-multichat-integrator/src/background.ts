@@ -6,13 +6,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('Background received message:', message, 'from tab:', sender.tab?.id);
 
   // Handle different message types
-  if (message.type === 'DOM_CHANGE') {
+  if (message.type === 'youtube-chat') {
     // Broadcast to all tabs
     chrome.tabs.query({ url: 'https://www.twitch.tv/*' }, (tabs) => {
       tabs.forEach((tab) => {
         if (tab.id && tab.id !== sender.tab?.id) {
           chrome.tabs.sendMessage(tab.id, {
-            type: 'DOM_CHANGE_BROADCAST',
+            type: 'youtube-chat-message',
             data: message.data,
             sourceTabId: sender.tab?.id,
           });
