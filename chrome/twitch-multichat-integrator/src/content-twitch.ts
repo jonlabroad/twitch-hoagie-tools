@@ -1,3 +1,5 @@
+import { getColorForAuthor } from "./youtube-chat-colors";
+
 const youtubeMessages: YoutubeChatMessage[] = [];
 
 // Content script for Twitch.tv pages
@@ -45,14 +47,16 @@ function insertYoutubeMessageIntoTwitchChat(youtubeMessage: YoutubeChatMessageDa
   const chatContainer = document.querySelector('.chat-scrollable-area__message-container');
   if (!chatContainer) return;
 
+  const usernameColor = getColorForAuthor(youtubeMessage.author);
+
   const messageElement = document.createElement('div');
-  messageElement.className = 'chat-line__message';
+  messageElement.className = 'chat-line__message youtube-chat-message';
   messageElement.style.margin = '2px';
   messageElement.style.padding = '4px';
   messageElement.style.backgroundColor = 'transparent';
   messageElement.innerHTML = `
     <span style="border-radius:4px;border-width:1px;background-color:#fc1037;color:white;padding:2px;font-size:12px;">YouTube</span>
-    <span style="color:#fc1037;font-weight:bold;">${youtubeMessage.author}:</span>
+    <span style="color:${usernameColor};font-weight:bold;">${youtubeMessage.author}:</span>
     <span>${youtubeMessage.content}</span>
   `;
   //<span style="color:#888;font-size:0.8em;margin-left:8px;">(${youtubeMessage.youtubeTimestamp})</span>
