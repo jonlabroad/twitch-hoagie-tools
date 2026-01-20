@@ -1,0 +1,54 @@
+/* YouTube message styles for Twitch chat integration */
+.youtube-chat-message {
+  margin: 0px !important;
+  padding: 0px !important;
+  color: white;
+  background-color: transparent;
+}
+
+.youtube-chat-message img {
+  display: inline-block;
+  vertical-align: middle;
+  height: 24px;
+  width: auto;
+  margin: 0 2px;
+}
+
+.youtube-chat-message-content {
+  color: white;
+  vertical-align: middle;
+}
+
+.youtube-chat-message-content img {
+  max-height: 28px;
+  vertical-align: middle;
+}
+
+/* Toggle button styles */
+.youtube-toggle-button {
+  background-color: #fc1037;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: opacity 0.2s;
+}
+
+.youtube-toggle-button:hover {
+  opacity: 0.8;
+}
+
+.youtube-toggle-button.disabled {
+  background-color: #555;
+  opacity: 0.5;
+}
+
+/* Hide YouTube messages when toggle is off */
+body.hide-youtube-messages .youtube-chat-message {
+  display: none !important;
+  padding: 0px !important;
+}

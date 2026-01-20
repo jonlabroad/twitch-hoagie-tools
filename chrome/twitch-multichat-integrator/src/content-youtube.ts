@@ -6,7 +6,7 @@ if (window.self !== window.top) {
   
   if (!isInChatFrame) {
     console.log("Not in chat iframe, skipping");
-    throw new Error("Not in chat iframe"); // Stop script execution
+    throw new Error("Not in chat iframe");
   }
 }
 
@@ -16,6 +16,7 @@ console.log("YouTube Live Chat Integrator content script loaded");
 interface YoutubeChatMessageData {
   author: string;
   content: string;
+  contentHtml: string;
   youtubeTimestamp: string;
   timestamp: number;
 }
@@ -58,8 +59,9 @@ const youtubeObserver = new MutationObserver((mutations) => {
 
 function handleYoutubeChatMessage(messageElement: HTMLElement) {
   const youtubeTimestamp = messageElement.querySelector("#timestamp")?.textContent || "";
-  const messageText =
-    messageElement.querySelector("#message")?.textContent || "";
+  const messageContainer = messageElement.querySelector("#message");
+  const messageText = messageContainer?.textContent || "";
+  const messageHtml = messageContainer?.innerHTML || "";
   const author =
     messageElement.querySelector("#author-name")?.textContent || "";
 
@@ -69,6 +71,7 @@ function handleYoutubeChatMessage(messageElement: HTMLElement) {
     data: {
       author: author,
       content: messageText,
+      contentHtml: messageHtml,
       youtubeTimestamp,
       timestamp: Date.now(),
     },
