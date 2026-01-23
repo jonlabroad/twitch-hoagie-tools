@@ -8,21 +8,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Handle different message types
   if (message.type === 'youtube-chat') {
     // Broadcast to all tabs
-    chrome.tabs.query({ url: 'https://www.twitch.tv/*' }, (tabs) => {
-      tabs.forEach((tab) => {
-        if (tab.id && tab.id !== sender.tab?.id) {
-          chrome.tabs.sendMessage(tab.id, {
-            type: 'youtube-chat-message',
-            data: message.data,
-            sourceTabId: sender.tab?.id,
-          });
-        }
-      });
+    broadcastToAllTwitchTabs({
+      type: 'youtube-chat-message',
+      data: message.data,
+      sourceTabId: sender.tab?.id,
     });
 
     sendResponse({ success: true });
   } else if (message.type === 'youtube-channel-name-declaration') {
     console.log('Channel name declared:', message.data.channelName, 'for video ID:', message.data.videoId);
+    broadcastToAllTwitchTabs({
+      type: 'youtube-channel-name-declaration',
+      data: message.data,
+      sourceTabId: sender.tab?.id,
+    });
     sendResponse({ success: true });
   }
 
@@ -35,3 +34,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     console.log('Twitch tab loaded:', tabId, tab.url);
   }
 });
+
+function broadcastToAllTwitchTabs(message: any) {
+  chrome.tabs.query({ url: 'https://www.twitch.tv/*' }, (tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id) {
+        chrome.tabs.sendMessage(tab.id, message);
+      }
+    });
+  });
+}

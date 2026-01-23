@@ -1,10 +1,19 @@
 import { YoutubeChatMessageData } from "../messages/messages";
 
-// Store information about the currently open youtube live chats
-interface YoutubeChatData {
+const idleTimeoutMs = 1 * 60 * 1000; // 1 minute
+
+export interface YoutubeLiveInfo {
   channelName: string;
   videoId: string;
 
+  idle: boolean;
+}
+
+// Store information about the currently open youtube live chats
+export interface YoutubeChatData {
+  liveInfo: YoutubeLiveInfo;
+
+  lastHeartbeatTimestamp?: number;
   chatMessages: YoutubeChatMessageData[];
   chatMessageById: Map<string, YoutubeChatMessageData>;
 }
@@ -19,12 +28,40 @@ export class YoutubeChatRepository {
   public initializeChannel(videoId: string, channelName: string) {
     if (!this.chatRepo[videoId]) {
       this.chatRepo[videoId] = {
-        channelName,
-        videoId,
+        liveInfo: {
+          videoId,
+          channelName,
+          idle: false,
+        },
+        lastHeartbeatTimestamp: Date.now(),
         chatMessages: [],
         chatMessageById: new Map<string, YoutubeChatMessageData>(),
       };
     }
+
+    this.setNewTimeoutForIdleCheck(videoId);
+  }
+
+  public handleHeartbeat(videoId: string) {
+    const chatData = this.chatRepo[videoId];
+    if (chatData) {
+      chatData.lastHeartbeatTimestamp = Date.now();
+      chatData.liveInfo.idle = false;
+    }
+  }
+
+  public getChannels(): YoutubeLiveInfo[] {
+    return Object.values(this.chatRepo).map((data) => (
+      data.liveInfo
+    ));
+  }
+
+  public getChannelById(videoId: string): YoutubeLiveInfo | null {
+    const data = this.chatRepo[videoId];
+    if (data) {
+      return data.liveInfo;
+    }
+    return null;
   }
 
   public hasMessage(videoId: string, messageId: string): boolean {
@@ -73,6 +110,22 @@ export class YoutubeChatRepository {
     const chatData = this.chatRepo[videoId];
     return chatData ? chatData.chatMessages : null;
   }
+
+  private setNewTimeoutForIdleCheck(videoId: string) {
+    setTimeout(() => {
+      const chatData = this.chatRepo[videoId];
+      if (chatData) {
+        const now = Date.now();
+        if (
+          chatData.lastHeartbeatTimestamp &&
+          now - chatData.lastHeartbeatTimestamp > idleTimeoutMs
+        ) {
+          chatData.liveInfo.idle = true;
+          console.log(`Channel ${chatData.liveInfo.channelName} (${videoId}) marked as idle.`);
+        }
+      }
+    }, idleTimeoutMs);
+  }
 }
 
 function findLastIndex<T>(
@@ -86,3 +139,4 @@ function findLastIndex<T>(
   }
   return -1;
 }
+

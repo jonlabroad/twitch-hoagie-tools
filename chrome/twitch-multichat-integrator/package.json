@@ -8,11 +8,19 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
     "css-loader": "^7.1.2",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/themes": "^3.2.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   }
 }

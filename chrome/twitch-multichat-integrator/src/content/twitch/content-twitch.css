@@ -26,6 +26,7 @@
 
 /* Toggle button styles */
 .youtube-toggle-button {
+/*
   background-color: #fc1037;
   color: white;
   border: none;
@@ -36,8 +37,9 @@
   cursor: pointer;
   margin-left: 4px;
   transition: opacity 0.2s;
+*/
 }
-
+/*
 .youtube-toggle-button:hover {
   opacity: 0.8;
 }
@@ -46,6 +48,7 @@
   background-color: #555;
   opacity: 0.5;
 }
+*/
 
 /* Hide YouTube messages when toggle is off */
 body.hide-youtube-messages .youtube-chat-message {

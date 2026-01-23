@@ -1,4 +1,4 @@
-import { YoutubeChatMessage } from "../../messages/messages";
+import { YoutubeChatMessage, YoutubeChannelNameDeclarationMessage } from "../../messages/messages";
 import { getYoutubeVideoIdFromUrl } from "./urlUtil";
 
 export const youtubeChatContent = () => {
@@ -45,6 +45,64 @@ export const youtubeChatContent = () => {
     });
   });
 
+  // Find and send channel name
+  findChannelName();
+
+  // Start observing
+  startObservingYoutube();
+
+  // Cleanup on unload
+  window.addEventListener("beforeunload", () => {
+    youtubeObserver.disconnect();
+  });
+
+  function findChannelName() {
+    const channelNameElement = document.querySelector(
+      "#channel-name #text a",
+    );
+
+    if (!channelNameElement) {
+        setTimeout(findChannelName, 1000);
+    } else {
+        const videoId = getYoutubeVideoIdFromUrl(window.location.href);
+
+        const channelName = channelNameElement.textContent?.trim();
+        if (!channelName || !videoId) {
+            throw new Error("Youtube channel name or id not found");
+        }
+
+        console.log("Youtube channel name:", channelName);
+        console.log("Youtube video ID:", videoId);
+
+        // Send channel name and video ID to background script
+        const message: YoutubeChannelNameDeclarationMessage = {
+            type: "youtube-channel-name-declaration",
+            data: {
+                channelName,
+                videoId: videoId,
+            },
+        };
+        chrome.runtime.sendMessage(message);
+        setHeartbeatTimeout();
+    }
+  }
+
+  function startObservingYoutube() {
+    const chatContainer = document.querySelector(
+      ".yt-live-chat-item-list-renderer #items",
+    );
+
+    if (chatContainer) {
+      youtubeObserver.observe(chatContainer, {
+        childList: true,
+        subtree: true,
+      });
+    } else {
+      // Retry after a short delay if chat container not found yet
+      setTimeout(startObservingYoutube, 1000);
+    }
+  }
+
   function handleYoutubeChatMessage(messageElement: HTMLElement) {
     const messageId = messageElement.id || "";
     const youtubeTimestamp =
@@ -81,28 +139,23 @@ export const youtubeChatContent = () => {
     }
   }
 
-  // Start observing when chat container is available
-  function startObservingYoutube() {
-    const chatContainer = document.querySelector(
-      ".yt-live-chat-item-list-renderer #items",
-    );
-
-    if (chatContainer) {
-      youtubeObserver.observe(chatContainer, {
-        childList: true,
-        subtree: true,
-      });
-    } else {
-      // Retry after a short delay if chat container not found yet
-      setTimeout(startObservingYoutube, 1000);
-    }
+  function setHeartbeatTimeout() {
+    setTimeout(() => {
+      // Send heartbeat message to background script
+      if (window.top?.location.href) {
+        const videoId = getYoutubeVideoIdFromUrl(window.top.location.href);
+        if (videoId) {
+          const heartbeatMessage = {
+            type: "youtube-channel-name-declaration",
+            data: {
+              channelName: document.title,
+              videoId,
+            },
+          };
+          chrome.runtime.sendMessage(heartbeatMessage);
+        }
+      }
+      setHeartbeatTimeout();
+    }, 15 * 1000); // every 15 seconds
   }
-
-  // Start observing
-  startObservingYoutube();
-
-  // Cleanup on unload
-  window.addEventListener("beforeunload", () => {
-    youtubeObserver.disconnect();
-  });
 };

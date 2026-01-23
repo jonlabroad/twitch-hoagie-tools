@@ -1,4 +1,4 @@
-import { YoutubeChatRepository } from "../../background/youtubeChatRepo";
+import { YoutubeChatRepository, YoutubeLiveInfo } from "../../background/youtubeChatRepo";
 import {
   YoutubeChatMessage,
   YoutubeChatMessageData,
@@ -9,7 +9,7 @@ import "./content-twitch.css";
 
 const youtubeChatRepository = new YoutubeChatRepository();
 const youtubeMessages: YoutubeChatMessage[] = [];
-const selectedYoutubeVideoSource = "none";
+var selectedYoutubeVideoSource: YoutubeLiveInfo | null = null;
 
 // Content script for Twitch.tv pages
 console.log("Twitch Multichat Integrator content script loaded");
@@ -40,8 +40,13 @@ function startObserving() {
 // Start observing
 startObserving();
 
+const onYoutubeChannelSelectionChange = (videoId: string) => {
+  console.log("Selected YouTube channel changed to:", videoId);
+  selectedYoutubeVideoSource = youtubeChatRepository.getChannelById(videoId);
+}
+
 // Inject the toggle button
-injectToggleButton();
+injectToggleButton(youtubeChatRepository.getChannels(), onYoutubeChannelSelectionChange);
 
 // Listen for messages from background script (broadcasts from other tabs)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -58,7 +63,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Insert chat message into the Twitch chat only if enabled
     insertYoutubeMessageIntoTwitchChat(message.data);
   } else if (message.type === "youtube-channel-name-declaration") {
-    youtubeChatRepository.initializeChannel(message.data.videoId, message.data.channelName);
+    const existingChannel = youtubeChatRepository.getChannelById(message.data.videoId);
+    console.log(
+      "Received channel name declaration:",
+      message.data.channelName,);
+
+    if (!existingChannel) {
+      youtubeChatRepository.initializeChannel(message.data.videoId, message.data.channelName);
+      injectToggleButton(youtubeChatRepository.getChannels(), (videoId: string) => {
+        console.log("Selected YouTube channel changed to:", videoId);
+        selectedYoutubeVideoSource = youtubeChatRepository.getChannelById(videoId);
+      });
+    } else {
+      youtubeChatRepository.handleHeartbeat(message.data.videoId);
+    }
   }
 });
 

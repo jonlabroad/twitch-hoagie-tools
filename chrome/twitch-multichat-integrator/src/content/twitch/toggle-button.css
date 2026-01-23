@@ -1,0 +1,73 @@
+/* Split button styles */
+.youtube-toggle-button {
+  background: #fc1037;
+  height: 30px;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.youtube-toggle-button:hover {
+  background: #ee4662;
+}
+
+.youtube-toggle-button.disabled {
+  background: #464649;
+  color: #adadb8;
+}
+
+.youtube-toggle-button-main {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.youtube-toggle-button-dropdown {
+  font-size: 8px;
+}
+
+/* Dropdown menu styles */
+.youtube-dropdown-content {
+  min-width: 200px;
+  background: #18181b;
+  border: 1px solid #464649;
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+
+.youtube-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #efeff1;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: background-color 0.1s ease;
+  outline: none;
+}
+
+.youtube-dropdown-item:hover,
+.youtube-dropdown-item:focus {
+  background: #464649;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
