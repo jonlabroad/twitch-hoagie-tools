@@ -1,3 +1,5 @@
+import { YoutubeChatRepository } from "./youtubeChatRepo";
+
 // Background service worker for Chrome extension
 console.log('Background service worker started');
 
@@ -20,6 +22,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
 
+    sendResponse({ success: true });
+  } else if (message.type === 'youtube-channel-name-declaration') {
+    console.log('Channel name declared:', message.data.channelName, 'for video ID:', message.data.videoId);
     sendResponse({ success: true });
   }
 

@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    background: './src/background.ts',
-    'content-twitch': './src/content-twitch.ts',
-    'content-youtube': './src/content-youtube.ts',
+    background: './src/background/background.ts',
+    'content-twitch': './src/content/twitch/content.ts',
+    'content-youtube': './src/content/youtube/content.ts',
   },
   module: {
     rules: [
