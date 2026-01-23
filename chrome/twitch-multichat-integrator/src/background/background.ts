@@ -1,5 +1,3 @@
-import { YoutubeChatRepository } from "./youtubeChatRepo";
-
 // Background service worker for Chrome extension
 console.log('Background service worker started');
 

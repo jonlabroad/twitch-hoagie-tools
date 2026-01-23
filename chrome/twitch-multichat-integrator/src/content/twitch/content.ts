@@ -4,12 +4,12 @@ import {
   YoutubeChatMessageData,
 } from "../../messages/messages";
 import { getColorForAuthor } from "./chat-colors";
+import { injectToggleButton, isYoutubeMessagesEnabled } from "./toggle-button";
 import "./content-twitch.css";
 
 const youtubeChatRepository = new YoutubeChatRepository();
 const youtubeMessages: YoutubeChatMessage[] = [];
-const selectedYoutubeVideoSource = "any"; // or set to specific videoId to filter
-let youtubeMessagesEnabled = true;
+const selectedYoutubeVideoSource = "none";
 
 // Content script for Twitch.tv pages
 console.log("Twitch Multichat Integrator content script loaded");
@@ -39,50 +39,6 @@ function startObserving() {
 
 // Start observing
 startObserving();
-
-// Inject toggle button into chat input area
-function injectToggleButton() {
-  const buttonContainer = document.querySelector(
-    '[data-test-selector="chat-input-buttons-container"]',
-  );
-
-  console.log("Button container:", buttonContainer);
-  if (buttonContainer && !document.getElementById("youtube-toggle-btn")) {
-    const toggleButton = document.createElement("button");
-    toggleButton.id = "youtube-toggle-btn";
-    toggleButton.className = "youtube-toggle-button";
-    toggleButton.textContent = "YT";
-    toggleButton.title = "Toggle YouTube messages";
-    toggleButton.setAttribute("aria-label", "Toggle YouTube messages");
-
-    toggleButton.onclick = () => {
-      youtubeMessagesEnabled = !youtubeMessagesEnabled;
-      toggleButton.classList.toggle("disabled", !youtubeMessagesEnabled);
-      document.body.classList.toggle(
-        "hide-youtube-messages",
-        !youtubeMessagesEnabled,
-      );
-      console.log(
-        "YouTube messages:",
-        youtubeMessagesEnabled ? "enabled" : "disabled",
-      );
-    };
-
-    // Insert after the first child
-    if (buttonContainer.firstChild?.nextSibling) {
-      buttonContainer.insertBefore(
-        toggleButton,
-        buttonContainer.firstChild.nextSibling,
-      );
-    } else {
-      buttonContainer.appendChild(toggleButton);
-    }
-    console.log("Toggle button injected");
-  } else if (!buttonContainer) {
-    // Retry if container not found yet
-    setTimeout(injectToggleButton, 1000);
-  }
-}
 
 // Inject the toggle button
 injectToggleButton();
@@ -120,7 +76,7 @@ function insertYoutubeMessageIntoTwitchChat(
   const chatLine = document.createElement("div");
   chatLine.className =
     "chat-line__status youtube-chat-message" +
-    (youtubeMessagesEnabled ? "" : " hidden-youtube-message");
+    (isYoutubeMessagesEnabled() ? "" : " hidden-youtube-message");
   chatLine.setAttribute("data-a-target", "chat-line-message");
 
   const messageElement = document.createElement("div");
