@@ -2,21 +2,28 @@ import React, { useState, useEffect } from "react";
 import { createRoot, Root } from "react-dom/client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import "./toggle-button.css";
-import { YoutubeLiveInfo } from "../../background/youtubeChatRepo";
+import { YoutubeChatRepository, YoutubeLiveInfo } from "../../shared/youtubeChatRepo";
 
 let youtubeMessagesEnabled = true;
 let rootInstance: Root | null = null;
 
 interface IProps {
-  liveInfo: YoutubeLiveInfo[];
+  repo: YoutubeChatRepository;
   onChannelSelectionChange: (videoId: string) => void;
 }
 
 const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
+  const [channels, setChannels] = useState<YoutubeLiveInfo[]>(props.repo.getChannels());
   const [enabled, setEnabled] = useState(youtubeMessagesEnabled);
   const [menuOpen, setMenuOpen] = useState(false);
 
-    console.log({ props });
+  useEffect(() => {
+    const handleChannelChange = () => {
+      setChannels(props.repo.getChannels());
+    };
+
+    props.repo.subscribeChannelChange(handleChannelChange);
+  }, [props.repo]);
 
   useEffect(() => {
     youtubeMessagesEnabled = enabled;
@@ -27,6 +34,8 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
     setEnabled(!enabled);
     console.log("YouTube messages:", !enabled ? "enabled" : "disabled");
   };
+
+  console.log({ channels });
 
   return (
     <div
@@ -59,7 +68,7 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content className="youtube-dropdown-content">
-            {props.liveInfo.filter(info => !info.idle).map((info) => (
+            {channels.filter(info => !info.idle).map((info) => (
               <DropdownMenu.Item
                 key={info.videoId}
                 className="youtube-dropdown-item"
@@ -77,7 +86,7 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
   );
 };
 
-export function injectToggleButton(liveInfo: YoutubeLiveInfo[], onChannelSelectionChange: (videoId: string) => void) {
+export function injectToggleButton(repo: YoutubeChatRepository, onChannelSelectionChange: (videoId: string) => void) {
   const buttonContainer = document.querySelector(
     '[data-test-selector="chat-input-buttons-container"]',
   );
@@ -98,22 +107,20 @@ export function injectToggleButton(liveInfo: YoutubeLiveInfo[], onChannelSelecti
     }
 
     rootInstance = createRoot(mountPoint);
-    console.log({ liveInfo });
     rootInstance.render(<YoutubeSplitButton
-        liveInfo={liveInfo}
+        repo={repo}
         onChannelSelectionChange={onChannelSelectionChange}
     />);
 
     console.log("Split toggle button injected");
   } else if (buttonContainer && buttonAlreadyExists && rootInstance) {
-    console.log({ liveInfo });
     // Update existing instance
     rootInstance.render(<YoutubeSplitButton
-        liveInfo={liveInfo}
+        repo={repo}
         onChannelSelectionChange={onChannelSelectionChange}
     />);
   } else if (!buttonContainer) {
-    setTimeout(() => injectToggleButton(liveInfo, onChannelSelectionChange), 1000);
+    setTimeout(() => injectToggleButton(repo, onChannelSelectionChange), 1000);
   }
 }
 

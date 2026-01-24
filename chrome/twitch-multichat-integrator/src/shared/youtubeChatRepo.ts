@@ -13,17 +13,24 @@ export interface YoutubeLiveInfo {
 export interface YoutubeChatData {
   liveInfo: YoutubeLiveInfo;
 
-  lastHeartbeatTimestamp?: number;
+  lastHeartbeatTimestamp: number;
   chatMessages: YoutubeChatMessageData[];
   chatMessageById: Map<string, YoutubeChatMessageData>;
 }
 
 type ChatMessageRepository = Record<string, YoutubeChatData>;
 
+type ChannelChangeCallback = (channel: YoutubeLiveInfo) => void;
+type ChatMessageCallback = (videoId: string, message: YoutubeChatMessageData) => void;
+type ChannelIdleCallback = (videoId: string, channel: YoutubeLiveInfo) => void;
+
 export class YoutubeChatRepository {
   private chatRepo: ChatMessageRepository = {};
 
-  constructor() {}
+  // Subscriber lists
+  private channelChangeListeners: Set<ChannelChangeCallback> = new Set();
+  private chatMessageListeners: Set<ChatMessageCallback> = new Set();
+  private channelIdleListeners: Set<ChannelIdleCallback> = new Set();
 
   public initializeChannel(videoId: string, channelName: string) {
     if (!this.chatRepo[videoId]) {
@@ -39,14 +46,23 @@ export class YoutubeChatRepository {
       };
     }
 
+    this.notifyChannelChange(this.chatRepo[videoId].liveInfo);
     this.setNewTimeoutForIdleCheck(videoId);
   }
 
-  public handleHeartbeat(videoId: string) {
-    const chatData = this.chatRepo[videoId];
+  public handleHeartbeat(liveInfo: YoutubeLiveInfo) {
+    const chatData = this.chatRepo[liveInfo.videoId];
     if (chatData) {
       chatData.lastHeartbeatTimestamp = Date.now();
+
+      const newlyActive = chatData.liveInfo.idle;
       chatData.liveInfo.idle = false;
+      if (newlyActive) {
+        this.notifyChannelChange(chatData.liveInfo);
+      }
+      this.setNewTimeoutForIdleCheck(liveInfo.videoId);
+    } else {
+      this.initializeChannel(liveInfo.videoId, liveInfo.channelName);
     }
   }
 
@@ -99,8 +115,7 @@ export class YoutubeChatRepository {
       // Insert new message
       chatData.chatMessages.push(chatMessage);
       chatData.chatMessageById.set(chatMessage.messageId, chatMessage);
-
-      console.log({ chatData });
+      this.notifyChatMessage(videoId, chatMessage);
     } else {
       console.warn(`Chat data for video ID ${videoId} not initialized.`);
     }
@@ -121,10 +136,40 @@ export class YoutubeChatRepository {
           now - chatData.lastHeartbeatTimestamp > idleTimeoutMs
         ) {
           chatData.liveInfo.idle = true;
+          this.notifyChannelIdle(videoId, chatData.liveInfo);
           console.log(`Channel ${chatData.liveInfo.channelName} (${videoId}) marked as idle.`);
         }
       }
-    }, idleTimeoutMs);
+    }, idleTimeoutMs + 1000); // Add a small buffer
+  }
+
+  // Subscribe methods
+  subscribeChannelChange(callback: ChannelChangeCallback): () => void {
+    this.channelChangeListeners.add(callback);
+    // Return unsubscribe function
+    return () => this.channelChangeListeners.delete(callback);
+  }
+
+  subscribeChatMessage(callback: ChatMessageCallback): () => void {
+    this.chatMessageListeners.add(callback);
+    return () => this.chatMessageListeners.delete(callback);
+  }
+
+  subscribeChannelIdle(callback: ChannelIdleCallback): () => void {
+    this.channelIdleListeners.add(callback);
+    return () => this.channelIdleListeners.delete(callback);
+  }
+
+  private notifyChannelChange(channel: YoutubeLiveInfo) {
+    this.channelChangeListeners.forEach(listener => listener(channel));
+  }
+
+  private notifyChatMessage(videoId: string, message: YoutubeChatMessageData) {
+    this.chatMessageListeners.forEach(listener => listener(videoId, message));
+  }
+
+  private notifyChannelIdle(videoId: string, channel: YoutubeLiveInfo) {
+    this.channelIdleListeners.forEach(listener => listener(videoId, channel));
   }
 }
 

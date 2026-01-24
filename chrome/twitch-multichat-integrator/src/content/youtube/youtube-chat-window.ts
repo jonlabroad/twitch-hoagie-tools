@@ -68,7 +68,7 @@ export const youtubeChatContent = () => {
 
         const channelName = channelNameElement.textContent?.trim();
         if (!channelName || !videoId) {
-            throw new Error("Youtube channel name or id not found");
+          return;
         }
 
         console.log("Youtube channel name:", channelName);
@@ -83,7 +83,7 @@ export const youtubeChatContent = () => {
             },
         };
         chrome.runtime.sendMessage(message);
-        setHeartbeatTimeout();
+        setHeartbeatTimeout(channelName, videoId);
     }
   }
 
@@ -133,29 +133,22 @@ export const youtubeChatContent = () => {
         },
       };
 
-      console.log({ chatMessage: message });
-
       chrome.runtime.sendMessage(message);
     }
   }
 
-  function setHeartbeatTimeout() {
+  function setHeartbeatTimeout(channelName: string, videoId: string) {
     setTimeout(() => {
       // Send heartbeat message to background script
-      if (window.top?.location.href) {
-        const videoId = getYoutubeVideoIdFromUrl(window.top.location.href);
-        if (videoId) {
-          const heartbeatMessage = {
-            type: "youtube-channel-name-declaration",
-            data: {
-              channelName: document.title,
-              videoId,
-            },
-          };
-          chrome.runtime.sendMessage(heartbeatMessage);
-        }
-      }
-      setHeartbeatTimeout();
+      const heartbeatMessage = {
+        type: "youtube-channel-name-declaration",
+        data: {
+          channelName,
+          videoId,
+        },
+      };
+      chrome.runtime.sendMessage(heartbeatMessage);
+      setHeartbeatTimeout(channelName, videoId);
     }, 15 * 1000); // every 15 seconds
   }
 };

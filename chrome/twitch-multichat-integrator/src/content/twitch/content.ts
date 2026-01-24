@@ -1,4 +1,4 @@
-import { YoutubeChatRepository, YoutubeLiveInfo } from "../../background/youtubeChatRepo";
+import { YoutubeChatRepository, YoutubeLiveInfo } from "../../shared/youtubeChatRepo";
 import {
   YoutubeChatMessage,
   YoutubeChatMessageData,
@@ -46,7 +46,7 @@ const onYoutubeChannelSelectionChange = (videoId: string) => {
 }
 
 // Inject the toggle button
-injectToggleButton(youtubeChatRepository.getChannels(), onYoutubeChannelSelectionChange);
+injectToggleButton(youtubeChatRepository, onYoutubeChannelSelectionChange);
 
 // Listen for messages from background script (broadcasts from other tabs)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -70,12 +70,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (!existingChannel) {
       youtubeChatRepository.initializeChannel(message.data.videoId, message.data.channelName);
-      injectToggleButton(youtubeChatRepository.getChannels(), (videoId: string) => {
-        console.log("Selected YouTube channel changed to:", videoId);
-        selectedYoutubeVideoSource = youtubeChatRepository.getChannelById(videoId);
-      });
     } else {
-      youtubeChatRepository.handleHeartbeat(message.data.videoId);
+      youtubeChatRepository.handleHeartbeat(existingChannel);
     }
   }
 });
@@ -96,6 +92,8 @@ function insertYoutubeMessageIntoTwitchChat(
     "chat-line__status youtube-chat-message" +
     (isYoutubeMessagesEnabled() ? "" : " hidden-youtube-message");
   chatLine.setAttribute("data-a-target", "chat-line-message");
+  chatLine.setAttribute("data-youtube-video-id", youtubeMessage.videoId);
+  chatLine.setAttribute("data-youtube-message-id", youtubeMessage.messageId);
 
   const messageElement = document.createElement("div");
   messageElement.id = youtubeMessage.messageId;
