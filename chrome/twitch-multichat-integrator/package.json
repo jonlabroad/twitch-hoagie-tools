@@ -24,6 +24,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@mui/icons-material": "^7.3.7",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/themes": "^3.2.1",
     "react": "^19.2.3",

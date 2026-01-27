@@ -41,8 +41,26 @@ function startObserving() {
 startObserving();
 
 const onYoutubeChannelSelectionChange = (videoId: string) => {
+  if (selectedYoutubeVideoSource?.videoId === videoId) {
+    return; // No change
+  }
+
   console.log("Selected YouTube channel changed to:", videoId);
   selectedYoutubeVideoSource = youtubeChatRepository.getChannelById(videoId);
+
+  // Find all YouTube messages and show/hide based on videoId
+  const allYoutubeMessages = document.querySelectorAll('.youtube-chat-message');
+  allYoutubeMessages.forEach((messageElement) => {
+    const messageVideoId = messageElement.getAttribute('data-youtube-video-id');
+    
+    if (messageVideoId === videoId) {
+      // Show messages from the selected channel
+      messageElement.classList.remove('hidden-youtube-message');
+    } else {
+      // Hide messages from other channels
+      messageElement.classList.add('hidden-youtube-message');
+    }
+  });
 }
 
 // Inject the toggle button
@@ -85,12 +103,15 @@ function insertYoutubeMessageIntoTwitchChat(
   if (!chatContainer) return;
 
   const usernameColor = getColorForAuthor(youtubeMessage.author);
+  console.log({ selectedYoutubeVideoSource });
+
+  const messageEnabled = isYoutubeMessagesEnabled() && isChatEnabled(youtubeMessage.videoId);
 
   // Create a wrapper that looks like a Twitch chat line
   const chatLine = document.createElement("div");
   chatLine.className =
     "chat-line__status youtube-chat-message" +
-    (isYoutubeMessagesEnabled() ? "" : " hidden-youtube-message");
+    (messageEnabled ? "" : " hidden-youtube-message");
   chatLine.setAttribute("data-a-target", "chat-line-message");
   chatLine.setAttribute("data-youtube-video-id", youtubeMessage.videoId);
   chatLine.setAttribute("data-youtube-message-id", youtubeMessage.messageId);
@@ -118,12 +139,17 @@ function insertYoutubeMessageIntoTwitchChat(
   chatLine.appendChild(messageElement);
   chatContainer.appendChild(chatLine);
 
-  // Auto-scroll to the bottom
-  const scrollableArea = document.querySelector(
-    '[data-a-target="chat-scroller"]',
-  );
-  if (scrollableArea) {
-    scrollableArea.scrollTop = scrollableArea.scrollHeight;
+  // Auto-scroll to the bottom only if chat is not paused and message is enabled
+  if (messageEnabled) {
+    const chatPaused = document.querySelector('.chat-paused-footer');
+    if (!chatPaused) {
+      const scrollableArea = document.querySelector(
+        '[data-a-target="chat-scroller"]',
+      );
+      if (scrollableArea) {
+        scrollableArea.scrollTop = scrollableArea.scrollHeight;
+      }
+    }
   }
 }
 
@@ -131,3 +157,8 @@ function insertYoutubeMessageIntoTwitchChat(
 window.addEventListener("beforeunload", () => {
   observer.disconnect();
 });
+
+function isChatEnabled(videoId: string): boolean {
+  console.log({ selectedYoutubeVideoSource, videoId });
+  return selectedYoutubeVideoSource?.videoId === videoId;
+}

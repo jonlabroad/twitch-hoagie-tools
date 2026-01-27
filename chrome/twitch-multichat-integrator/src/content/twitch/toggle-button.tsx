@@ -3,6 +3,7 @@ import { createRoot, Root } from "react-dom/client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import "./toggle-button.css";
 import { YoutubeChatRepository, YoutubeLiveInfo } from "../../shared/youtubeChatRepo";
+import { CheckIcon } from "../../shared/icons/CheckIcon";
 
 let youtubeMessagesEnabled = true;
 let rootInstance: Root | null = null;
@@ -13,6 +14,7 @@ interface IProps {
 }
 
 const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [channels, setChannels] = useState<YoutubeLiveInfo[]>(props.repo.getChannels());
   const [enabled, setEnabled] = useState(youtubeMessagesEnabled);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -72,11 +74,14 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
               <DropdownMenu.Item
                 key={info.videoId}
                 className="youtube-dropdown-item"
-                onSelect={() =>
+                onSelect={() => {
+                  setSelectedChannelId(info.videoId);
                   props.onChannelSelectionChange(info.videoId)
-                }
+                }}
               >
-                {info.channelName}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  {info.channelName}{selectedChannelId === info.videoId && <CheckIcon color="green" />}
+                </div>
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

@@ -55,3 +55,9 @@ body.hide-youtube-messages .youtube-chat-message {
   display: none !important;
   padding: 0px !important;
 }
+
+.hidden-youtube-message {
+  display: none !important;
+  padding: 0px !important;
+}
+
