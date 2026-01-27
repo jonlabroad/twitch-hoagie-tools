@@ -100,10 +100,11 @@ function insertYoutubeMessageIntoTwitchChat(
   const chatContainer = document.querySelector(
     ".chat-scrollable-area__message-container",
   );
-  if (!chatContainer) return;
+  if (!chatContainer) {
+    return;
+  }
 
   const usernameColor = getColorForAuthor(youtubeMessage.author);
-  console.log({ selectedYoutubeVideoSource });
 
   const messageEnabled = isYoutubeMessagesEnabled() && isChatEnabled(youtubeMessage.videoId);
 
@@ -159,6 +160,5 @@ window.addEventListener("beforeunload", () => {
 });
 
 function isChatEnabled(videoId: string): boolean {
-  console.log({ selectedYoutubeVideoSource, videoId });
   return selectedYoutubeVideoSource?.videoId === videoId;
 }
