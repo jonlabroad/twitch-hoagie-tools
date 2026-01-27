@@ -1,6 +1,12 @@
 import { YoutubeChatMessageData } from "../messages/messages";
 
-const idleTimeoutMs = 1 * 60 * 1000; // 1 minute
+export interface YoutubeChatRepositoryConfig {
+  idleTimeoutMs: number;
+}
+
+const defaultConfig: YoutubeChatRepositoryConfig = {
+  idleTimeoutMs: 1 * 60 * 1000, // 1 minutes
+};
 
 export interface YoutubeLiveInfo {
   channelName: string;
@@ -26,6 +32,13 @@ type ChannelIdleCallback = (videoId: string, channel: YoutubeLiveInfo) => void;
 
 export class YoutubeChatRepository {
   private chatRepo: ChatMessageRepository = {};
+  private config: YoutubeChatRepositoryConfig = { ...defaultConfig };
+
+  constructor(config?: Partial<YoutubeChatRepositoryConfig>) {
+    if (config) {
+      this.config = { ...this.config, ...config };
+    }
+  }
 
   // Subscriber lists
   private channelChangeListeners: Set<ChannelChangeCallback> = new Set();
@@ -93,6 +106,7 @@ export class YoutubeChatRepository {
     chatMessage: YoutubeChatMessageData,
   ) {
     const chatData = this.chatRepo[videoId];
+
     if (chatData) {
       if (chatData.chatMessageById.has(chatMessage.messageId)) {
         // Update existing message
@@ -133,14 +147,14 @@ export class YoutubeChatRepository {
         const now = Date.now();
         if (
           chatData.lastHeartbeatTimestamp &&
-          now - chatData.lastHeartbeatTimestamp > idleTimeoutMs
+          now - chatData.lastHeartbeatTimestamp > this.config.idleTimeoutMs
         ) {
           chatData.liveInfo.idle = true;
           this.notifyChannelIdle(videoId, chatData.liveInfo);
           console.log(`Channel ${chatData.liveInfo.channelName} (${videoId}) marked as idle.`);
         }
       }
-    }, idleTimeoutMs + 1000); // Add a small buffer
+    }, this.config.idleTimeoutMs + 500); // Add a small buffer
   }
 
   // Subscribe methods
