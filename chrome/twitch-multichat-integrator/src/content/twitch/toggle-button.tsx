@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createRoot, Root } from "react-dom/client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Toggle } from "@radix-ui/react-toggle";
 import "./toggle-button.css";
 import { YoutubeChatRepository, YoutubeLiveInfo } from "../../shared/youtubeChatRepo";
 import { CheckIcon } from "../../shared/icons/CheckIcon";
@@ -37,30 +38,23 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
     console.log("YouTube messages:", !enabled ? "enabled" : "disabled");
   };
 
-  console.log({ channels });
-
   return (
     <div
       className="youtube-split-button-container"
-      style={{
-        display: "inline-flex",
-        position: "relative",
-        alignItems: "center",
-      }}
     >
-      <button
+      <Toggle
         className={`youtube-toggle-button youtube-toggle-button-main ${!enabled ? "disabled" : ""}`}
-        onClick={handleToggle}
-        title="Toggle YouTube messages"
-        aria-label="Toggle YouTube messages"
+        aria-label="Toggle italic"
+        pressed={enabled}
+        onPressedChange={handleToggle}
       >
         YT
-      </button>
+      </Toggle>
 
       <DropdownMenu.Root open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenu.Trigger asChild>
+        <DropdownMenu.Trigger asChild disabled={!enabled}>
           <button
-            className="youtube-toggle-button youtube-toggle-button-dropdown"
+            className={`youtube-toggle-button youtube-toggle-button-dropdown ${!enabled ? "disabled" : ""}`}
             title="YouTube message options"
             aria-label="YouTube message options"
           >
@@ -70,20 +64,32 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content className="youtube-dropdown-content">
-            {channels.filter(info => !info.idle).map((info) => (
-              <DropdownMenu.Item
-                key={info.videoId}
-                className="youtube-dropdown-item"
-                onSelect={() => {
-                  setSelectedChannelId(info.videoId);
-                  props.onChannelSelectionChange(info.videoId)
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  {info.channelName}{selectedChannelId === info.videoId && <CheckIcon color="green" />}
-                </div>
-              </DropdownMenu.Item>
-            ))}
+            {channels
+              .filter((info) => !info.idle)
+              .map((info) => (
+                <DropdownMenu.Item
+                  key={info.videoId}
+                  className="youtube-dropdown-item"
+                  onSelect={() => {
+                    setSelectedChannelId(info.videoId);
+                    props.onChannelSelectionChange(info.videoId);
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    {info.channelName}
+                    {selectedChannelId === info.videoId && (
+                      <CheckIcon color="green" />
+                    )}
+                  </div>
+                </DropdownMenu.Item>
+              ))}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
@@ -101,6 +107,7 @@ export function injectToggleButton(repo: YoutubeChatRepository, onChannelSelecti
   if (buttonContainer && !buttonAlreadyExists) {
     const mountPoint = document.createElement("div");
     mountPoint.id = "youtube-toggle-btn";
+    mountPoint.style.display = "contents";
 
     if (buttonContainer.firstChild?.nextSibling) {
       buttonContainer.insertBefore(

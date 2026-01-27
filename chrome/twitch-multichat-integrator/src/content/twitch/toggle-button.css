@@ -1,14 +1,24 @@
 /* Split button styles */
+.youtube-split-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .youtube-toggle-button {
   background: #fc1037;
-  height: 30px;
+  height: 24px;
+  width: 24px;
   color: white;
   border: none;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .youtube-toggle-button:hover {
