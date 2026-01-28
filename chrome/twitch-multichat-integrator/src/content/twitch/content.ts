@@ -184,7 +184,7 @@ function insertYoutubeMessageIntoTwitchChat(
     // Replace the existing element's parent (the chatLine wrapper)
     const existingChatLine = chatMessageExists.closest('.youtube-chat-message');
     if (existingChatLine) {
-      renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser, handleMenuStateChange);
+      renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser);
       chatLine.appendChild(messageElement);
       existingChatLine.replaceWith(chatLine);
       return;
@@ -192,12 +192,12 @@ function insertYoutubeMessageIntoTwitchChat(
   }
 
   // It's a new message, render and append it
-  renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser, handleMenuStateChange);
+  renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser);
   chatLine.appendChild(messageElement);
   chatContainer.appendChild(chatLine);
 
-  // Auto-scroll to the bottom only if chat is not paused, message is enabled, and menu is not open
-  if (messageEnabled && !isYoutubeMenuOpen) {
+  // Auto-scroll to the bottom only if chat is not paused and message is enabled
+  if (messageEnabled) {
     const chatPaused = document.querySelector('.chat-paused-footer');
     if (!chatPaused) {
       const scrollableArea = document.querySelector(

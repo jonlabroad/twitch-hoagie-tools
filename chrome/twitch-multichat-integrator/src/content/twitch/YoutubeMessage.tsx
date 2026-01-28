@@ -2,31 +2,22 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { YoutubeChatMessageData } from "../../messages/messages";
 import { getColorForAuthor } from "./chat-colors";
-import { YoutubeMessageMenu } from "./YoutubeMessageMenu";
+import { YoutubeMessageModal } from "./YoutubeMessageModal";
 
 interface YoutubeMessageProps {
   message: YoutubeChatMessageData;
   usernameColor: string;
   onDelete?: (messageId: string) => void;
   onBanUser?: (author: string) => void;
-  onMenuStateChange?: (isOpen: boolean) => void;
 }
 
 const YoutubeMessage: React.FC<YoutubeMessageProps> = ({ 
   message, 
   usernameColor, 
   onDelete, 
-  onBanUser,
-  onMenuStateChange
+  onBanUser
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleMenuOpenChange = (open: boolean) => {
-    setMenuOpen(open);
-    if (onMenuStateChange) {
-      onMenuStateChange(open);
-    }
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDelete = () => {
     if (onDelete) {
@@ -41,12 +32,7 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
   };
 
   return (
-    <YoutubeMessageMenu
-      open={menuOpen}
-      onOpenChange={handleMenuOpenChange}
-      onDelete={handleDelete}
-      onBanUser={handleBanUser}
-    >
+    <>
       <div 
         className="chat-line__message" 
         data-a-target="chat-line-message-body"
@@ -57,6 +43,7 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
           borderRadius: '4px',
           transition: 'background-color 0.15s ease'
         }}
+        onClick={() => setIsModalOpen(true)}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
         }}
@@ -84,7 +71,16 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
           dangerouslySetInnerHTML={{ __html: message.contentHtml ?? message.content }}
         />
       </div>
-    </YoutubeMessageMenu>
+
+      <YoutubeMessageModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onDelete={handleDelete}
+        onBan={handleBanUser}
+        messageAuthor={message.author}
+        messageContent={message.contentHtml ?? message.content}
+      />
+    </>
   );
 };
 
@@ -92,8 +88,7 @@ export function renderYoutubeMessage(
   container: HTMLElement,
   message: YoutubeChatMessageData,
   onDelete?: (messageId: string) => void,
-  onBanUser?: (author: string) => void,
-  onMenuStateChange?: (isOpen: boolean) => void
+  onBanUser?: (author: string) => void
 ): void {
   const usernameColor = getColorForAuthor(message.author);
   const root = createRoot(container);
@@ -103,7 +98,6 @@ export function renderYoutubeMessage(
       usernameColor={usernameColor}
       onDelete={onDelete}
       onBanUser={onBanUser}
-      onMenuStateChange={onMenuStateChange}
     />
   );
 }
