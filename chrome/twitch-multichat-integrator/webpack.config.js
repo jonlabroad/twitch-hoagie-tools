@@ -5,6 +5,7 @@ module.exports = {
     background: './src/background/background.ts',
     'content-twitch': './src/content/twitch/content.ts',
     'content-youtube': './src/content/youtube/content.ts',
+    'options': './src/options/options.ts',
   },
   module: {
     rules: [

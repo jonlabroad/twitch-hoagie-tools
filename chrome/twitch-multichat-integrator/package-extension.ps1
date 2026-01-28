@@ -15,8 +15,8 @@ if (-not (Test-Path $distFolder)) {
     exit 1
 }
 
-# Create the zip file
-Write-Host "Packaging $distFolder into $outputZip..."
-Compress-Archive -Path "$distFolder\*" -DestinationPath $outputZip -Force
+# Create the zip file including necessary files and folders
+Write-Host "Packaging extension into $outputZip..."
+Compress-Archive -Path @("manifest.json", "dist", "src") -DestinationPath $outputZip -Force
 
 Write-Host "Successfully created $outputZip" -ForegroundColor Green
