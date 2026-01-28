@@ -31,12 +31,5 @@
   "options_ui": {
     "page": "src/options/options.html",
     "open_in_tab": true
-  },
-  "oauth2": {
-    "client_id": "360294299808-iqequqbflf9tfsfr6gghhil1hblrq76j.apps.googleusercontent.com",
-    "scopes": [
-      "https://www.googleapis.com/auth/youtube.readonly",
-      "https://www.googleapis.com/auth/youtube.force-ssl"
-    ]
   }
 }

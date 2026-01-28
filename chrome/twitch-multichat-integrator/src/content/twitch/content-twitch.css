@@ -1,7 +1,5 @@
 /* YouTube message styles for Twitch chat integration */
 .youtube-chat-message {
-  margin: 0px !important;
-  padding: 0px !important;
   color: white;
   background-color: transparent;
 }
@@ -35,3 +33,12 @@ body.hide-youtube-messages .youtube-chat-message {
   padding: 0px !important;
 }
 
+.deleted-youtube-message .youtube-chat-message-content {
+  text-decoration: line-through;
+  opacity: 0.5;
+  color: #808080;
+}
+
+.deleted-youtube-message .chat-line__message {
+  opacity: 0.6;
+}

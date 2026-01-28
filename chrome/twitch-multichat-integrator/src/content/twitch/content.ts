@@ -3,13 +3,15 @@ import {
   YoutubeChatMessage,
   YoutubeChatMessageData,
 } from "../../messages/messages";
-import { getColorForAuthor } from "./chat-colors";
 import { injectToggleButton, isYoutubeMessagesEnabled } from "./toggle-button";
+import { renderYoutubeMessage } from "./YoutubeMessage";
 import "./content-twitch.css";
 
 const youtubeChatRepository = new YoutubeChatRepository();
 const youtubeMessages: YoutubeChatMessage[] = [];
 var selectedYoutubeVideoSource: YoutubeLiveInfo | null = null;
+let isYoutubeMenuOpen = false;
+let scrollLockPosition: number | null = null;
 
 // Content script for Twitch.tv pages
 console.log("Twitch Multichat Integrator content script loaded");
@@ -39,6 +41,16 @@ function startObserving() {
 
 // Start observing
 startObserving();
+
+// Add scroll lock enforcement
+setInterval(() => {
+  if (scrollLockPosition !== null) {
+    const scrollableArea = document.querySelector('[data-a-target="chat-scroller"]') as HTMLElement;
+    if (scrollableArea && scrollableArea.scrollTop !== scrollLockPosition) {
+      scrollableArea.scrollTop = scrollLockPosition;
+    }
+  }
+}, 16); // Check every frame (~60fps)
 
 const onYoutubeChannelSelectionChange = (videoId: string) => {
   if (selectedYoutubeVideoSource?.videoId === videoId) {
@@ -104,8 +116,6 @@ function insertYoutubeMessageIntoTwitchChat(
     return;
   }
 
-  const usernameColor = getColorForAuthor(youtubeMessage.author);
-
   const messageEnabled = isYoutubeMessagesEnabled() && isChatEnabled(youtubeMessage.videoId);
 
   // Create a wrapper that looks like a Twitch chat line
@@ -119,29 +129,64 @@ function insertYoutubeMessageIntoTwitchChat(
 
   const messageElement = document.createElement("div");
   messageElement.id = youtubeMessage.messageId;
-  messageElement.className = "chat-line__message";
-  messageElement.setAttribute("data-a-target", "chat-line-message-body");
-  messageElement.innerHTML = `
-    <span style="border-radius:4px;border-width:1px;background-color:#fc1037;color:white;padding:2px;font-size:12px;">YouTube</span>
-    <span style="color:${usernameColor};font-weight:bold;">${youtubeMessage.author}:</span>
-    <span class="youtube-chat-message-content">${youtubeMessage.contentHtml ?? youtubeMessage.content}</span>
-  `;
+
+  // Define handlers for delete and ban
+  const handleDelete = (messageId: string) => {
+    console.log('Delete message:', messageId);
+    // Remove the message from DOM
+    const messageToRemove = document.querySelector(`[data-youtube-message-id="${messageId}"]`);
+    if (messageToRemove) {
+      messageToRemove.classList.add('deleted-youtube-message');
+    }
+    // TODO: Send delete request to YouTube API
+    console.log("TODO DELETE message with ID:", messageId);
+    alert(`Delete message functionality for message ID "${messageId}" will be implemented`);
+  };
+
+  const handleBanUser = (author: string) => {
+    console.log('Ban user:', author);
+    // TODO: Implement ban user functionality with YouTube API
+    alert(`Ban user functionality for "${author}" will be implemented`);
+  };
+
+  const handleMenuStateChange = (isOpen: boolean) => {
+    isYoutubeMenuOpen = isOpen;
+    
+    const scrollableArea = document.querySelector('[data-a-target="chat-scroller"]') as HTMLElement;
+    if (scrollableArea) {
+      if (isOpen) {
+        // Lock the scroll position
+        scrollLockPosition = scrollableArea.scrollTop;
+        scrollableArea.style.overflow = 'hidden';
+      } else {
+        // Unlock the scroll
+        scrollableArea.style.overflow = '';
+        scrollLockPosition = null;
+      }
+    }
+  };
 
   const chatMessageExists = chatContainer.querySelector(
     `#${youtubeMessage.messageId}`,
   );
   if (youtubeChatRepository.hasMessage(youtubeMessage.videoId, youtubeMessage.messageId) && chatMessageExists) {
-    // Replace the existing element
-    chatMessageExists.replaceWith(messageElement);
-    return;
+    // Replace the existing element's parent (the chatLine wrapper)
+    const existingChatLine = chatMessageExists.closest('.youtube-chat-message');
+    if (existingChatLine) {
+      renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser, handleMenuStateChange);
+      chatLine.appendChild(messageElement);
+      existingChatLine.replaceWith(chatLine);
+      return;
+    }
   }
 
-  // It's a new message, append it
+  // It's a new message, render and append it
+  renderYoutubeMessage(messageElement, youtubeMessage, handleDelete, handleBanUser, handleMenuStateChange);
   chatLine.appendChild(messageElement);
   chatContainer.appendChild(chatLine);
 
-  // Auto-scroll to the bottom only if chat is not paused and message is enabled
-  if (messageEnabled) {
+  // Auto-scroll to the bottom only if chat is not paused, message is enabled, and menu is not open
+  if (messageEnabled && !isYoutubeMenuOpen) {
     const chatPaused = document.querySelector('.chat-paused-footer');
     if (!chatPaused) {
       const scrollableArea = document.querySelector(

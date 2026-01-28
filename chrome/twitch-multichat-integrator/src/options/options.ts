@@ -6,7 +6,7 @@ const YOUTUBE_CLIENT_ID = '360294299808-qpddue75gnqun3p3pr5a0efq6pd45fbo.apps.go
 
 const YOUTUBE_SCOPES = [
     'https://www.googleapis.com/auth/youtube.readonly',
-    'https://www.googleapis.com/auth/youtube.force-ssl'
+    //'https://www.googleapis.com/auth/youtube.force-ssl'
 ];
 
 interface YouTubeAuthState {
