@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { YoutubeChatMessageData } from "../../messages/messages";
-import { getColorForAuthor } from "./chat-colors";
-import { YoutubeMessageModal } from "./YoutubeMessageModal";
+import { getColorForAuthor } from "./chatColors";
+import { YoutubeMessageModal } from "./youtubeMessageModal";
 
 interface YoutubeMessageProps {
   message: YoutubeChatMessageData;

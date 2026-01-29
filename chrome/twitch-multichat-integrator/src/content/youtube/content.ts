@@ -1,3 +1,3 @@
-import { youtubeChatContent } from "./youtube-chat-window";
+import { youtubeChatContent } from "./youtubeChatWindow";
 
 youtubeChatContent();

@@ -3,14 +3,12 @@ import {
   YoutubeLiveInfo,
 } from "../../shared/youtubeChatRepo";
 import {
-  YoutubeChatMessage,
   YoutubeChatMessageData,
   YoutubeChatMessageWithTabId,
 } from "../../messages/messages";
-import { injectToggleButton, isYoutubeMessagesEnabled } from "./toggle-button";
-import { renderYoutubeMessage } from "./YoutubeMessage";
-import { YouTubeApiClient } from "../../shared/youtubeApiClient";
-import "./content-twitch.css";
+import { injectToggleButton, isYoutubeMessagesEnabled } from "./toggleButton";
+import { renderYoutubeMessage } from "./youtubeMessage";
+import "./contentTwitch.css";
 import { ModActions } from "./modActions";
 
 const youtubeChatRepository = new YoutubeChatRepository();

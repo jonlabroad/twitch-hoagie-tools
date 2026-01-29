@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { createRoot, Root } from "react-dom/client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Toggle } from "@radix-ui/react-toggle";
-import "./toggle-button.css";
+import "./toggleButton.css";
 import { YoutubeChatRepository, YoutubeLiveInfo } from "../../shared/youtubeChatRepo";
-import { CheckIcon } from "../../shared/icons/CheckIcon";
+import { CheckIcon } from "../../shared/icons/checkIcon";
 
 let youtubeMessagesEnabled = true;
 let rootInstance: Root | null = null;

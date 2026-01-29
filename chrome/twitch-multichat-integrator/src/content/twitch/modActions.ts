@@ -1,5 +1,3 @@
-import { YouTubeApiClient } from "../../shared/youtubeApiClient";
-
 export class ModActions {
   // Define handlers for delete and ban
   public handleDelete = async (messageId: string) => {
