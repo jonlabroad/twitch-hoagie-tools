@@ -5,6 +5,7 @@ import {
 import {
   YoutubeChatMessage,
   YoutubeChatMessageData,
+  YoutubeChatMessageWithTabId,
 } from "../../messages/messages";
 import { injectToggleButton, isYoutubeMessagesEnabled } from "./toggle-button";
 import { renderYoutubeMessage } from "./YoutubeMessage";
@@ -13,7 +14,6 @@ import "./content-twitch.css";
 import { ModActions } from "./modActions";
 
 const youtubeChatRepository = new YoutubeChatRepository();
-const youtubeMessages: YoutubeChatMessage[] = [];
 var selectedYoutubeVideoSource: YoutubeLiveInfo | null = null;
 let isYoutubeMenuOpen = false;
 let scrollLockPosition: number | null = null;
@@ -67,17 +67,18 @@ function onYoutubeChannelSelectionChange(videoId: string) {
 }
 
 function onMessageReceived(message: any) {
-  if (message.type === "youtube-chat-message") {
+  
+  if (message.type === "youtube-chat") {
+    const parsedMessage = message as YoutubeChatMessageWithTabId;
     console.log(
       "Received broadcast from tab:",
-      message.sourceTabId,
-      message.data,
+      parsedMessage.tabId,
+      parsedMessage.data,
     );
     // Store the received YouTube chat message
-    youtubeChatRepository.upsertChatMessage(message.data.videoId, message.data);
-    youtubeMessages.push(message.data);
+    youtubeChatRepository.upsertChatMessage(parsedMessage.data.videoId, parsedMessage);
 
-    insertYoutubeMessageIntoTwitchChat(message.data);
+    insertYoutubeMessageIntoTwitchChat(parsedMessage.data);
   } else if (message.type === "youtube-channel-name-declaration") {
     const existingChannel = youtubeChatRepository.getChannelById(
       message.data.videoId,

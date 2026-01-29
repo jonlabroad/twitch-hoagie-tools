@@ -1,4 +1,4 @@
-import { YoutubeChatMessageData } from "../messages/messages";
+import { YoutubeChatMessageData, YoutubeChatMessageWithTabId } from "../messages/messages";
 
 export interface YoutubeChatRepositoryConfig {
   idleTimeoutMs: number;
@@ -20,14 +20,14 @@ export interface YoutubeChatData {
   liveInfo: YoutubeLiveInfo;
 
   lastHeartbeatTimestamp: number;
-  chatMessages: YoutubeChatMessageData[];
-  chatMessageById: Map<string, YoutubeChatMessageData>;
+  chatMessages: YoutubeChatMessageWithTabId[];
+  chatMessageById: Map<string, YoutubeChatMessageWithTabId>;
 }
 
 type ChatMessageRepository = Record<string, YoutubeChatData>;
 
 type ChannelChangeCallback = (channel: YoutubeLiveInfo) => void;
-type ChatMessageCallback = (videoId: string, message: YoutubeChatMessageData) => void;
+type ChatMessageCallback = (videoId: string, message: YoutubeChatMessageWithTabId) => void;
 type ChannelIdleCallback = (videoId: string, channel: YoutubeLiveInfo) => void;
 
 export class YoutubeChatRepository {
@@ -55,7 +55,7 @@ export class YoutubeChatRepository {
         },
         lastHeartbeatTimestamp: Date.now(),
         chatMessages: [],
-        chatMessageById: new Map<string, YoutubeChatMessageData>(),
+        chatMessageById: new Map<string, YoutubeChatMessageWithTabId>(),
       };
     }
 
@@ -103,21 +103,22 @@ export class YoutubeChatRepository {
 
   public upsertChatMessage(
     videoId: string,
-    chatMessage: YoutubeChatMessageData,
+    chatMessage: YoutubeChatMessageWithTabId,
   ) {
     const chatData = this.chatRepo[videoId];
+    const messageData = chatMessage.data;
 
     if (chatData) {
-      if (chatData.chatMessageById.has(chatMessage.messageId)) {
+      if (chatData.chatMessageById.has(messageData.messageId)) {
         // Update existing message
         const existingMessage = chatData.chatMessageById.get(
-          chatMessage.messageId,
+          messageData.messageId,
         );
         if (existingMessage) {
           Object.assign(existingMessage, chatMessage);
           let msgIndex = findLastIndex(
             chatData.chatMessages,
-            (msg) => msg.messageId === chatMessage.messageId,
+            (msg) => msg.data.messageId === messageData.messageId,
           );
           if (msgIndex !== -1) {
             chatData.chatMessages[msgIndex] = existingMessage;
@@ -128,14 +129,14 @@ export class YoutubeChatRepository {
 
       // Insert new message
       chatData.chatMessages.push(chatMessage);
-      chatData.chatMessageById.set(chatMessage.messageId, chatMessage);
+      chatData.chatMessageById.set(messageData.messageId, chatMessage);
       this.notifyChatMessage(videoId, chatMessage);
     } else {
       console.warn(`Chat data for video ID ${videoId} not initialized.`);
     }
   }
 
-  public getChatMessages(videoId: string): YoutubeChatMessageData[] | null {
+  public getChatMessages(videoId: string): YoutubeChatMessageWithTabId[] | null {
     const chatData = this.chatRepo[videoId];
     return chatData ? chatData.chatMessages : null;
   }
@@ -178,7 +179,7 @@ export class YoutubeChatRepository {
     this.channelChangeListeners.forEach(listener => listener(channel));
   }
 
-  private notifyChatMessage(videoId: string, message: YoutubeChatMessageData) {
+  private notifyChatMessage(videoId: string, message: YoutubeChatMessageWithTabId) {
     this.chatMessageListeners.forEach(listener => listener(videoId, message));
   }
 

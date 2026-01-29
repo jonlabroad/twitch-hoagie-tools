@@ -1,5 +1,6 @@
 import { YoutubeChatMessage, YoutubeChannelNameDeclarationMessage, YoutubeMessageDeletedMessage } from "../../messages/messages";
 import { getYoutubeVideoIdFromUrl } from "./urlUtil";
+import { clickYoutubeDeleteButton } from "./modActions";
 
 export const youtubeChatContent = () => {
   const state = {
@@ -289,4 +290,13 @@ export const youtubeChatContent = () => {
       setHeartbeatTimeout(channelName, videoId);
     }, 15 * 1000); // every 15 seconds
   }
+
+  // Listen for messages from background script
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'youtube-click-delete') {
+      const success = clickYoutubeDeleteButton(message.messageId);
+      sendResponse({ success });
+    }
+    return true; // Keep channel open for async response
+  });
 };

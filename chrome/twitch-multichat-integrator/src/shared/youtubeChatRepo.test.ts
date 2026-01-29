@@ -1,5 +1,8 @@
 import { YoutubeChatRepository, YoutubeLiveInfo } from "./youtubeChatRepo";
-import { YoutubeChatMessageData } from "../messages/messages";
+import {
+  YoutubeChatMessageData,
+  YoutubeChatMessageWithTabId,
+} from "../messages/messages";
 
 describe("YoutubeChatRepository", () => {
   let repo: YoutubeChatRepository;
@@ -35,7 +38,7 @@ describe("YoutubeChatRepository", () => {
             channelName: "Channel Two",
             idle: false,
           }),
-        ])
+        ]),
       );
     });
 
@@ -101,7 +104,7 @@ describe("YoutubeChatRepository", () => {
           videoId: "video123",
           channelName: "Channel One",
           idle: true,
-        })
+        }),
       );
     });
   });
@@ -137,24 +140,32 @@ describe("YoutubeChatRepository", () => {
       repo.initializeChannel("video123", "Channel One");
 
       // Add some messages
-      const message1: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Hello",
-        contentHtml: "<span>Hello</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message1: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Hello",
+          contentHtml: "<span>Hello</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
-      const message2: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg2",
-        author: "User2",
-        content: "World",
-        contentHtml: "<span>World</span>",
-        youtubeTimestamp: "0:05",
-        timestamp: Date.now(),
+      const message2: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg2",
+          author: "User2",
+          content: "World",
+          contentHtml: "<span>World</span>",
+          youtubeTimestamp: "0:05",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message1);
@@ -182,14 +193,18 @@ describe("YoutubeChatRepository", () => {
       repo = new YoutubeChatRepository();
       repo.initializeChannel("video123", "Channel One");
 
-      const message: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Test message",
-        contentHtml: "<span>Test message</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Test message",
+          contentHtml: "<span>Test message</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message);
@@ -206,14 +221,18 @@ describe("YoutubeChatRepository", () => {
       repo.subscribeChatMessage(messageCallback);
       repo.initializeChannel("video123", "Channel One");
 
-      const message: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Test message",
-        contentHtml: "<span>Test message</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Test message",
+          contentHtml: "<span>Test message</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message);
@@ -225,34 +244,46 @@ describe("YoutubeChatRepository", () => {
       repo = new YoutubeChatRepository();
       repo.initializeChannel("video123", "Channel One");
 
-      const message1: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "First",
-        contentHtml: "<span>First</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message1: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "First",
+          contentHtml: "<span>First</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
-      const message2: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg2",
-        author: "User2",
-        content: "Second",
-        contentHtml: "<span>Second</span>",
-        youtubeTimestamp: "0:05",
-        timestamp: Date.now(),
+      const message2: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg2",
+          author: "User2",
+          content: "Second",
+          contentHtml: "<span>Second</span>",
+          youtubeTimestamp: "0:05",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
-      const message3: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg3",
-        author: "User3",
-        content: "Third",
-        contentHtml: "<span>Third</span>",
-        youtubeTimestamp: "0:10",
-        timestamp: Date.now(),
+      const message3: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg3",
+          author: "User3",
+          content: "Third",
+          contentHtml: "<span>Third</span>",
+          youtubeTimestamp: "0:10",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message1);
@@ -261,9 +292,9 @@ describe("YoutubeChatRepository", () => {
 
       const messages = repo.getChatMessages("video123");
       expect(messages).toHaveLength(3);
-      expect(messages![0].messageId).toBe("msg1");
-      expect(messages![1].messageId).toBe("msg2");
-      expect(messages![2].messageId).toBe("msg3");
+      expect(messages![0].data.messageId).toBe("msg1");
+      expect(messages![1].data.messageId).toBe("msg2");
+      expect(messages![2].data.messageId).toBe("msg3");
     });
   });
 
@@ -272,14 +303,18 @@ describe("YoutubeChatRepository", () => {
       repo = new YoutubeChatRepository();
       repo.initializeChannel("video123", "Channel One");
 
-      const message: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Original content",
-        contentHtml: "<span>Original content</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Original content",
+          contentHtml: "<span>Original content</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message);
@@ -293,35 +328,45 @@ describe("YoutubeChatRepository", () => {
       repo = new YoutubeChatRepository();
       repo.initializeChannel("video123", "Channel One");
 
-      const originalMessage: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Original content",
-        contentHtml: "<span>Original content</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: 1000,
+      const originalMessage: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Original content",
+          contentHtml: "<span>Original content</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: 1000,
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", originalMessage);
 
-      const updatedMessage: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Updated content",
-        contentHtml: "<span>Updated content</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: 2000,
+      const updatedMessage: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Updated content",
+          contentHtml: "<span>Updated content</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: 2000,
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", updatedMessage);
 
       const messages = repo.getChatMessages("video123");
       expect(messages).toHaveLength(1);
-      expect(messages![0].content).toBe("Updated content");
-      expect(messages![0].contentHtml).toBe("<span>Updated content</span>");
-      expect(messages![0].timestamp).toBe(2000);
+      expect(messages![0].data.content).toBe("Updated content");
+      expect(messages![0].data.contentHtml).toBe(
+        "<span>Updated content</span>",
+      );
+      expect(messages![0].data.timestamp).toBe(2000);
     });
 
     it("should not trigger chat message callback when updating existing message", () => {
@@ -331,14 +376,18 @@ describe("YoutubeChatRepository", () => {
       repo.subscribeChatMessage(messageCallback);
       repo.initializeChannel("video123", "Channel One");
 
-      const message: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Original",
-        contentHtml: "<span>Original</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Original",
+          contentHtml: "<span>Original</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       repo.upsertChatMessage("video123", message);
@@ -347,10 +396,13 @@ describe("YoutubeChatRepository", () => {
       messageCallback.mockClear();
 
       // Upsert the same message ID
-      const updatedMessage: YoutubeChatMessageData = {
+      const updatedMessage: YoutubeChatMessageWithTabId = {
         ...message,
-        content: "Updated",
-        contentHtml: "<span>Updated</span>",
+        data: {
+          ...message.data,
+          content: "Updated",
+          contentHtml: "<span>Updated</span>",
+        },
       };
 
       repo.upsertChatMessage("video123", updatedMessage);
@@ -363,14 +415,18 @@ describe("YoutubeChatRepository", () => {
       repo = new YoutubeChatRepository();
       repo.initializeChannel("video123", "Channel One");
 
-      const message: YoutubeChatMessageData = {
-        videoId: "video123",
-        messageId: "msg1",
-        author: "User1",
-        content: "Test",
-        contentHtml: "<span>Test</span>",
-        youtubeTimestamp: "0:00",
-        timestamp: Date.now(),
+      const message: YoutubeChatMessageWithTabId = {
+        tabId: 1,
+        data: {
+          videoId: "video123",
+          messageId: "msg1",
+          author: "User1",
+          content: "Test",
+          contentHtml: "<span>Test</span>",
+          youtubeTimestamp: "0:00",
+          timestamp: Date.now(),
+        },
+        type: "youtube-chat",
       };
 
       expect(repo.hasMessage("video123", "msg1")).toBe(false);

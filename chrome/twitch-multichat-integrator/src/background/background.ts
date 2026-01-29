@@ -1,3 +1,5 @@
+import { YoutubeChatMessageWithTabId } from "../messages/messages";
+
 // Background service worker for Chrome extension
 console.log('Background service worker started');
 
@@ -9,10 +11,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'youtube-chat') {
     // Broadcast to all tabs
     broadcastToAllTwitchTabs({
-      type: 'youtube-chat-message',
+      type: 'youtube-chat',
       data: message.data,
-      sourceTabId: sender.tab?.id,
-    });
+      tabId: sender.tab?.id,
+    } as YoutubeChatMessageWithTabId);
 
     sendResponse({ success: true });
   } else if (message.type === 'youtube-channel-name-declaration') {
@@ -20,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     broadcastToAllTwitchTabs({
       type: 'youtube-channel-name-declaration',
       data: message.data,
-      sourceTabId: sender.tab?.id,
+      tabId: sender.tab?.id,
     });
     sendResponse({ success: true });
   } else if (message.type === 'youtube-message-deleted') {
@@ -28,9 +30,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     broadcastToAllTwitchTabs({
       type: 'youtube-message-deleted',
       data: message.data,
-      sourceTabId: sender.tab?.id,
+      tabId: sender.tab?.id,
     });
     sendResponse({ success: true });
+  } else if (message.type === 'youtube-click-delete') {
+    // Forward delete request to YouTube tab
+    chrome.tabs.query({ url: '*://www.youtube.com/live_chat*' }, (tabs) => {
+      if (tabs.length > 0 && tabs[0].id) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: 'youtube-click-delete',
+          messageId: message.messageId
+        }, (response) => {
+          sendResponse(response || { success: false, error: 'No response from YouTube tab' });
+        });
+      } else {
+        sendResponse({ success: false, error: 'YouTube tab not found' });
+      }
+    });
+    return true; // Keep channel open for async response
   }
 
   return true; // Keep message channel open for async response

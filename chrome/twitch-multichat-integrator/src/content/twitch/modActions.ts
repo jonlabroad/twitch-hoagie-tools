@@ -6,58 +6,30 @@ export class ModActions {
     console.log("Delete message:", messageId);
 
     try {
-      // Get the access token from storage
-      const result = await chrome.storage.local.get("youtubeAuth");
-      const authState = result.youtubeAuth;
+      // Send message to background to forward to YouTube tab
+      const response = await chrome.runtime.sendMessage({
+        type: 'youtube-click-delete',
+        messageId: messageId
+      });
 
-      if (!authState || !authState.accessToken) {
-        alert("Please connect to YouTube in the extension settings first");
-        return;
-      }
-
-      // Check if token is expired
-      if (authState.expiresAt && Date.now() >= authState.expiresAt) {
-        alert(
-          "Your YouTube session has expired. Please reconnect in the extension settings.",
+      if (response && response.success) {
+        // Mark the message as deleted in the Twitch UI
+        const messageToRemove = document.querySelector(
+          `[data-youtube-message-id="${messageId}"]`,
         );
-        return;
+        if (messageToRemove) {
+          messageToRemove.classList.add("deleted-youtube-message");
+        }
+        console.log("Message deleted successfully:", messageId);
+      } else {
+        const errorMsg = response?.error || "Unknown error";
+        console.error("Failed to delete message:", errorMsg);
+        alert(`Failed to delete message: ${errorMsg}\n\nMake sure the YouTube live chat tab is open.`);
       }
-
-      // Create API client and delete the message
-      const apiClient = new YouTubeApiClient(authState.accessToken);
-      await apiClient.deleteMessage(messageId);
-
-      // Mark the message as deleted in the UI
-      const messageToRemove = document.querySelector(
-        `[data-youtube-message-id="${messageId}"]`,
-      );
-      if (messageToRemove) {
-        messageToRemove.classList.add("deleted-youtube-message");
-      }
-
-      console.log("Message deleted successfully:", messageId);
     } catch (error) {
       console.error("Failed to delete message:", error);
-
-      // Check if it's an auth error
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      if (
-        errorMessage.includes("401") ||
-        errorMessage.includes("authError") ||
-        errorMessage.includes("Invalid Credentials")
-      ) {
-        alert(
-          "Your YouTube session has expired or is invalid. Please reconnect in the extension settings.",
-        );
-      } else if (
-        errorMessage.includes("403") ||
-        errorMessage.includes("forbidden")
-      ) {
-        alert("You do not have permission to delete messages in this chat.");
-      } else {
-        alert(`Failed to delete message: ${errorMessage}`);
-      }
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Failed to delete message: ${errorMessage}\n\nMake sure the YouTube live chat tab is open.`);
     }
   };
 

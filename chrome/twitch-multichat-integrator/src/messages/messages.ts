@@ -16,6 +16,10 @@ export interface YoutubeChatMessageData {
   timestamp: number;
 }
 
+export interface YoutubeChatMessageWithTabId extends YoutubeChatMessage {
+  tabId: number | null;
+}
+
 export interface YoutubeChatMessage extends IMessage<YoutubeChatMessageData> {
   type: 'youtube-chat';
 }
