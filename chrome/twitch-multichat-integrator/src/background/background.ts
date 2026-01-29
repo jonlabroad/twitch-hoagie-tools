@@ -23,6 +23,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sourceTabId: sender.tab?.id,
     });
     sendResponse({ success: true });
+  } else if (message.type === 'youtube-message-deleted') {
+    console.log('Message deleted:', message.data.messageId, 'from video ID:', message.data.videoId);
+    broadcastToAllTwitchTabs({
+      type: 'youtube-message-deleted',
+      data: message.data,
+      sourceTabId: sender.tab?.id,
+    });
+    sendResponse({ success: true });
   }
 
   return true; // Keep message channel open for async response

@@ -92,6 +92,12 @@ function onMessageReceived(message: any) {
     } else {
       youtubeChatRepository.handleHeartbeat(existingChannel);
     }
+  } else if (message.type === "youtube-message-deleted") {
+    console.log(
+      "Received YouTube message deletion:",
+      message.data.messageId,
+    );
+    handleYoutubeMessageDeleted(message.data.videoId, message.data.messageId);
   }
 }
 
@@ -193,6 +199,20 @@ function startObservingChat() {
 
 function isChatEnabled(videoId: string): boolean {
   return selectedYoutubeVideoSource?.videoId === videoId;
+}
+
+function handleYoutubeMessageDeleted(videoId: string, messageId: string) {
+  // Find the message in the Twitch chat and mark it as deleted
+  const messageElement = document.querySelector(
+    `[data-youtube-message-id="${messageId}"]`,
+  );
+  
+  if (messageElement) {
+    messageElement.classList.add("deleted-youtube-message");
+    console.log("Marked YouTube message as deleted in Twitch chat:", messageId);
+  } else {
+    console.warn("Could not find YouTube message in Twitch chat to mark as deleted:", messageId);
+  }
 }
 
 main();

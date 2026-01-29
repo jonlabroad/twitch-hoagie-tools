@@ -1,4 +1,4 @@
-import { YoutubeChatMessage, YoutubeChannelNameDeclarationMessage } from "../../messages/messages";
+import { YoutubeChatMessage, YoutubeChannelNameDeclarationMessage, YoutubeMessageDeletedMessage } from "../../messages/messages";
 import { getYoutubeVideoIdFromUrl } from "./urlUtil";
 
 export const youtubeChatContent = () => {
@@ -26,27 +26,72 @@ export const youtubeChatContent = () => {
   // MutationObserver to watch for DOM changes
   const youtubeObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+      if (mutation.type === "childList") {
         // Detect when chat messages are added
-        mutation.addedNodes.forEach((node) => {
-          if (node instanceof HTMLElement) {
-            // Check if the node itself is a chat message
-            if (node.tagName === "YT-LIVE-CHAT-TEXT-MESSAGE-RENDERER") {
-              handleYoutubeChatMessage(node);
-            }
-
-            // Also check children for chat messages (tag selector, not class)
-            const chatMessages = node.querySelectorAll(
-              "yt-live-chat-text-message-renderer",
-            );
-
-            chatMessages.forEach((msgNode) => {
-              if (msgNode instanceof HTMLElement) {
-                handleYoutubeChatMessage(msgNode);
+        if (mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof HTMLElement) {
+              // Check if the node itself is a chat message
+              if (node.tagName === "YT-LIVE-CHAT-TEXT-MESSAGE-RENDERER") {
+                handleYoutubeChatMessage(node);
               }
-            });
+
+              // Also check children for chat messages (tag selector, not class)
+              const chatMessages = node.querySelectorAll(
+                "yt-live-chat-text-message-renderer",
+              );
+
+              chatMessages.forEach((msgNode) => {
+                if (msgNode instanceof HTMLElement) {
+                  handleYoutubeChatMessage(msgNode);
+                }
+              });
+            }
+          });
+        }
+
+        // Detect when chat messages are removed
+        if (mutation.removedNodes.length > 0) {
+          mutation.removedNodes.forEach((node) => {
+            if (node instanceof HTMLElement) {
+              // Check if the node itself is a chat message
+              if (node.tagName === "YT-LIVE-CHAT-TEXT-MESSAGE-RENDERER") {
+                handleYoutubeChatMessageDeleted(node);
+              }
+
+              // Also check children for chat messages
+              const chatMessages = node.querySelectorAll(
+                "yt-live-chat-text-message-renderer",
+              );
+
+              chatMessages.forEach((msgNode) => {
+                if (msgNode instanceof HTMLElement) {
+                  handleYoutubeChatMessageDeleted(msgNode);
+                }
+              });
+            }
+          });
+        }
+      } else if (mutation.type === "attributes") {
+        // Detect when a message element's attributes change (e.g., class added for deleted state)
+        const target = mutation.target;
+        if (target instanceof HTMLElement) {
+          if (target.tagName === "YT-LIVE-CHAT-TEXT-MESSAGE-RENDERER") {
+            checkIfMessageDeleted(target);
           }
-        });
+        }
+      } else if (mutation.type === "characterData" || mutation.type === "childList") {
+        // Detect when message content changes (e.g., to "[message deleted]")
+        const target = mutation.target;
+        if (target instanceof HTMLElement || target.parentElement instanceof HTMLElement) {
+          const messageElement = target instanceof HTMLElement 
+            ? target.closest("yt-live-chat-text-message-renderer")
+            : target.parentElement?.closest("yt-live-chat-text-message-renderer");
+          
+          if (messageElement instanceof HTMLElement) {
+            checkIfMessageDeleted(messageElement);
+          }
+        }
       }
     });
   });
@@ -141,6 +186,9 @@ export const youtubeChatContent = () => {
       youtubeObserver.observe(chatContainer, {
         childList: true,
         subtree: true,
+        attributes: true,
+        attributeFilter: ["class", "is-deleted"], // Watch for class changes and potential is-deleted attribute
+        characterData: true,
       });
     } else {
       // Retry after a short delay if chat container not found yet
@@ -179,6 +227,50 @@ export const youtubeChatContent = () => {
       };
 
       chrome.runtime.sendMessage(message);
+    }
+  }
+
+  function handleYoutubeChatMessageDeleted(messageElement: HTMLElement) {
+    const messageId = messageElement.id || "";
+    
+    if (!messageId) {
+      console.warn("Cannot handle deleted message without ID");
+      return;
+    }
+
+    // Send deletion message to background script
+    if (window.top?.location.href) {
+      const videoId = getYoutubeVideoIdFromUrl(window.top.location.href);
+      if (!videoId) {
+        console.warn("Could not determine video ID from URL");
+        return;
+      }
+
+      console.log("YouTube message deleted:", messageId);
+
+      const message: YoutubeMessageDeletedMessage = {
+        type: "youtube-message-deleted",
+        data: {
+          videoId,
+          messageId,
+        },
+      };
+
+      chrome.runtime.sendMessage(message);
+   }
+  }
+
+  function checkIfMessageDeleted(messageElement: HTMLElement) {
+    const messageId = messageElement.id || "";
+    
+    if (!messageId) {
+      return;
+    }
+
+    // YouTube marks deleted messages with the is-deleted attribute
+    if (messageElement.hasAttribute("is-deleted")) {
+      console.log("Detected deleted message:", messageId);
+      handleYoutubeChatMessageDeleted(messageElement);
     }
   }
 

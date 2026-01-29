@@ -1,5 +1,5 @@
 // Message types
-export type MessageType = 'youtube-chat' | 'youtube-channel-name-declaration';
+export type MessageType = 'youtube-chat' | 'youtube-channel-name-declaration' | 'youtube-message-deleted';
 
 export interface IMessage<T> {
     type: MessageType;
@@ -27,6 +27,15 @@ export interface YoutubeChannelNameDeclarationData {
 
 export interface YoutubeChannelNameDeclarationMessage extends IMessage<YoutubeChannelNameDeclarationData> {
   type: 'youtube-channel-name-declaration';
+}
+
+export interface YoutubeMessageDeletedData {
+  videoId: string;
+  messageId: string;
+}
+
+export interface YoutubeMessageDeletedMessage extends IMessage<YoutubeMessageDeletedData> {
+  type: 'youtube-message-deleted';
 }
 
 
