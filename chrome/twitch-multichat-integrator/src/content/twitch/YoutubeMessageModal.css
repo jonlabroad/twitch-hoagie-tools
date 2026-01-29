@@ -77,6 +77,12 @@
   gap: 10px;
 }
 
+.youtube-message-modal-timeout-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
 .youtube-message-modal-button {
   padding: 10px 15px;
   border: none;
@@ -96,9 +102,21 @@
   background-color: #772ce8;
 }
 
+.youtube-message-modal-button-timeout {
+  background-color: #f57c00;
+  color: white;
+  flex: 1;
+}
+
+.youtube-message-modal-button-timeout:hover {
+  background-color: #e65100;
+}
+
 .youtube-message-modal-button-ban {
   background-color: #eb0400;
   color: white;
+  flex: 1;
+  font-size: 18px;
 }
 
 .youtube-message-modal-button-ban:hover {

@@ -61,9 +61,10 @@ export class ModActions {
     }
   };
 
-  public handleBanUser = async (author: string) => {
-    console.log("Ban user:", author);
-    // TODO: Implement ban user functionality with YouTube API
-    alert(`Ban user functionality for "${author}" will be implemented`);
+  public handleTimeout = async (author: string, seconds: number | 'infinite') => {
+    const duration = seconds === 'infinite' ? 'permanently' : `for ${seconds} seconds`;
+    console.log(`Timeout user ${author} ${duration}`);
+    // TODO: Implement timeout user functionality with YouTube API
+    alert(`Timeout functionality for "${author}" ${duration} will be implemented`);
   };
 }

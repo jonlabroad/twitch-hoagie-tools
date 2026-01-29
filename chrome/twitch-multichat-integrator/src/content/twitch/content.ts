@@ -139,7 +139,7 @@ function insertYoutubeMessageIntoTwitchChat(
         messageElement,
         youtubeMessage,
         modActions.handleDelete,
-        modActions.handleBanUser,
+        modActions.handleTimeout,
       );
       chatLine.appendChild(messageElement);
       existingChatLine.replaceWith(chatLine);
@@ -152,7 +152,7 @@ function insertYoutubeMessageIntoTwitchChat(
     messageElement,
     youtubeMessage,
     modActions.handleDelete,
-    modActions.handleBanUser,
+    modActions.handleTimeout,
   );
   chatLine.appendChild(messageElement);
   chatContainer.appendChild(chatLine);

@@ -8,14 +8,14 @@ interface YoutubeMessageProps {
   message: YoutubeChatMessageData;
   usernameColor: string;
   onDelete?: (messageId: string) => void;
-  onBanUser?: (author: string) => void;
+  onTimeout?: (author: string, seconds: number | 'infinite') => void;
 }
 
 const YoutubeMessage: React.FC<YoutubeMessageProps> = ({ 
   message, 
   usernameColor, 
   onDelete, 
-  onBanUser
+  onTimeout
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -25,9 +25,9 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
     }
   };
 
-  const handleBanUser = () => {
-    if (onBanUser) {
-      onBanUser(message.author);
+  const handleTimeout = (seconds: number | 'infinite') => {
+    if (onTimeout) {
+      onTimeout(message.author, seconds);
     }
   };
 
@@ -76,7 +76,7 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onDelete={handleDelete}
-        onBan={handleBanUser}
+        onTimeout={handleTimeout}
         messageAuthor={message.author}
         messageContent={message.contentHtml ?? message.content}
       />
@@ -88,7 +88,7 @@ export function renderYoutubeMessage(
   container: HTMLElement,
   message: YoutubeChatMessageData,
   onDelete?: (messageId: string) => void,
-  onBanUser?: (author: string) => void
+  onTimeout?: (author: string, seconds: number | 'infinite') => void
 ): void {
   const usernameColor = getColorForAuthor(message.author);
   const root = createRoot(container);
@@ -97,7 +97,7 @@ export function renderYoutubeMessage(
       message={message} 
       usernameColor={usernameColor}
       onDelete={onDelete}
-      onBanUser={onBanUser}
+      onTimeout={onTimeout}
     />
   );
 }

@@ -6,7 +6,7 @@ interface YoutubeMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDelete: () => void;
-  onBan: () => void;
+  onTimeout: (seconds: number | 'infinite') => void;
   messageAuthor: string;
   messageContent: string;
 }
@@ -15,7 +15,7 @@ export const YoutubeMessageModal: React.FC<YoutubeMessageModalProps> = ({
   isOpen,
   onClose,
   onDelete,
-  onBan,
+  onTimeout,
   messageAuthor,
   messageContent,
 }) => {
@@ -45,15 +45,44 @@ export const YoutubeMessageModal: React.FC<YoutubeMessageModalProps> = ({
             >
               Delete Message
             </button>
-            <button
-              className="youtube-message-modal-button youtube-message-modal-button-ban"
-              onClick={() => {
-                onBan();
-                onClose();
-              }}
-            >
-              Ban User
-            </button>
+            <div className="youtube-message-modal-timeout-buttons">
+              <button
+                className="youtube-message-modal-button youtube-message-modal-button-timeout"
+                onClick={() => {
+                  onTimeout(60);
+                  onClose();
+                }}
+              >
+                60s
+              </button>
+              <button
+                className="youtube-message-modal-button youtube-message-modal-button-timeout"
+                onClick={() => {
+                  onTimeout(600);
+                  onClose();
+                }}
+              >
+                600s
+              </button>
+              <button
+                className="youtube-message-modal-button youtube-message-modal-button-timeout"
+                onClick={() => {
+                  onTimeout(3600);
+                  onClose();
+                }}
+              >
+                3600s
+              </button>
+              <button
+                className="youtube-message-modal-button youtube-message-modal-button-ban"
+                onClick={() => {
+                  onTimeout('infinite');
+                  onClose();
+                }}
+              >
+                ∞
+              </button>
+            </div>
             <button
               className="youtube-message-modal-button youtube-message-modal-button-cancel"
               onClick={onClose}
