@@ -95,7 +95,7 @@ export function clickYoutubeDeleteButton(messageId: string): boolean {
 
     // Wait for the menu to appear, then find and click the remove button
     setTimeout(() => {
-      if (clickMenuItem('Remove')) {
+      if (clickMenuItem("Remove")) {
         // Check for confirmation dialog
         setTimeout(() => {
           clickConfirmDialog();
@@ -114,7 +114,7 @@ export function clickYoutubeDeleteButton(messageId: string): boolean {
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'youtube-delete-message') {
+  if (message.type === 'youtube-delete-message-command') {
     const success = clickYoutubeDeleteButton(message.messageId);
     sendResponse({ success });
   }

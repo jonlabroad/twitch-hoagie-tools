@@ -6,20 +6,13 @@ export class ModActions {
     try {
       // Send message to background to forward to YouTube tab
       const response = await chrome.runtime.sendMessage({
-        type: 'youtube-delete-message',
+        type: 'youtube-delete-message-command',
         
         tabId,
         messageId,
       });
 
       if (response && response.success) {
-        // Mark the message as deleted in the Twitch UI
-        const messageToRemove = document.querySelector(
-          `[data-youtube-message-id="${messageId}"]`,
-        );
-        if (messageToRemove) {
-          messageToRemove.classList.add("deleted-youtube-message");
-        }
         console.log("Message deleted successfully:", messageId);
       } else {
         const errorMsg = response?.error || "Unknown error";

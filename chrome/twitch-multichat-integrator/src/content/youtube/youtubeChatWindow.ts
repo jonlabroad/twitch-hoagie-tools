@@ -6,7 +6,7 @@ export const youtubeChatContent = () => {
   const state = {
     currentChannelName: null as string | null,
     currentVideoId: null as string | null,
-    heartbeatHandle: null as number | null,
+    heartbeatHandle: null as NodeJS.Timeout | null,
   };
 
   // Only run in the chat iframe
@@ -293,7 +293,7 @@ export const youtubeChatContent = () => {
 
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'youtube-delete-message') {
+    if (message.type === 'youtube-delete-message-command') {
       const success = clickYoutubeDeleteButton(message.messageId);
       sendResponse({ success });
     }

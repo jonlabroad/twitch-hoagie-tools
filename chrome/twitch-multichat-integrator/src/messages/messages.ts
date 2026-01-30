@@ -2,7 +2,7 @@
 export type MessageType =
   | "youtube-chat"
   | "youtube-channel-name-declaration"
-  | "youtube-delete-message"
+  | "youtube-delete-message-command"
   | "youtube-message-deleted";
 
 export interface IMessage<T> {
@@ -51,6 +51,6 @@ export interface YoutubeDeleteMessageData {
 }
 
 export interface YoutubeDeleteMessage extends IMessage<YoutubeDeleteMessageData> {
-  type: "youtube-delete-message";
+  type: "youtube-delete-message-command";
   tabId: number;
 }
