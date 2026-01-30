@@ -293,7 +293,7 @@ export const youtubeChatContent = () => {
 
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'youtube-click-delete') {
+    if (message.type === 'youtube-delete-message') {
       const success = clickYoutubeDeleteButton(message.messageId);
       sendResponse({ success });
     }

@@ -18,12 +18,12 @@
   "content_scripts": [
     {
       "matches": ["https://www.twitch.tv/*"],
-      "js": ["dist/contentTwitch.js"],
+      "js": ["dist/content-twitch.js"],
       "run_at": "document_end"
     },
     {
       "matches": ["https://www.youtube.com/*"],
-      "js": ["dist/contentYoutube.js"],
+      "js": ["dist/content-youtube.js"],
       "run_at": "document_end",
       "all_frames": true
     }

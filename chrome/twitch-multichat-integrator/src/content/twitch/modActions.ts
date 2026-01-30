@@ -1,13 +1,15 @@
 export class ModActions {
   // Define handlers for delete and ban
-  public handleDelete = async (messageId: string) => {
+  public handleDelete = async (tabId: number, messageId: string) => {
     console.log("Delete message:", messageId);
 
     try {
       // Send message to background to forward to YouTube tab
       const response = await chrome.runtime.sendMessage({
-        type: 'youtube-click-delete',
-        messageId: messageId
+        type: 'youtube-delete-message',
+        
+        tabId,
+        messageId,
       });
 
       if (response && response.success) {

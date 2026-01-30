@@ -13,10 +13,8 @@ import { ModActions } from "./modActions";
 
 const youtubeChatRepository = new YoutubeChatRepository();
 var selectedYoutubeVideoSource: YoutubeLiveInfo | null = null;
-let isYoutubeMenuOpen = false;
-let scrollLockPosition: number | null = null;
 
-const modActions= new ModActions();
+const modActions = new ModActions();
 
 // MutationObserver to watch for DOM changes
 const observer = new MutationObserver((mutations) => {
@@ -76,7 +74,7 @@ function onMessageReceived(message: any) {
     // Store the received YouTube chat message
     youtubeChatRepository.upsertChatMessage(parsedMessage.data.videoId, parsedMessage);
 
-    insertYoutubeMessageIntoTwitchChat(parsedMessage.data);
+    insertYoutubeMessageIntoTwitchChat(parsedMessage);
   } else if (message.type === "youtube-channel-name-declaration") {
     const existingChannel = youtubeChatRepository.getChannelById(
       message.data.videoId,
@@ -101,7 +99,7 @@ function onMessageReceived(message: any) {
 }
 
 function insertYoutubeMessageIntoTwitchChat(
-  youtubeMessage: YoutubeChatMessageData,
+  youtubeMessage: YoutubeChatMessageWithTabId,
 ) {
   const chatContainer = document.querySelector(
     ".chat-scrollable-area__message-container",
@@ -112,28 +110,28 @@ function insertYoutubeMessageIntoTwitchChat(
   }
 
   const messageEnabled =
-    isYoutubeMessagesEnabled() && isChatEnabled(youtubeMessage.videoId);
+    isYoutubeMessagesEnabled() && isChatEnabled(youtubeMessage.data.videoId);
   console.log({ messageEnabled });
 
   // Create a wrapper that looks like a Twitch chat line
   const chatLine = document.createElement("div");
   chatLine.className =
     "chat-line__status youtube-chat-message" +
-    (isChatEnabled(youtubeMessage.videoId) ? "" : " hidden-youtube-message");
+    (isChatEnabled(youtubeMessage.data.videoId) ? "" : " hidden-youtube-message");
   chatLine.setAttribute("data-a-target", "chat-line-message");
-  chatLine.setAttribute("data-youtube-video-id", youtubeMessage.videoId);
-  chatLine.setAttribute("data-youtube-message-id", youtubeMessage.messageId);
+  chatLine.setAttribute("data-youtube-video-id", youtubeMessage.data.videoId);
+  chatLine.setAttribute("data-youtube-message-id", youtubeMessage.data.messageId);
 
   const messageElement = document.createElement("div");
-  messageElement.id = youtubeMessage.messageId;
+  messageElement.id = youtubeMessage.data.messageId;
 
   const chatMessageExists = chatContainer.querySelector(
-    `#${youtubeMessage.messageId}`,
+    `#${youtubeMessage.data.messageId}`,
   );
   if (
     youtubeChatRepository.hasMessage(
-      youtubeMessage.videoId,
-      youtubeMessage.messageId,
+      youtubeMessage.data.videoId,
+      youtubeMessage.data.messageId,
     ) &&
     chatMessageExists
   ) {

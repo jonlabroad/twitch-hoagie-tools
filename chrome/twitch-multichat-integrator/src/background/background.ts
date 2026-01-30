@@ -33,12 +33,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       tabId: sender.tab?.id,
     });
     sendResponse({ success: true });
-  } else if (message.type === 'youtube-click-delete') {
+  } else if (message.type === 'youtube-delete-message') {
     // Forward delete request to YouTube tab
     chrome.tabs.query({ url: '*://www.youtube.com/live_chat*' }, (tabs) => {
       if (tabs.length > 0 && tabs[0].id) {
         chrome.tabs.sendMessage(tabs[0].id, {
-          type: 'youtube-click-delete',
+          type: 'youtube-delete-message',
           messageId: message.messageId
         }, (response) => {
           sendResponse(response || { success: false, error: 'No response from YouTube tab' });

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { YoutubeChatMessageData } from "../../messages/messages";
+import { YoutubeChatMessageData, YoutubeChatMessageWithTabId } from "../../messages/messages";
 import { getColorForAuthor } from "./chatColors";
 import { YoutubeMessageModal } from "./youtubeMessageModal";
 
 interface YoutubeMessageProps {
-  message: YoutubeChatMessageData;
+  message: YoutubeChatMessageWithTabId;
   usernameColor: string;
-  onDelete?: (messageId: string) => void;
+  onDelete?: (tabId: number, messageId: string) => void;
   onTimeout?: (author: string, seconds: number | 'infinite') => void;
 }
 
@@ -21,13 +21,13 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
 
   const handleDelete = () => {
     if (onDelete) {
-      onDelete(message.messageId);
+      onDelete(message.tabId, message.data.messageId);
     }
   };
 
   const handleTimeout = (seconds: number | 'infinite') => {
     if (onTimeout) {
-      onTimeout(message.author, seconds);
+      onTimeout(message.data.author, seconds);
     }
   };
 
@@ -63,12 +63,12 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
         </span>
         {' '}
         <span style={{ color: usernameColor, fontWeight: 'bold' }}>
-          {message.author}:
+          {message.data.author}:
         </span>
         {' '}
         <span 
           className="youtube-chat-message-content"
-          dangerouslySetInnerHTML={{ __html: message.contentHtml ?? message.content }}
+          dangerouslySetInnerHTML={{ __html: message.data.contentHtml ?? message.data.content }}
         />
       </div>
 
@@ -77,8 +77,8 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
         onClose={() => setIsModalOpen(false)}
         onDelete={handleDelete}
         onTimeout={handleTimeout}
-        messageAuthor={message.author}
-        messageContent={message.contentHtml ?? message.content}
+        messageAuthor={message.data.author}
+        messageContent={message.data.contentHtml ?? message.data.content}
       />
     </>
   );
@@ -86,11 +86,11 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
 
 export function renderYoutubeMessage(
   container: HTMLElement,
-  message: YoutubeChatMessageData,
-  onDelete?: (messageId: string) => void,
+  message: YoutubeChatMessageWithTabId,
+  onDelete?: (tabId: number, messageId: string) => void,
   onTimeout?: (author: string, seconds: number | 'infinite') => void
 ): void {
-  const usernameColor = getColorForAuthor(message.author);
+  const usernameColor = getColorForAuthor(message.data.author);
   const root = createRoot(container);
   root.render(
     <YoutubeMessage 
