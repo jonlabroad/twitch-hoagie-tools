@@ -1,4 +1,8 @@
-import { YoutubeChatMessage, YoutubeChannelNameDeclarationMessage, YoutubeMessageDeletedMessage } from "../../messages/messages";
+import {
+  YoutubeChatMessage,
+  YoutubeChannelNameDeclarationMessage,
+  YoutubeMessageDeletedMessage,
+} from "../../messages/messages";
 import { getYoutubeVideoIdFromUrl } from "./urlUtil";
 import { clickYoutubeDeleteButton } from "./modActions";
 
@@ -81,14 +85,23 @@ export const youtubeChatContent = () => {
             checkIfMessageDeleted(target);
           }
         }
-      } else if (mutation.type === "characterData" || mutation.type === "childList") {
+      } else if (
+        mutation.type === "characterData" ||
+        mutation.type === "childList"
+      ) {
         // Detect when message content changes (e.g., to "[message deleted]")
         const target = mutation.target;
-        if (target instanceof HTMLElement || target.parentElement instanceof HTMLElement) {
-          const messageElement = target instanceof HTMLElement 
-            ? target.closest("yt-live-chat-text-message-renderer")
-            : target.parentElement?.closest("yt-live-chat-text-message-renderer");
-          
+        if (
+          target instanceof HTMLElement ||
+          target.parentElement instanceof HTMLElement
+        ) {
+          const messageElement =
+            target instanceof HTMLElement
+              ? target.closest("yt-live-chat-text-message-renderer")
+              : target.parentElement?.closest(
+                  "yt-live-chat-text-message-renderer",
+                );
+
           if (messageElement instanceof HTMLElement) {
             checkIfMessageDeleted(messageElement);
           }
@@ -111,11 +124,11 @@ export const youtubeChatContent = () => {
     // Poll for URL changes (since YouTube is an SPA)
     const urlCheckInterval = setInterval(() => {
       const currentUrl = window.location.href;
-      
+
       if (currentUrl !== lastUrl) {
         console.log("URL changed from", lastUrl, "to", currentUrl);
         lastUrl = currentUrl;
-        
+
         // Extract and compare video IDs
         const newVideoId = getYoutubeVideoIdFromUrl(currentUrl);
         if (newVideoId) {
@@ -138,43 +151,44 @@ export const youtubeChatContent = () => {
   });
 
   function findChannelName() {
-    const channelNameElement = document.querySelector(
-      "#channel-name #text a",
-    );
+    const channelNameElement = document.querySelector("#channel-name #text a");
 
     if (!channelNameElement) {
-        setTimeout(findChannelName, 1000);
+      setTimeout(findChannelName, 1000);
     } else {
-        const videoId = getYoutubeVideoIdFromUrl(window.location.href);
+      const videoId = getYoutubeVideoIdFromUrl(window.location.href);
 
-        const channelName = channelNameElement.textContent?.trim();
-        if (!channelName || !videoId) {
-          return;
+      const channelName = channelNameElement.textContent?.trim();
+      if (!channelName || !videoId) {
+        return;
+      }
+
+      if (
+        channelName !== state.currentChannelName &&
+        videoId !== state.currentVideoId
+      ) {
+        if (state.heartbeatHandle) {
+          clearTimeout(state.heartbeatHandle);
         }
 
-        if (channelName !== state.currentChannelName && videoId !== state.currentVideoId) {
-          if (state.heartbeatHandle) {
-            clearTimeout(state.heartbeatHandle);
-          }
+        state.currentChannelName = channelName;
+        state.currentVideoId = videoId;
 
-          state.currentChannelName = channelName;
-          state.currentVideoId = videoId;
+        console.log("Youtube channel name:", channelName);
+        console.log("Youtube video ID:", videoId);
 
-          console.log("Youtube channel name:", channelName);
-          console.log("Youtube video ID:", videoId);
+        // Send channel name and video ID to background script
+        const message: YoutubeChannelNameDeclarationMessage = {
+          type: "youtube-channel-name-declaration",
+          data: {
+            channelName,
+            videoId: videoId,
+          },
+        };
 
-          // Send channel name and video ID to background script
-          const message: YoutubeChannelNameDeclarationMessage = {
-              type: "youtube-channel-name-declaration",
-              data: {
-                  channelName,
-                  videoId: videoId,
-              },
-          };
-
-          chrome.runtime.sendMessage(message);
-          setHeartbeatTimeout(channelName, videoId);
-        }
+        chrome.runtime.sendMessage(message);
+        setHeartbeatTimeout(channelName, videoId);
+      }
     }
   }
 
@@ -233,7 +247,7 @@ export const youtubeChatContent = () => {
 
   function handleYoutubeChatMessageDeleted(messageElement: HTMLElement) {
     const messageId = messageElement.id || "";
-    
+
     if (!messageId) {
       console.warn("Cannot handle deleted message without ID");
       return;
@@ -258,12 +272,12 @@ export const youtubeChatContent = () => {
       };
 
       chrome.runtime.sendMessage(message);
-   }
+    }
   }
 
   function checkIfMessageDeleted(messageElement: HTMLElement) {
     const messageId = messageElement.id || "";
-    
+
     if (!messageId) {
       return;
     }
@@ -293,7 +307,7 @@ export const youtubeChatContent = () => {
 
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'youtube-delete-message-command') {
+    if (message.type === "youtube-delete-message-command") {
       const success = clickYoutubeDeleteButton(message.messageId);
       sendResponse({ success });
     }

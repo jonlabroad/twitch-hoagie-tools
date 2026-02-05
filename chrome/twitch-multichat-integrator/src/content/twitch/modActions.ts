@@ -22,14 +22,13 @@ export class ModActions {
     } catch (error) {
       console.error("Failed to delete message:", error);
       const errorMessage = error instanceof Error ? error.message : String(error);
-      alert(`Failed to delete message: ${errorMessage}\n\nMake sure the YouTube live chat tab is open.`);
+      console.error("Failed to delete message:", errorMessage);
     }
   };
 
   public handleTimeout = async (author: string, seconds: number | 'infinite') => {
     const duration = seconds === 'infinite' ? 'permanently' : `for ${seconds} seconds`;
     console.log(`Timeout user ${author} ${duration}`);
-    // TODO: Implement timeout user functionality with YouTube API
     alert(`Timeout functionality for "${author}" ${duration} will be implemented`);
   };
 }

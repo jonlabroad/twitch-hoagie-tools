@@ -75,7 +75,7 @@ describe('YouTube modActions', () => {
       expect(menuButtonClicked).toBe(true);
 
       // Advance timers by at least 200ms to trigger the delete button click
-      jest.advanceTimersByTime(300);
+      jest.advanceTimersByTime(500);
 
       // Verify the delete button was clicked
       expect(deleteButtonClicked).toBe(true);

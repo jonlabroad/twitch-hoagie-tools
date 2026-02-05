@@ -24,7 +24,10 @@ export function getColorForAuthor(author: string): string {
   }
 
   // Assign a color based on a hash of the author's name
-  const hash = Array.from(author).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = Array.from(author).reduce(
+    (acc, char) => acc + char.charCodeAt(0),
+    0,
+  );
   const color = validColors[hash % validColors.length];
   assignedColors[author] = color;
   return color;

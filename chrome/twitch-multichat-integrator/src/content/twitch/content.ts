@@ -51,7 +51,7 @@ function onYoutubeChannelSelectionChange(videoId: string) {
   const allYoutubeMessages = document.querySelectorAll(".youtube-chat-message");
   allYoutubeMessages.forEach((messageElement) => {
     const messageVideoId = messageElement.getAttribute("data-youtube-video-id");
-
+    
     if (messageVideoId === videoId) {
       // Show messages from the selected channel
       messageElement.classList.remove("hidden-youtube-message");
@@ -63,7 +63,7 @@ function onYoutubeChannelSelectionChange(videoId: string) {
 }
 
 function onMessageReceived(message: any) {
-  
+
   if (message.type === "youtube-chat") {
     const parsedMessage = message as YoutubeChatMessageWithTabId;
     console.log(
@@ -146,8 +146,8 @@ function insertYoutubeMessageIntoTwitchChat(
       );
       chatLine.appendChild(messageElement);
       existingChatLine.replaceWith(chatLine);
-      return;
-    }
+    return;
+  }
   }
 
   // It's a new message, render and append it
@@ -169,7 +169,7 @@ function insertYoutubeMessageIntoTwitchChat(
       );
       if (scrollableArea) {
         setTimeout(() => {
-          scrollableArea.scrollTop = scrollableArea.scrollHeight;
+        scrollableArea.scrollTop = scrollableArea.scrollHeight;
         }, 10);
       }
     }

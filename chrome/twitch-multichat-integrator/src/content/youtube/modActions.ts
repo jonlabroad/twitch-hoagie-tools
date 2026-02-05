@@ -1,41 +1,43 @@
 /**
  * Opens the context menu for a YouTube chat message
  * @param messageId The ID of the message element
- * @returns The menu button element if found, null otherwise
+ * @returns The message element if found, null otherwise
  */
-function openMessageMenu(messageId: string): HTMLButtonElement | null {
+function openMessageMenu(messageId: string): HTMLElement | null {
   const messageElement = document.querySelector(`#${messageId}`) as HTMLElement;
   if (!messageElement) {
-    console.error('Message element not found:', messageId);
+    console.error("Message element not found:", messageId);
     return null;
   }
 
-  const menuButton = messageElement.querySelector('#menu-button #button') as HTMLButtonElement;
+  const menuButton = messageElement.querySelector(
+    "#menu-button #button",
+  ) as HTMLButtonElement;
   if (!menuButton) {
-    console.error('Menu button not found for message:', messageId);
+    console.error("Menu button not found for message:", messageId);
     return null;
   }
 
-  console.log('Clicking menu button for message:', messageId);
+  console.log("Clicking menu button for message:", messageId);
   menuButton.click();
-  return menuButton;
+  return messageElement;
 }
 
 /**
  * Finds and clicks a menu item by its text label
+ * Note: Menu is rendered elsewhere in the DOM (not as a child of the message)
  * @param menuItemText The text of the menu item to find (e.g., "Remove", "Report", "Block")
  * @returns True if the item was found and clicked, false otherwise
  */
 function clickMenuItem(menuItemText: string): boolean {
   const menuItems = document.querySelectorAll(
-    'tp-yt-iron-dropdown ytd-menu-service-item-renderer, ' +
-    'tp-yt-iron-dropdown ytd-menu-navigation-item-renderer'
+    "ytd-menu-service-item-renderer, ytd-menu-navigation-item-renderer",
   );
-  
+
   let targetItem: Element | null = null;
   for (let i = 0; i < menuItems.length; i++) {
     const item = menuItems.item(i);
-    const text = item.querySelector('yt-formatted-string')?.textContent?.trim();
+    const text = item.querySelector("yt-formatted-string")?.textContent?.trim();
     if (text === menuItemText) {
       targetItem = item;
       break;
@@ -47,14 +49,22 @@ function clickMenuItem(menuItemText: string): boolean {
     return false;
   }
 
-  console.log(`Clicking menu item: ${menuItemText}`);
-  const paperItem = targetItem.querySelector('tp-yt-paper-item') as HTMLElement;
-  if (paperItem) {
-    paperItem.click();
-  } else {
-    (targetItem as HTMLElement).click();
-  }
+  // Safety check: ensure the menu item is visible
+  const targetElement = targetItem as HTMLElement;
+  const isVisible = window.getComputedStyle(targetElement).visibility !== 'hidden' &&
+                    window.getComputedStyle(targetElement).display !== 'none';
   
+  if (!isVisible) {
+    console.error(`Menu item "${menuItemText}" found but not visible`);
+    return false;
+  }
+
+  console.log(`Clicking menu item: ${menuItemText}`);
+  const paperItem = targetItem.querySelector("tp-yt-paper-item") as HTMLElement;
+  const elementToClick = paperItem || targetElement;
+   
+  elementToClick.click();
+
   return true;
 }
 
@@ -62,7 +72,7 @@ function clickMenuItem(menuItemText: string): boolean {
  * Closes the YouTube context menu
  */
 function closeMenu(): void {
-  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
 }
 
 /**
@@ -72,24 +82,24 @@ function closeMenu(): void {
 function clickConfirmDialog(): boolean {
   const confirmButton = document.querySelector(
     'yt-confirm-dialog-renderer [aria-label*="Remove"], ' +
-    'yt-confirm-dialog-renderer #confirm-button button'
+      "yt-confirm-dialog-renderer #confirm-button button",
   ) as HTMLButtonElement;
-  
+
   if (confirmButton) {
-    console.log('Confirming dialog');
+    console.log("Confirming dialog");
     confirmButton.click();
     return true;
   }
-  
+
   return false;
 }
 
 export function clickYoutubeDeleteButton(messageId: string): boolean {
   try {
-    console.log('Attempting to delete YouTube message:', messageId);
-    
-    const menuButton = openMessageMenu(messageId);
-    if (!menuButton) {
+    console.log("Attempting to delete YouTube message:", messageId);
+
+    const messageElement = openMessageMenu(messageId);
+    if (!messageElement) {
       return false;
     }
 
@@ -107,14 +117,14 @@ export function clickYoutubeDeleteButton(messageId: string): boolean {
 
     return true;
   } catch (error) {
-    console.error('Error clicking delete button:', error);
+    console.error("Error clicking delete button:", error);
     return false;
   }
 }
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'youtube-delete-message-command') {
+  if (message.type === "youtube-delete-message-command") {
     const success = clickYoutubeDeleteButton(message.messageId);
     sendResponse({ success });
   }
