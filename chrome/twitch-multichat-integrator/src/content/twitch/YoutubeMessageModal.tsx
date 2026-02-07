@@ -6,7 +6,7 @@ interface YoutubeMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDelete: () => void;
-  onTimeout: (seconds: number | 'infinite') => void;
+  onTimeout: (duration: string) => void;
   messageAuthor: string;
   messageContent: string;
 }
@@ -49,38 +49,38 @@ export const YoutubeMessageModal: React.FC<YoutubeMessageModalProps> = ({
               <button
                 className="youtube-message-modal-button youtube-message-modal-button-timeout"
                 onClick={() => {
-                  onTimeout(60);
+                  onTimeout('1 minute');
                   onClose();
                 }}
               >
-                60s
+                1m
               </button>
               <button
                 className="youtube-message-modal-button youtube-message-modal-button-timeout"
                 onClick={() => {
-                  onTimeout(600);
+                  onTimeout('10 minutes');
                   onClose();
                 }}
               >
-                600s
+                10m
               </button>
               <button
                 className="youtube-message-modal-button youtube-message-modal-button-timeout"
                 onClick={() => {
-                  onTimeout(3600);
+                  onTimeout('30 minutes');
                   onClose();
                 }}
               >
-                3600s
+                30m
               </button>
               <button
-                className="youtube-message-modal-button youtube-message-modal-button-ban"
+                className="youtube-message-modal-button youtube-message-modal-button-timeout"
                 onClick={() => {
-                  onTimeout('infinite');
+                  onTimeout('24 hours');
                   onClose();
                 }}
               >
-                ∞
+                24h
               </button>
             </div>
             <button

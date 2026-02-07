@@ -3,6 +3,7 @@ export type MessageType =
   | "youtube-chat"
   | "youtube-channel-name-declaration"
   | "youtube-delete-message-command"
+  | "youtube-timeout-user-command"
   | "youtube-message-deleted";
 
 export interface IMessage<T> {
@@ -52,5 +53,15 @@ export interface YoutubeDeleteMessageData {
 
 export interface YoutubeDeleteMessage extends IMessage<YoutubeDeleteMessageData> {
   type: "youtube-delete-message-command";
+  tabId: number;
+}
+
+export interface YoutubeTimeoutUserData {
+  messageId: string;
+  duration: string;
+}
+
+export interface YoutubeTimeoutMessage extends IMessage<YoutubeTimeoutUserData> {
+  type: "youtube-timeout-user-command";
   tabId: number;
 }

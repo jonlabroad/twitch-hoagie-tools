@@ -11,6 +11,11 @@ import { renderYoutubeMessage } from "./youtubeMessage";
 import "./contentTwitch.css";
 import { ModActions } from "./modActions";
 
+const usernamesToIgnore = new Set<string>([
+  "@nightbot",
+  "@streamelements",
+]);
+
 const youtubeChatRepository = new YoutubeChatRepository();
 var selectedYoutubeVideoSource: YoutubeLiveInfo | null = null;
 
@@ -73,6 +78,10 @@ function onMessageReceived(message: any) {
     );
     // Store the received YouTube chat message
     youtubeChatRepository.upsertChatMessage(parsedMessage.data.videoId, parsedMessage);
+
+    if (usernamesToIgnore.has(parsedMessage.data.author.toLowerCase())) {
+      return;
+    }
 
     insertYoutubeMessageIntoTwitchChat(parsedMessage);
   } else if (message.type === "youtube-channel-name-declaration") {

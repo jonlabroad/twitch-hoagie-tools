@@ -1,6 +1,7 @@
 import {
   YoutubeChatMessageWithTabId,
   YoutubeDeleteMessage,
+  YoutubeTimeoutMessage,
 } from "../messages/messages";
 
 // Background service worker for Chrome extension
@@ -62,6 +63,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       {
         type: "youtube-delete-message-command",
         messageId: message.messageId,
+      },
+      (response) => {
+        sendResponse(
+          response || { success: false, error: "No response from YouTube tab" },
+        );
+      },
+    );
+    
+  } else if (message.type === "youtube-timeout-user-command") {
+    const parsedMessage = message as YoutubeTimeoutMessage;
+    const targetTabId = parsedMessage.tabId;
+    chrome.tabs.sendMessage(
+      targetTabId,
+      {
+        type: "youtube-timeout-user-command",
+        messageId: message.messageId,
+        duration: message.duration,
       },
       (response) => {
         sendResponse(

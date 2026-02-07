@@ -8,7 +8,7 @@ interface YoutubeMessageProps {
   message: YoutubeChatMessageWithTabId;
   usernameColor: string;
   onDelete?: (tabId: number, messageId: string) => void;
-  onTimeout?: (author: string, seconds: number | 'infinite') => void;
+  onTimeout?: (tabId: number, messageId: string, duration: string) => void;
 }
 
 const YoutubeMessage: React.FC<YoutubeMessageProps> = ({ 
@@ -25,9 +25,9 @@ const YoutubeMessage: React.FC<YoutubeMessageProps> = ({
     }
   };
 
-  const handleTimeout = (seconds: number | 'infinite') => {
+  const handleTimeout = (duration: string) => {
     if (onTimeout) {
-      onTimeout(message.data.author, seconds);
+      onTimeout(message.tabId, message.data.messageId, duration);
     }
   };
 
@@ -88,7 +88,7 @@ export function renderYoutubeMessage(
   container: HTMLElement,
   message: YoutubeChatMessageWithTabId,
   onDelete?: (tabId: number, messageId: string) => void,
-  onTimeout?: (author: string, seconds: number | 'infinite') => void
+  onTimeout?: (tabId: number, messageId: string, duration: string) => void
 ): void {
   const usernameColor = getColorForAuthor(message.data.author);
   const root = createRoot(container);

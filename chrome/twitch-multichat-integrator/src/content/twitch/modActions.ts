@@ -26,9 +26,29 @@ export class ModActions {
     }
   };
 
-  public handleTimeout = async (author: string, seconds: number | 'infinite') => {
-    const duration = seconds === 'infinite' ? 'permanently' : `for ${seconds} seconds`;
-    console.log(`Timeout user ${author} ${duration}`);
-    alert(`Timeout functionality for "${author}" ${duration} will be implemented`);
+  public handleTimeout = async (tabId: number, messageId: string, duration: string) => {
+    console.log(`Timeout user with duration: ${duration}`);
+
+    try {
+      // Send message to background to forward to YouTube tab
+      const response = await chrome.runtime.sendMessage({
+        type: 'youtube-timeout-user-command',
+        tabId,
+        messageId,
+        duration,
+      });
+
+      if (response && response.success) {
+        console.log(`User timed out successfully for ${duration}`);
+      } else {
+        const errorMsg = response?.error || "Unknown error";
+        console.error("Failed to timeout user:", errorMsg);
+        alert(`Failed to timeout user: ${errorMsg}\n\nMake sure the YouTube live chat tab is open.`);
+      }
+    } catch (error) {
+      console.error("Failed to timeout user:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Failed to timeout user: ${errorMessage}`);
+    }
   };
 }
