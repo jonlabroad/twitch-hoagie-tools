@@ -50,18 +50,6 @@
   position: relative;
 }
 
-/* Small indicator dot for disabled but configured state */
-.youtube-toggle-button.disabled.has-selection::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 4px;
-  height: 4px;
-  background: #adadb8;
-  border-radius: 50%;
-}
-
 .youtube-toggle-button-main {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
