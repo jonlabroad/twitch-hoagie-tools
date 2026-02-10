@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { createRoot, Root } from "react-dom/client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Toggle } from "@radix-ui/react-toggle";
@@ -15,17 +15,33 @@ interface IProps {
 }
 
 const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
+  const [hidden, setHidden] = useState(true);
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [channels, setChannels] = useState<YoutubeLiveInfo[]>(props.repo.getChannels());
   const [enabled, setEnabled] = useState(youtubeMessagesEnabled);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleChannelChange = () => {
-      setChannels(props.repo.getChannels());
-    };
+  console.log({ hidden, channels: props.repo.getChannels() });
 
+  const handleChannelChange = useCallback(() => {
+    const channels = props.repo.getChannels();
+    setChannels(channels);
+
+    if (!channels || channels.length === 0) {
+      setHidden(true);
+    } else if (hidden) {
+      setHidden(false);
+    }
+  }, [props.repo, hidden]);
+
+  useEffect(() => {
     props.repo.subscribeChannelChange(handleChannelChange);
+    const channels = props.repo.getChannels();
+    if (!channels || channels.length === 0) {
+      setHidden(true);
+    } else if (hidden) {
+      setHidden(false);
+    }
   }, [props.repo]);
 
   useEffect(() => {
@@ -35,15 +51,23 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
 
   const handleToggle = () => {
     setEnabled(!enabled);
-    console.log("YouTube messages:", !enabled ? "enabled" : "disabled");
   };
 
   return (
     <div
       className="youtube-split-button-container"
+      style={{
+        display: hidden ? "none" : undefined,
+      }}
     >
       <Toggle
-        className={`youtube-toggle-button youtube-toggle-button-main ${!enabled ? "disabled" : ""}`}
+        className={`youtube-toggle-button youtube-toggle-button-main ${
+          !selectedChannelId
+            ? "no-channel-selected"
+            : !enabled
+            ? "disabled has-selection"
+            : ""
+        }`}
         aria-label="Toggle italic"
         pressed={enabled}
         onPressedChange={handleToggle}
@@ -52,9 +76,11 @@ const YoutubeSplitButton: React.FC<IProps> = (props: IProps) => {
       </Toggle>
 
       <DropdownMenu.Root open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenu.Trigger asChild disabled={!enabled}>
+        <DropdownMenu.Trigger asChild>
           <button
-            className={`youtube-toggle-button youtube-toggle-button-dropdown ${!enabled ? "disabled" : ""}`}
+            className={`youtube-toggle-button youtube-toggle-button-dropdown ${
+              !selectedChannelId ? "no-channel-selected" : !enabled ? "disabled" : ""
+            }`}
             title="YouTube message options"
             aria-label="YouTube message options"
           >
